@@ -17,7 +17,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata = {
-  title: "Your Name — Software Engineer",
+  title: "Rondale Rae Bufete — Software Engineer",
   description: "Portfolio of a software engineer specializing in frontend development.",
 };
 

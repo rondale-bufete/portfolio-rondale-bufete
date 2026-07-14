@@ -1,12 +1,16 @@
+import Image from "next/image";
+
 export default function ProjectCard({ project }) {
     return (
         <div className="group border border-[#E4E4E7] rounded-xl overflow-hidden bg-white hover:border-[#3355FF] transition-colors">
             <div className="relative aspect-video bg-[#F0F0F2] overflow-hidden">
                 {project.imageUrl ? (
-                    <img
+                    <Image
                         src={project.imageUrl}
                         alt={project.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        fill
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center text-[#9A9DA3] text-sm font-[family-name:var(--font-mono)]">

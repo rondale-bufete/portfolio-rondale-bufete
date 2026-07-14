@@ -13,15 +13,15 @@ export const profile = {
 export const skills = [
     {
         category: "Languages",
-        items: ["JavaScript", "TypeScript", "HTML", "CSS"],
+        items: ["JavaScript", "PHP", "TypeScript", "HTML", "CSS"],
     },
     {
         category: "Frameworks & Libraries",
-        items: ["React", "Next.js", "Tailwind CSS"],
+        items: ["React", "Next.js", "Tailwind CSS", "Node.js", "Express.js", "Laravel"],
     },
     {
         category: "Tools",
-        items: ["Git", "VS Code", "Vercel", "Figma"],
+        items: ["Git", "GitHub", "GitHub Actions (CI/CD)", "VS Code", "Vercel", "Figma"],
     },
 ];
 
@@ -33,7 +33,7 @@ export const projects = [
         tags: ["Next.js", "Tailwind CSS", "Recharts", "GitHub API"],
         liveUrl: "https://githubdashboard-eight.vercel.app/",
         repoUrl: "https://github.com/rondale-bufete/github.dashboard.git",
-        imageUrl: null,
+        imageUrl: '/projects/ss_ghd.png',
     },
     {
         title: "SearchFlix",
@@ -42,6 +42,6 @@ export const projects = [
         tags: ["Next.js", "TMDB API", "Tailwind CSS"],
         liveUrl: "https://nextjs-movie-search-gccr0hh7l-ron-bufetes-projects.vercel.app/",
         repoUrl: "https://github.com/rondale-bufete/nextjs-movie-search.git",
-        imageUrl: null,
+        imageUrl: '/projects/ss_sf.png',
     },
 ];
