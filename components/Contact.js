@@ -1,20 +1,37 @@
 "use client";
 
 import { useState } from "react";
-import { profile } from "@/data/portfolio";
+import emailjs from "@emailjs/browser";
 
 export default function Contact() {
     const [form, setForm] = useState({ name: "", email: "", message: "" });
+    const [status, setStatus] = useState("idle"); // idle | sending | success | error
 
     function handleChange(e) {
         setForm({ ...form, [e.target.name]: e.target.value });
     }
 
-    function handleSubmit(e) {
+    async function handleSubmit(e) {
         e.preventDefault();
-        const subject = encodeURIComponent(`Portfolio inquiry from ${form.name}`);
-        const body = encodeURIComponent(`${form.message}\n\n— ${form.name} (${form.email})`);
-        window.location.href = `mailto:${profile.email}?subject=${subject}&body=${body}`;
+        setStatus("sending");
+
+        try {
+            await emailjs.send(
+                process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID,
+                process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID,
+                {
+                    name: form.name,
+                    email: form.email,
+                    message: form.message,
+                },
+                process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY
+            );
+
+            setStatus("success");
+            setForm({ name: "", email: "", message: "" });
+        } catch (err) {
+            setStatus("error");
+        }
     }
 
     return (
@@ -36,7 +53,8 @@ export default function Contact() {
                         required
                         value={form.name}
                         onChange={handleChange}
-                        className="w-full px-4 py-2.5 rounded-md border border-[#E4E4E7] bg-white focus:outline-none focus:border-[#3355FF] transition-colors"
+                        disabled={status === "sending"}
+                        className="w-full px-4 py-2.5 rounded-md border border-[#E4E4E7] bg-white focus:outline-none focus:border-[#3355FF] transition-colors disabled:opacity-60"
                     />
                 </div>
 
@@ -51,7 +69,8 @@ export default function Contact() {
                         required
                         value={form.email}
                         onChange={handleChange}
-                        className="w-full px-4 py-2.5 rounded-md border border-[#E4E4E7] bg-white focus:outline-none focus:border-[#3355FF] transition-colors"
+                        disabled={status === "sending"}
+                        className="w-full px-4 py-2.5 rounded-md border border-[#E4E4E7] bg-white focus:outline-none focus:border-[#3355FF] transition-colors disabled:opacity-60"
                     />
                 </div>
 
@@ -66,16 +85,27 @@ export default function Contact() {
                         rows={4}
                         value={form.message}
                         onChange={handleChange}
-                        className="w-full px-4 py-2.5 rounded-md border border-[#E4E4E7] bg-white focus:outline-none focus:border-[#3355FF] transition-colors resize-none"
+                        disabled={status === "sending"}
+                        className="w-full px-4 py-2.5 rounded-md border border-[#E4E4E7] bg-white focus:outline-none focus:border-[#3355FF] transition-colors resize-none disabled:opacity-60"
                     />
                 </div>
 
                 <button
                     type="submit"
-                    className="px-6 py-2.5 rounded-md bg-[#14161A] text-white text-sm font-medium hover:bg-[#3355FF] transition-colors"
+                    disabled={status === "sending"}
+                    className="px-6 py-2.5 rounded-md bg-[#14161A] text-white text-sm font-medium hover:bg-[#3355FF] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                    Send Message
+                    {status === "sending" ? "Sending..." : "Send Message"}
                 </button>
+
+                {status === "success" && (
+                    <p className="text-sm text-[#27C93F]">Message sent — thanks for reaching out! I&rsquo;ll get back to you soon.</p>
+                )}
+                {status === "error" && (
+                    <p className="text-sm text-[#E5484D]">
+                        Something went wrong. Please try again, or email me directly.
+                    </p>
+                )}
             </form>
         </section>
     );
