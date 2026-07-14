@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import emailjs from "@emailjs/browser";
+import FormStatusModal from "./FormStatusModal";
 
 export default function Contact() {
     const [form, setForm] = useState({ name: "", email: "", message: "" });
@@ -32,6 +33,10 @@ export default function Contact() {
         } catch (err) {
             setStatus("error");
         }
+    }
+
+    function closeModal() {
+        setStatus("idle");
     }
 
     return (
@@ -97,16 +102,11 @@ export default function Contact() {
                 >
                     {status === "sending" ? "Sending..." : "Send Message"}
                 </button>
-
-                {status === "success" && (
-                    <p className="text-sm text-[#27C93F]">Message sent — thanks for reaching out! I&rsquo;ll get back to you soon.</p>
-                )}
-                {status === "error" && (
-                    <p className="text-sm text-[#E5484D]">
-                        Something went wrong. Please try again, or email me directly.
-                    </p>
-                )}
             </form>
+
+            {(status === "success" || status === "error") && (
+                <FormStatusModal status={status} onClose={closeModal} />
+            )}
         </section>
     );
 }
