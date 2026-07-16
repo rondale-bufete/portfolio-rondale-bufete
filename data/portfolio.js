@@ -30,7 +30,7 @@ export const projects = [
         title: "GitHub Profile Dashboard",
         description:
             "A dashboard to search any GitHub user and view their profile stats, language breakdown, and top repositories with sorting and pagination.",
-        tags: ["Next.js", "Tailwind CSS", "Recharts", "GitHub API"],
+        tags: ["Next.js", "Tailwind CSS", "Recharts", "GitHub API", "REST API"],
         liveUrl: "https://githubdashboard-eight.vercel.app/",
         repoUrl: "https://github.com/rondale-bufete/github.dashboard.git",
         imageUrl: '/projects/ss_ghd.png',
@@ -39,7 +39,7 @@ export const projects = [
         title: "SearchFlix",
         description:
             "A Netflix-inspired movie discovery app with live search, genre filtering, infinite scroll, and an inline trailer player, powered by TMDB.",
-        tags: ["Next.js", "TMDB API", "Tailwind CSS"],
+        tags: ["Next.js", "TMDB API", "Tailwind CSS", "REST API"],
         liveUrl: "https://nextjs-movie-search-gccr0hh7l-ron-bufetes-projects.vercel.app/",
         repoUrl: "https://github.com/rondale-bufete/nextjs-movie-search.git",
         imageUrl: '/projects/ss_sf.png',
