@@ -3,7 +3,7 @@ export const profile = {
     name: "Rondale Rae Bufete",
     role: "Software Engineer",
     tagline: "I build fast, thoughtful interfaces — and the systems behind them.",
-    bio: "Placeholder bio. Replace this with 2-3 sentences about your background, what you specialize in, and what kind of work excites you. Keep it conversational, not a resume dump.", // TODO: replace
+    bio: "I'm a software engineer with a passion for building web applications that are both functional and visually appealing. I enjoy working on projects that challenge me to learn new technologies and improve my skills.",
     email: "rondale.bufete7@gmail.com",
     github: "https://github.com/rondale-bufete",
     linkedin: "https://www.linkedin.com/in/ronbufete7/",
