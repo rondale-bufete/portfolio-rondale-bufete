@@ -44,4 +44,13 @@ export const projects = [
         repoUrl: "https://github.com/rondale-bufete/nextjs-movie-search.git",
         imageUrl: '/projects/ss_sf.png',
     },
+    {
+        title: "Custom Job Application Tracker",
+        description:
+            "A custom job application tracker with features like status updates, notes, and data visualization.",
+        tags: ["Next.js", "Tailwind CSS", "Supabase"],
+        liveUrl: "https://job-application-tracker-navy-rho.vercel.app/",
+        repoUrl: "https://github.com/rondale-bufete/job-application-tracker.git",
+        imageUrl: '/projects/ss_jt.png',
+    }
 ];
