@@ -17,6 +17,7 @@ export default function Home() {
         <Skills />
         <Projects />
         <Contact />
+        <SpeedInsights />
       </main>
       <Footer />
     </>
