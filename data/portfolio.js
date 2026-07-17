@@ -7,7 +7,7 @@ export const profile = {
     email: "rondale.bufete7@gmail.com",
     github: "https://github.com/rondale-bufete",
     linkedin: "https://www.linkedin.com/in/ronbufete7/",
-    resumeUrl: "#",
+    resumeUrl: "/resume.pdf",
 };
 
 export const skills = [
