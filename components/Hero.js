@@ -43,7 +43,7 @@ export default function Hero() {
                     <p className="pl-4">
                         <span className="text-[#9CDCFE]">focus</span><span className="text-[#D4D4D4]">:</span> <span className="text-[#D4D4D4]">[</span>
                     </p>
-                    {["React", "Next.js", "UI Craft"].map((item, i, arr) => (
+                    {["React", "Next.js", "PHP", "Node.js", "Python", "CI/CD"].map((item, i, arr) => (
                         <p key={item} className="pl-8">
                             <span className="text-[#CE9178]">&quot;{item}&quot;</span>
                             {i < arr.length - 1 && <span className="text-[#D4D4D4]">,</span>}
