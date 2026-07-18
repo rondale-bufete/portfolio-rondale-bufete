@@ -51,6 +51,6 @@ export const projects = [
         tags: ["Next.js", "Tailwind CSS", "Supabase"],
         liveUrl: "https://job-application-tracker-navy-rho.vercel.app/",
         repoUrl: "https://github.com/rondale-bufete/job-application-tracker.git",
-        imageUrl: '/projects/ss_jt.png',
+        imageUrl: '/projects/ss_jbt.png',
     }
 ];
