@@ -1,9 +1,9 @@
 
 export const profile = {
     name: "Rondale Rae Bufete",
-    role: "Software Engineer",
+    role: "Full Stack Developer",
     tagline: "I build fast, thoughtful interfaces — and the systems behind them.",
-    bio: "I'm a software engineer with a passion for building web applications that are both functional and visually appealing. I enjoy working on projects that challenge me to learn new technologies and improve my skills.",
+    bio: "I'm a full stack developer with a passion for building web applications that are both functional and visually appealing. I enjoy working on projects that challenge me to learn new technologies and improve my skills.",
     email: "rondale.bufete7@gmail.com",
     github: "https://github.com/rondale-bufete",
     linkedin: "https://www.linkedin.com/in/ronbufete7/",
