@@ -52,5 +52,64 @@ export const projects = [
         liveUrl: "https://job-application-tracker-navy-rho.vercel.app/",
         repoUrl: "https://github.com/rondale-bufete/job-application-tracker.git",
         imageUrl: '/projects/ss_jbt.png',
-    }
+    },
+    {
+        title: "Home Environment Monitoring System - ESP32 Sensors",
+        description:
+            "A personal dashboard for monitoring home environment conditions using ESP32 sensors and visualizing the data.",
+        tags: ["ESP32", "IoT", "Supabase", "Chart.js", "REST API", "WebSocket", "Tailwind CSS", "Next.js", "Open-Meteo API", "C++", "Arduino IDE"],
+        liveUrl: "https://esp32-home-sensors-dashboard.vercel.app/",
+        repoUrl: "https://github.com/rondale-bufete/esp32-home-sensors-dashboard.git",
+        imageUrl: '/projects/ss_hsd.png',
+    },
+];
+
+export const education = [
+    {
+        degree: "Bachelor of Science in Information Technology",
+        school: "Camarines Sur Polytechnic Colleges - Nabua Main Campus",
+        period: "2022 — 2026",
+        description: "",
+    },
+    {
+        degree: "Senior High School - IT in Mobile Application and Web Development",
+        school: "STI College - Naga City",
+        period: "2020 — 2022",
+        description: "",
+    },
+];
+
+export const certifications = [
+    // {
+    //     title: "Full Stack Web Development Certification",
+    //     issuer: "freeCodeCamp",
+    //     date: "2026",
+    //     description: "Completed the Full Stack Web Development Certification from freeCodeCamp, covering HTML, CSS, JavaScript, and backend development principles.",
+    // },
+    {
+        title: "EF SET English Proficiency Test",
+        issuer: "EF SET",
+        date: "2025",
+        description: "Completed the EF SET English Proficiency Test.",
+    },
+    {
+        title: "Responsive Web Design Certification",
+        issuer: "freeCodeCamp",
+        date: "2023",
+        description: "Completed the Responsive Web Design Certification from freeCodeCamp, covering HTML, CSS, and responsive design principles.",
+
+    },
+    {
+        title: "Data Structures and Algorithms Certification",
+        issuer: "freeCodeCamp",
+        date: "2023",
+        description: "Completed the Data Structures and Algorithms Certification from freeCodeCamp.",
+    },
+
+    {
+        title: "System Administration Certification",
+        issuer: "Linux Professional Institute (LPI)",
+        date: "2019",
+        description: "Completed the System Administration Certification from freeCodeCamp.",
+    },
 ];
