@@ -29,7 +29,7 @@ export const projects = [
     {
         title: "GitHub Profile Dashboard",
         description:
-            "A dashboard to search any GitHub user and view their profile stats, language breakdown, and top repositories with sorting and pagination.",
+            "A dashboard to search any GitHub user and view their profile stats, language breakdown, and top repositories with sorting and pagination. It uses the GitHub API to fetch user data and Recharts for data visualization.",
         tags: ["Next.js", "Tailwind CSS", "Recharts", "GitHub API", "REST API"],
         liveUrl: "https://githubdashboard-eight.vercel.app/",
         repoUrl: "https://github.com/rondale-bufete/github.dashboard.git",
@@ -47,7 +47,7 @@ export const projects = [
     {
         title: "Custom Job Application Tracker",
         description:
-            "A custom job application tracker for job seekers with features like status updates, notes, and data visualization.",
+            "A custom job application tracker for job seekers with features like status updates, notes, and data visualization. It helps users stay organized and track their job applications effectively.",
         tags: ["Next.js", "Tailwind CSS", "Supabase"],
         liveUrl: "https://job-application-tracker-navy-rho.vercel.app/",
         repoUrl: "https://github.com/rondale-bufete/job-application-tracker.git",
@@ -56,12 +56,21 @@ export const projects = [
     {
         title: "Home Environment Monitoring System - ESP32 Sensors",
         description:
-            "A personal dashboard for monitoring home environment conditions using ESP32 sensors and visualizing the data.",
+            "A personal dashboard for monitoring home environment conditions using ESP32 sensors and visualizing the data. It includes real-time updates, historical data visualization, and weather forecasts.",
         tags: ["ESP32", "IoT", "Supabase", "Chart.js", "REST API", "WebSocket", "Tailwind CSS", "Next.js", "Open-Meteo API", "C++", "Arduino IDE"],
         liveUrl: "https://esp32-home-sensors-dashboard.vercel.app/",
         repoUrl: "https://github.com/rondale-bufete/esp32-home-sensors-dashboard.git",
         imageUrl: '/projects/ss_hsd.png',
     },
+    {
+        title: "AI-Powered Resume Analyzer",
+        description:
+            "An AI-powered tool for analyzing and improving resumes. It provides feedback on formatting, content, and overall effectiveness using the Gemini API.",
+        tags: ["Next.js", "Gemini API", "JavaScript", "React", "Tailwind CSS", "REST API"],
+        liveUrl: "https://ai-resume-analyzer-lovat-beta.vercel.app/",
+        repoUrl: "https://github.com/rondale-bufete/ai-resume-analyzer.git",
+        imageUrl: '/projects/ss_ara.png',
+    }
 ];
 
 export const education = [
