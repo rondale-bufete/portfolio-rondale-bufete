@@ -17,8 +17,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata = {
-  title: "Rondale Rae Bufete — Software Engineer",
-  description: "Portfolio of a software engineer specializing in frontend development.",
+  title: "Rondale Rae Bufete — Full Stack Developer",
+  description: "Portfolio of a full stack developer specializing in modern web technologies.",
 };
 
 export default function RootLayout({ children }) {
