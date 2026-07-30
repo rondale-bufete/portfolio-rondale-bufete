@@ -2,12 +2,13 @@
 export const profile = {
     name: "Rondale Rae Bufete",
     role: "Full Stack Developer",
-    tagline: "I build fast, thoughtful interfaces — and the systems behind them.",
-    bio: "I'm a full stack developer with a passion for building web applications that are both functional and visually appealing. I enjoy working on projects that challenge me to learn new technologies and improve my skills.",
+    tagline: "I design the parts people see, and engineer the parts they don't.",
+    bio: "I work across the full stack — React and Next.js on the front end, PHP, Node.js, and Python on the back, with PostgreSQL, MySQL, MongoDB, or Supabase depending on what the project actually needs.", // I care about the parts most people never notice: load times, clean data models, and deploys that don't break at 2am.
     email: "rondale.bufete7@gmail.com",
     github: "https://github.com/rondale-bufete",
     linkedin: "https://www.linkedin.com/in/ronbufete7/",
     resumeUrl: "/resume.pdf",
+    photo: "/photo_ron.png",
 };
 
 export const skills = [
@@ -89,36 +90,45 @@ export const education = [
 ];
 
 export const certifications = [
-    // {
-    //     title: "Full Stack Web Development Certification",
-    //     issuer: "freeCodeCamp",
-    //     date: "2026",
-    //     description: "Completed the Full Stack Web Development Certification from freeCodeCamp, covering HTML, CSS, JavaScript, and backend development principles.",
-    // },
     {
-        title: "EF SET English Proficiency Test",
-        issuer: "EF SET",
-        date: "2025",
-        description: "Completed the EF SET English Proficiency Test.",
+        title: "Data Analyst: Professional Certificate in Data Analysis",
+        issuer: "Udemy",
+        date: "2026",
+        description: "Completed the Data Analyst Professional Certificate in Data Analysis from Udemy. This certification covers data analysis techniques, statistical methods, and data visualization using tools like Python, Excel, and Power BI.",
+        image: "/certs/uda.jpg",
+        url: "https://www.udemy.com/certificate/UC-384c2ce8-fe37-4636-a9f8-3714a18ca7ff/"
+    },
+    {
+        title: "Front-End Development Libraries Certification",
+        issuer: "freeCodeCamp",
+        date: "2026",
+        description: "Completed the Front-End Development Libraries Certification from freeCodeCamp. This certification covers React, Redux, jQuery, and Bootstrap, providing a strong foundation in front-end web development.",
+        image: "/certs/FEL.png",
+        url: "https://www.freecodecamp.org/certification/rondalerae/front-end-development-libraries-v9"
     },
     {
         title: "Responsive Web Design Certification",
         issuer: "freeCodeCamp",
-        date: "2023",
+        date: "2026",
         description: "Completed the Responsive Web Design Certification from freeCodeCamp, covering HTML, CSS, and responsive design principles.",
-
+        image: "/certs/rwc9.png",
+        url: "https://www.freecodecamp.org/certification/rondalerae/responsive-web-design-v9"
     },
     {
-        title: "Data Structures and Algorithms Certification",
-        issuer: "freeCodeCamp",
-        date: "2023",
-        description: "Completed the Data Structures and Algorithms Certification from freeCodeCamp.",
+        title: "EF SET English Proficiency Test",
+        issuer: "EF SET",
+        date: "2025",
+        description: "Completed the EF SET English Proficiency Test. This test assesses English language skills in reading and listening, providing a score based on the CEFR scale.",
+        image: "/certs/EFSET.png",
+        pdf: "/certs/pdf/efset.pdf",
     },
 
     {
         title: "System Administration Certification",
         issuer: "Linux Professional Institute (LPI)",
         date: "2019",
-        description: "Completed the System Administration Certification from freeCodeCamp.",
+        description: "Completed the System Administration Certification from freeCodeCamp. This certification covers Linux system administration, including command-line usage, file management, and basic networking.",
+        image: "/certs/sa.png",
+        pdf: "/certs/pdf/lpi-sysadmin.pdf",
     },
 ];
