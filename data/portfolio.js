@@ -50,7 +50,7 @@ export const projects = [
         description:
             "A custom job application tracker for job seekers with features like status updates, notes, and data visualization. It helps users stay organized and track their job applications effectively.",
         tags: ["Next.js", "Tailwind CSS", "Supabase"],
-        liveUrl: "https://job-application-tracker-navy-rho.vercel.app/",
+        liveUrl: "https://job-application-tracker-navy-rho.vercel.app/login",
         repoUrl: "https://github.com/rondale-bufete/job-application-tracker.git",
         imageUrl: '/projects/ss_jbt.png',
     },
