@@ -41,7 +41,7 @@ export const projects = [
         description:
             "A Netflix-inspired movie discovery app with live search, genre filtering, infinite scroll, and an inline trailer player, powered by TMDB.",
         tags: ["Next.js", "TMDB API", "Tailwind CSS", "REST API"],
-        liveUrl: "https://nextjs-movie-search-gccr0hh7l-ron-bufetes-projects.vercel.app/",
+        liveUrl: "https://nextjs-movie-search-app.vercel.app/",
         repoUrl: "https://github.com/rondale-bufete/nextjs-movie-search.git",
         imageUrl: '/projects/ss_sf.png',
     },
