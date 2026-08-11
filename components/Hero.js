@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { profile } from "@/data/portfolio";
 
-export default function Hero() {
+export default function Hero({ profile }) {
     const [isFlipped, setIsFlipped] = useState(false);
+
+    if (!profile) return null;
 
     return (
         <section className="max-w-5xl mx-auto px-6 pt-20 pb-24 grid md:grid-cols-2 gap-12 items-center">
@@ -15,9 +16,6 @@ export default function Hero() {
                 <h1 className="font-[family-name:var(--font-display)] text-5xl md:text-6xl font-medium tracking-tight leading-[1.05] mb-6">
                     {profile.tagline}
                 </h1>
-                {/* <p className="text-[#5B5F66] text-lg leading-relaxed mb-8 max-w-md">
-                    {profile.bio}
-                </p> */}
                 <div className="flex items-center gap-4">
                     <a
                         href="#projects"
@@ -81,14 +79,12 @@ export default function Hero() {
                                 <p><span className="text-[#D4D4D4]">{"}"}</span></p>
                             </div>
 
-                            {/* discoverability hint: quiet corner fold, no label */}
                             <div className="absolute top-0 right-0 w-7 h-7 overflow-hidden pointer-events-none">
                                 <div
                                     className="absolute -top-3.5 -right-3.5 w-7 h-7 rotate-45 bg-gradient-to-br from-white/0 via-white/[0.06] to-white/[0.18] transition-all duration-300 group-hover:via-white/10 group-hover:to-white/25"
                                 />
                             </div>
 
-                            {/* hover overlay: dim + click-to-flip label */}
                             <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/40 transition-colors duration-300 pointer-events-none">
                                 <span className="flex items-center gap-1.5 text-white text-xs font-medium tracking-wide opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-75">
                                     <svg
@@ -119,14 +115,12 @@ export default function Hero() {
                                 className="w-full h-full object-cover"
                             />
 
-                            {/* discoverability hint: quiet corner fold, no label */}
                             <div className="absolute top-0 right-0 w-7 h-7 overflow-hidden pointer-events-none">
                                 <div
                                     className="absolute -top-3.5 -right-3.5 w-7 h-7 rotate-45 bg-gradient-to-br from-white/0 via-white/[0.06] to-white/[0.18] transition-all duration-300 group-hover:via-white/10 group-hover:to-white/25"
                                 />
                             </div>
 
-                            {/* hover overlay: dim + click-to-flip label */}
                             <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/40 transition-colors duration-300 pointer-events-none">
                                 <span className="flex items-center gap-1.5 text-white text-xs font-medium tracking-wide opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-75">
                                     <svg

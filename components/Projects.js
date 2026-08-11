@@ -1,7 +1,6 @@
-import { projects } from "@/data/portfolio";
 import ProjectCard from "./ProjectCard";
 
-export default function Projects() {
+export default function Projects({ projects = [] }) {
     return (
         <section id="projects" className="max-w-5xl mx-auto px-6 py-20 border-t border-[#E4E4E7]">
             <p className="font-[family-name:var(--font-mono)] text-sm text-[#3355FF] mb-3">03 — Projects</p>

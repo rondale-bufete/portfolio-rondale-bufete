@@ -1,5 +1,3 @@
-import { profile, education, certifications } from "@/data/portfolio";
-
 // Fallback badge shown when a certification has no `image` yet — keeps the
 // grid from ever showing a broken image while you backfill assets.
 function CertBadgeFallback() {
@@ -91,7 +89,7 @@ function CertificationCard({ cert }) {
     );
 }
 
-export default function About() {
+export default function About({ profile, education = [], certifications = [] }) {
     return (
         <section id="about" className="max-w-5xl mx-auto px-6 py-20 border-t border-[#E4E4E7]">
             <p className="font-[family-name:var(--font-mono)] text-sm text-[#3355FF] mb-3">01 — About</p>
@@ -99,7 +97,7 @@ export default function About() {
                 A bit about how I work
             </h2>
             <p className="text-[#5B5F66] text-lg leading-relaxed max-w-2xl mb-14">
-                {profile.bio}
+                {profile?.bio}
             </p>
 
             {education.length > 0 && (

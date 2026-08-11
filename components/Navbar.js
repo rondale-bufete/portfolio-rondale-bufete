@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { profile } from "@/data/portfolio";
 import ResumeModal from "./ResumeModal";
 
 const LINKS = [
@@ -12,7 +11,7 @@ const LINKS = [
     { href: "#contact", label: "Contact" },
 ];
 
-export default function Navbar() {
+export default function Navbar({ profile }) {
     const [isOpen, setIsOpen] = useState(false);
     const [showResume, setShowResume] = useState(false);
 
@@ -28,7 +27,7 @@ export default function Navbar() {
                         href="#"
                         className="font-[family-name:var(--font-display)] font-medium text-lg tracking-tight"
                     >
-                        {profile.name}
+                        {profile?.name}
                     </Link>
 
                     <div className="hidden md:flex items-center gap-8 text-sm text-[#5B5F66]">
@@ -97,7 +96,7 @@ export default function Navbar() {
                 </div>
             </header >
 
-            {showResume && <ResumeModal onClose={() => setShowResume(false)} />
+            {showResume && <ResumeModal profile={profile} onClose={() => setShowResume(false)} />
             }
         </>
     );

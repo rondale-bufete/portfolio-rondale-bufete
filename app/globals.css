@@ -1,7 +1,23 @@
 @import "tailwindcss";
 
+:root {
+  color-scheme: light;
+}
+
 html,
 body {
 	overflow-x: hidden;
 	scroll-behavior: smooth;
+}
+
+body {
+  background:
+    radial-gradient(circle at top left, rgba(99, 102, 241, 0.12), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(14, 116, 144, 0.1), transparent 22%),
+    linear-gradient(135deg, #f4f7fb 0%, #eef2f7 26%, #f9fafb 100%);
+  color: #0f172a;
+}
+
+::selection {
+  background: rgba(79, 70, 229, 0.18);
 }

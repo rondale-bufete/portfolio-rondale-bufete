@@ -1,14 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
-import { profile } from "@/data/portfolio";
 
 function getResumeFilename(name) {
-    const cleaned = name.trim().replace(/\s+/g, "-");
+    const cleaned = (name || "resume").trim().replace(/\s+/g, "-");
     return `${cleaned}-Resume.pdf`;
 }
 
-export default function ResumeModal({ onClose }) {
+export default function ResumeModal({ profile, onClose }) {
     useEffect(() => {
         document.body.style.overflow = "hidden";
         return () => {
@@ -37,8 +36,8 @@ export default function ResumeModal({ onClose }) {
                     <h2 className="font-[family-name:var(--font-display)] text-lg">Resume</h2>
                     <div className="flex items-center gap-2">
                         <a
-                            href={profile.resumeUrl}
-                            download={getResumeFilename(profile.name)}
+                            href={profile?.resumeUrl}
+                            download={getResumeFilename(profile?.name)}
                             className="text-sm px-3 py-1.5 rounded-md bg-[#14161A] text-white hover:bg-[#3355FF] transition-colors"
                         >
                             Download
@@ -55,7 +54,7 @@ export default function ResumeModal({ onClose }) {
 
                 <div className="flex-1 overflow-hidden">
                     <iframe
-                        src={profile.resumeUrl}
+                        src={profile?.resumeUrl}
                         title="Resume preview"
                         className="w-full h-full"
                     />
@@ -64,7 +63,7 @@ export default function ResumeModal({ onClose }) {
                 {/* Mobile fallback — some mobile browsers don't render PDFs inline */}
                 <p className="sm:hidden text-center text-xs text-[#5B5F66] py-3 border-t border-[#E4E4E7]">
                     Preview not showing?{" "}
-                    <a href={profile.resumeUrl} download={getResumeFilename(profile.name)} className="text-[#3355FF] hover:underline">
+                    <a href={profile?.resumeUrl} download={getResumeFilename(profile?.name)} className="text-[#3355FF] hover:underline">
                         Download instead
                     </a>
                 </p>

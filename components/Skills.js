@@ -1,5 +1,3 @@
-import { skills } from "@/data/portfolio";
-
 // Maps a skill's display name to its Simple Icons slug (https://simpleicons.org).
 // Add to this as your skills list grows — anything not listed here falls back
 // to a plain monogram badge instead of a broken image.
@@ -99,7 +97,7 @@ function SkillIcon({ name }) {
     );
 }
 
-export default function Skills() {
+export default function Skills({ skills = [] }) {
     return (
         <section id="skills" className="max-w-5xl mx-auto px-6 py-20 border-t border-[#E4E4E7]">
             <p className="font-[family-name:var(--font-mono)] text-sm text-[#3355FF] mb-3">02 — Skills</p>
