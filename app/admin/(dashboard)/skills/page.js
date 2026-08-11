@@ -117,14 +117,17 @@ function SkillItemTag({ item }) {
     }
 
     return (
-        <form action={handleDelete}>
+        <form action={handleDelete} className="inline-flex">
             <button
                 type="submit"
-                title="Click to remove"
-                className="group inline-flex items-center gap-1.5 font-[family-name:var(--font-mono)] text-xs pl-2.5 pr-2 py-1.5 rounded-md bg-[#F0F0F2] border border-[#E4E4E7] hover:border-[#E5484D] hover:bg-[#E5484D]/5 transition-colors"
+                aria-label={`Remove ${item.name}`}
+                title={`Remove ${item.name}`}
+                className="group inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-[#E4E4E7] bg-[#F0F0F2] px-2.5 py-1.5 font-[family-name:var(--font-mono)] text-xs text-[#14161A] transition-all duration-200 hover:border-[#E5484D] hover:bg-[#E5484D]/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3355FF]/30"
             >
-                {item.name}
-                <span className="text-[#5B5F66] group-hover:text-[#E5484D]">×</span>
+                <span>{item.name}</span>
+                <span className="inline-flex h-4 w-4 items-center justify-center rounded-full text-base leading-none text-[#5B5F66] transition-colors group-hover:text-[#E5484D]">
+                    ×
+                </span>
             </button>
         </form>
     );
