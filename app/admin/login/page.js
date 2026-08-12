@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { loginAction } from "../auth-actions";
+import { inputBase, labelBase, buttonPrimary } from "../ui/tokens";
 
 const initialState = { error: null };
 
@@ -17,47 +18,43 @@ export default function LoginPage() {
     );
 
     return (
-        <div className="flex min-h-screen items-center justify-center px-6 py-10">
-            <div className="w-full max-w-md rounded-[28px] border border-slate-200/80 bg-white/75 p-7 shadow-[0_24px_60px_rgba(15,23,42,0.12)] backdrop-blur-sm md:p-8">
-                <div className="mb-6">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-slate-500">
-                        Portfolio
-                    </p>
-                    <h1 className="mt-2 font-[family-name:var(--font-display)] text-3xl font-semibold text-slate-900">
+        <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center px-6">
+            <form
+                action={formAction}
+                className="w-full max-w-sm bg-white border border-[#E4E4E7] rounded-xl shadow-[0_1px_2px_rgba(20,22,26,0.04)] p-8"
+            >
+                <div className="flex items-center gap-2.5 mb-6">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#3355FF]" />
+                    <p className="font-[family-name:var(--font-display)] text-lg font-medium tracking-tight">
                         Admin
-                    </h1>
+                    </p>
                 </div>
 
-                <form action={formAction} className="space-y-5">
-                    <div>
-                        <p className="mb-4 text-sm text-slate-600">Enter your password to continue.</p>
+                <h1 className="font-[family-name:var(--font-display)] text-2xl font-medium mb-1">
+                    Welcome back
+                </h1>
+                <p className="text-sm text-[#5B5F66] mb-6">Enter your password to continue.</p>
 
-                        <label className="mb-1.5 block text-sm font-medium text-slate-700" htmlFor="password">
-                            Password
-                        </label>
-                        <input
-                            id="password"
-                            name="password"
-                            type="password"
-                            required
-                            autoFocus
-                            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.75 text-slate-900 outline-none transition-colors focus:border-indigo-400 focus:bg-white focus:ring-4 focus:ring-indigo-100"
-                        />
-                    </div>
+                <label className={labelBase} htmlFor="password">
+                    Password
+                </label>
+                <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    required
+                    autoFocus
+                    className={`${inputBase} mb-2`}
+                />
 
-                    {state?.error && (
-                        <p className="text-sm text-rose-600">{state.error}</p>
-                    )}
+                {state?.error && (
+                    <p className="text-sm text-[#E5484D] mb-4">{state.error}</p>
+                )}
 
-                    <button
-                        type="submit"
-                        disabled={isPending}
-                        className="w-full rounded-xl bg-slate-950 px-6 py-2.75 text-sm font-medium text-white transition-all duration-200 hover:bg-indigo-600 focus:outline-none focus:ring-4 focus:ring-indigo-100 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                        {isPending ? "Checking..." : "Log in"}
-                    </button>
-                </form>
-            </div>
+                <button type="submit" disabled={isPending} className={`${buttonPrimary} w-full mt-4`}>
+                    {isPending ? "Checking..." : "Log in"}
+                </button>
+            </form>
         </div>
     );
 }

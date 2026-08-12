@@ -3,7 +3,7 @@ import Image from "next/image";
 export default function ProjectCard({ project }) {
     return (
         <div className="group border border-[#E4E4E7] rounded-xl overflow-hidden bg-white hover:border-[#3355FF] transition-colors">
-            <div className="relative aspect-video bg-[#F0F0F2] overflow-hidden">
+            <div className="relative aspect-video bg-[#ffffff] overflow-hidden">
                 {project.imageUrl ? (
                     <Image
                         src={project.imageUrl}

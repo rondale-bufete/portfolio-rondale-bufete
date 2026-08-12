@@ -1,12 +1,17 @@
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { MONTHS, yearOptions } from "@/lib/monthYear";
+import { MONTHS } from "@/lib/monthYear";
 import {
     createEducationAction,
     updateEducationAction,
     deleteEducationAction,
 } from "../../actions/education";
-
-const YEARS = yearOptions();
+import PageHeader from "../../ui/PageHeader";
+import Field from "../../ui/Field";
+import EmptyState from "../../ui/EmptyState";
+import { ItemRow, AddNewRow } from "../../ui/CollapsibleRow";
+import { MonthYearFields, CurrentCheckbox } from "../../ui/MonthYearFields";
+import { buttonPrimary, linkDanger } from "../../ui/tokens";
+import { TrashIcon } from "../../ui/icons";
 
 export default async function EducationAdminPage() {
     const { data: education } = await supabaseAdmin
@@ -21,30 +26,27 @@ export default async function EducationAdminPage() {
 
     return (
         <div>
-            <h1 className="font-[family-name:var(--font-display)] text-2xl font-medium mb-1">Education</h1>
-            <p className="text-sm text-[#5B5F66] mb-8">Shown as a timeline under About.</p>
+            <PageHeader title="Education" description="Shown as a timeline under About." />
 
-            <div className="space-y-4 mb-10">
+            <div className="mb-6">
+                <AddNewRow label="Add an entry">
+                    <form action={handleCreate} className="mt-4 space-y-4 max-w-xl">
+                        <EduFields />
+                        <button type="submit" className={buttonPrimary}>
+                            Add entry
+                        </button>
+                    </form>
+                </AddNewRow>
+            </div>
+
+            <div className="space-y-3">
                 {(education || []).map((edu) => (
                     <EduRow key={edu.id} edu={edu} />
                 ))}
                 {(!education || education.length === 0) && (
-                    <p className="text-sm text-[#5B5F66]">Nothing yet — add your first entry below.</p>
+                    <EmptyState title="Nothing yet" description="Add your first entry above." />
                 )}
             </div>
-
-            <details className="bg-white border border-[#E4E4E7] rounded-xl p-6">
-                <summary className="cursor-pointer font-medium text-sm">+ Add an entry</summary>
-                <form action={handleCreate} className="mt-5 space-y-4 max-w-xl">
-                    <EduFields />
-                    <button
-                        type="submit"
-                        className="px-6 py-2.5 rounded-md bg-[#14161A] text-white text-sm font-medium hover:bg-[#3355FF] transition-colors"
-                    >
-                        Add entry
-                    </button>
-                </form>
-            </details>
         </div>
     );
 }
@@ -60,36 +62,29 @@ function EduRow({ edu }) {
     }
 
     return (
-        <details className="bg-white border border-[#E4E4E7] rounded-xl p-6">
-            <summary className="cursor-pointer flex items-center justify-between">
-                <span className="font-medium text-sm">{edu.degree}</span>
-                <span className="text-xs text-[#5B5F66] font-[family-name:var(--font-mono)]">{edu.period}</span>
-            </summary>
-
-            <form action={handleUpdate} className="mt-5 space-y-4 max-w-xl">
+        <ItemRow title={edu.degree} meta={edu.period}>
+            <form action={handleUpdate} className="mt-4 space-y-4 max-w-xl">
                 <EduFields edu={edu} />
-                <button
-                    type="submit"
-                    className="px-6 py-2.5 rounded-md bg-[#14161A] text-white text-sm font-medium hover:bg-[#3355FF] transition-colors"
-                >
+                <button type="submit" className={buttonPrimary}>
                     Save changes
                 </button>
             </form>
 
-            <form action={handleDelete} className="mt-3">
-                <button type="submit" className="text-sm text-[#E5484D] hover:underline">
+            <form action={handleDelete} className="mt-4">
+                <button type="submit" className={linkDanger}>
+                    <TrashIcon className="w-4 h-4" />
                     Delete this entry
                 </button>
             </form>
-        </details>
+        </ItemRow>
     );
 }
 
 // Best-effort parse of an existing "Mon YYYY — Mon YYYY" / "... — Present"
 // string so the dropdowns preselect sensibly when editing. Entries created
-// before this update (e.g. "2022 — 2026") won't parse — that's fine, the
-// selects just start blank and the raw text is kept as a fallback via the
-// hidden period_fallback field until the admin picks real dates.
+// before the date pickers existed (e.g. "2022 — 2026") won't parse — that's
+// fine, the selects just start blank and the raw text is kept as a
+// fallback via the hidden period_fallback field until new dates are picked.
 function parseExistingPeriod(period) {
     if (!period) return {};
     const [startRaw, endRaw] = period.split("—").map((s) => s?.trim());
@@ -115,105 +110,32 @@ function EduFields({ edu }) {
 
             <input type="hidden" name="period_fallback" value={edu?.period || ""} />
 
-            <div>
-                <label className="block text-sm text-[#5B5F66] mb-1.5">Start date</label>
-                <div className="flex gap-2">
-                    <MonthSelect name="start_month" defaultValue={start.month} />
-                    <YearSelect name="start_year" defaultValue={start.year} />
-                </div>
-            </div>
-
-            <label className="flex items-center gap-2 text-sm text-[#5B5F66]">
-                <input type="checkbox" name="is_current" defaultChecked={isCurrent} className="accent-[#3355FF]" />
-                Currently studying here
-            </label>
-
-            <div>
-                <label className="block text-sm text-[#5B5F66] mb-1.5">End date (ignored if currently studying)</label>
-                <div className="flex gap-2">
-                    <MonthSelect name="end_month" defaultValue={end.month} />
-                    <YearSelect name="end_year" defaultValue={end.year} />
-                </div>
-            </div>
-            {!start.month && !edu?.period && (
-                <p className="text-xs text-[#5B5F66]">Leave both blank to keep no date shown.</p>
-            )}
+            <MonthYearFields
+                label="Start date"
+                monthName="start_month"
+                yearName="start_year"
+                monthDefault={start.month}
+                yearDefault={start.year}
+            />
+            <CurrentCheckbox label="Currently studying here" defaultChecked={isCurrent} />
+            <MonthYearFields
+                label="End date (ignored if currently studying)"
+                monthName="end_month"
+                yearName="end_year"
+                monthDefault={end.month}
+                yearDefault={end.year}
+            />
 
             <Field label="Description (optional)" name="description" defaultValue={edu?.description} textarea />
 
-            <div>
-                <label className="block text-sm text-[#5B5F66] mb-1.5" htmlFor="bullets">
-                    Bullet points — coursework, honors, thesis (one per line, optional)
-                </label>
-                <textarea
-                    id="bullets"
-                    name="bullets"
-                    defaultValue={(edu?.bullets || []).join("\n")}
-                    rows={4}
-                    placeholder={"Dean's Lister, 2023–2025\nThesis: Real-time anomaly detection for IoT sensor networks"}
-                    className="w-full px-4 py-2.5 rounded-md border border-[#E4E4E7] bg-white focus:outline-none focus:border-[#3355FF] transition-colors resize-none"
-                />
-            </div>
+            <Field
+                label="Bullet points — coursework, honors, thesis (one per line, optional)"
+                name="bullets"
+                textarea
+                rows={4}
+                defaultValue={(edu?.bullets || []).join("\n")}
+                placeholder={"Dean's Lister, 2023–2025\nThesis: Real-time anomaly detection for IoT sensor networks"}
+            />
         </>
-    );
-}
-
-function MonthSelect({ name, defaultValue }) {
-    return (
-        <select
-            name={name}
-            defaultValue={defaultValue || ""}
-            className="flex-1 px-3 py-2.5 rounded-md border border-[#E4E4E7] bg-white focus:outline-none focus:border-[#3355FF] transition-colors"
-        >
-            <option value="">Month</option>
-            {MONTHS.map((m, i) => (
-                <option key={m} value={i + 1}>{m}</option>
-            ))}
-        </select>
-    );
-}
-
-function YearSelect({ name, defaultValue }) {
-    return (
-        <select
-            name={name}
-            defaultValue={defaultValue || ""}
-            className="w-28 px-3 py-2.5 rounded-md border border-[#E4E4E7] bg-white focus:outline-none focus:border-[#3355FF] transition-colors"
-        >
-            <option value="">Year</option>
-            {YEARS.map((y) => (
-                <option key={y} value={y}>{y}</option>
-            ))}
-        </select>
-    );
-}
-
-function Field({ label, name, defaultValue, placeholder, textarea = false, required = false }) {
-    return (
-        <div>
-            <label className="block text-sm text-[#5B5F66] mb-1.5" htmlFor={name}>
-                {label}
-            </label>
-            {textarea ? (
-                <textarea
-                    id={name}
-                    name={name}
-                    defaultValue={defaultValue}
-                    placeholder={placeholder}
-                    rows={3}
-                    required={required}
-                    className="w-full px-4 py-2.5 rounded-md border border-[#E4E4E7] bg-white focus:outline-none focus:border-[#3355FF] transition-colors resize-none"
-                />
-            ) : (
-                <input
-                    id={name}
-                    name={name}
-                    defaultValue={defaultValue}
-                    placeholder={placeholder}
-                    required={required}
-                    className="w-full px-4 py-2.5 rounded-md border border-[#E4E4E7] bg-white focus:outline-none focus:border-[#3355FF] transition-colors"
-                />
-            )}
-        </div>
     );
 }

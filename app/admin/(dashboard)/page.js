@@ -1,5 +1,8 @@
 import Link from "next/link";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import PageHeader from "../ui/PageHeader";
+import { cardBase } from "../ui/tokens";
+import { ChevronIcon } from "../ui/icons";
 
 const SECTIONS = [
     { href: "/admin/profile", label: "Profile", desc: "Name, bio, tagline, contact links, photo, resume." },
@@ -35,30 +38,32 @@ export default async function AdminOverview() {
 
     return (
         <div>
-            <h1 className="font-[family-name:var(--font-display)] text-2xl font-medium mb-1">
-                Overview
-            </h1>
-            <p className="text-sm text-[#5B5F66] mb-8">
-                Edits here go live on your site within a minute (or immediately, since every save
-                revalidates the homepage).
-            </p>
+            <PageHeader
+                title="Overview"
+                description="Edits here go live on your site within a minute — every save also revalidates the homepage immediately."
+            />
 
             <div className="grid sm:grid-cols-2 gap-4">
                 {SECTIONS.map((s) => (
                     <Link
                         key={s.href}
                         href={s.href}
-                        className="block rounded-xl border border-[#E4E4E7] bg-white p-5 hover:border-[#3355FF] transition-colors"
+                        className={`group block ${cardBase} p-5 transition-all hover:border-[#3355FF]/40 hover:shadow-[0_4px_12px_rgba(20,22,26,0.06)]`}
                     >
-                        <div className="flex items-center justify-between mb-1">
-                            <h3 className="font-[family-name:var(--font-display)] font-medium">{s.label}</h3>
-                            {counts[s.href] !== undefined && (
-                                <span className="font-[family-name:var(--font-mono)] text-xs text-[#5B5F66]">
-                                    {counts[s.href]}
-                                </span>
-                            )}
+                        <div className="flex items-center justify-between mb-1.5">
+                            <h3 className="font-[family-name:var(--font-display)] font-medium text-[#14161A]">
+                                {s.label}
+                            </h3>
+                            <div className="flex items-center gap-1.5 shrink-0">
+                                {counts[s.href] !== undefined && (
+                                    <span className="font-[family-name:var(--font-mono)] text-xs text-[#5B5F66]">
+                                        {counts[s.href]}
+                                    </span>
+                                )}
+                                <ChevronIcon className="w-4 h-4 text-[#9A9DA3] transition-transform group-hover:translate-x-0.5" />
+                            </div>
                         </div>
-                        <p className="text-sm text-[#5B5F66]">{s.desc}</p>
+                        <p className="text-sm text-[#5B5F66] leading-relaxed">{s.desc}</p>
                     </Link>
                 ))}
             </div>

@@ -5,6 +5,10 @@ import {
     createSkillItemAction,
     deleteSkillItemAction,
 } from "../../actions/skills";
+import PageHeader from "../../ui/PageHeader";
+import EmptyState from "../../ui/EmptyState";
+import { cardBase, inputBase, buttonPrimary, buttonSecondary, linkDanger } from "../../ui/tokens";
+import { TrashIcon } from "../../ui/icons";
 
 export default async function SkillsAdminPage() {
     const { data: categories } = await supabaseAdmin
@@ -19,26 +23,26 @@ export default async function SkillsAdminPage() {
 
     return (
         <div>
-            <h1 className="font-[family-name:var(--font-display)] text-2xl font-medium mb-1">Skills</h1>
-            <p className="text-sm text-[#5B5F66] mb-8">
-                Organized into categories — each category is a column on the homepage.
-            </p>
+            <PageHeader
+                title="Skills"
+                description="Organized into categories — each category is a column on the homepage."
+            />
 
-            <div className="space-y-6 mb-10">
+            <div className="space-y-4 mb-6">
                 {(categories || []).map((cat) => (
                     <CategoryCard key={cat.id} category={cat} />
                 ))}
                 {(!categories || categories.length === 0) && (
-                    <p className="text-sm text-[#5B5F66]">No categories yet — add one below.</p>
+                    <EmptyState title="No categories yet" description="Add one below to get started." />
                 )}
             </div>
 
             <form
                 action={handleCreateCategory}
-                className="bg-white border border-[#E4E4E7] rounded-xl p-6 flex items-end gap-3 max-w-md"
+                className={`${cardBase} p-5 flex items-end gap-3 max-w-md`}
             >
                 <div className="flex-1">
-                    <label className="block text-sm text-[#5B5F66] mb-1.5" htmlFor="category">
+                    <label className="block text-xs font-semibold uppercase tracking-wide text-[#5B5F66] mb-1.5" htmlFor="category">
                         New category name
                     </label>
                     <input
@@ -46,13 +50,10 @@ export default async function SkillsAdminPage() {
                         name="category"
                         placeholder="Databases"
                         required
-                        className="w-full px-4 py-2.5 rounded-md border border-[#E4E4E7] bg-white focus:outline-none focus:border-[#3355FF] transition-colors"
+                        className={inputBase}
                     />
                 </div>
-                <button
-                    type="submit"
-                    className="px-6 py-2.5 rounded-md bg-[#14161A] text-white text-sm font-medium hover:bg-[#3355FF] transition-colors"
-                >
+                <button type="submit" className={buttonPrimary}>
                     Add
                 </button>
             </form>
@@ -73,11 +74,12 @@ function CategoryCard({ category }) {
     }
 
     return (
-        <div className="bg-white border border-[#E4E4E7] rounded-xl p-6">
+        <div className={`${cardBase} p-5`}>
             <div className="flex items-center justify-between mb-4">
                 <h3 className="font-[family-name:var(--font-display)] font-medium">{category.category}</h3>
                 <form action={handleDeleteCategory}>
-                    <button type="submit" className="text-sm text-[#E5484D] hover:underline">
+                    <button type="submit" className={linkDanger}>
+                        <TrashIcon className="w-4 h-4" />
                         Delete category
                     </button>
                 </form>
@@ -97,12 +99,9 @@ function CategoryCard({ category }) {
                     name="name"
                     placeholder="e.g. Redis"
                     required
-                    className="flex-1 max-w-xs px-3 py-2 text-sm rounded-md border border-[#E4E4E7] bg-white focus:outline-none focus:border-[#3355FF] transition-colors"
+                    className={`${inputBase} flex-1 max-w-xs`}
                 />
-                <button
-                    type="submit"
-                    className="px-4 py-2 rounded-md bg-[#F0F0F2] text-sm font-medium hover:bg-[#E4E4E7] transition-colors"
-                >
+                <button type="submit" className={buttonSecondary}>
                     + Add skill
                 </button>
             </form>
@@ -117,17 +116,14 @@ function SkillItemTag({ item }) {
     }
 
     return (
-        <form action={handleDelete} className="inline-flex">
+        <form action={handleDelete}>
             <button
                 type="submit"
-                aria-label={`Remove ${item.name}`}
-                title={`Remove ${item.name}`}
-                className="group inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-[#E4E4E7] bg-[#F0F0F2] px-2.5 py-1.5 font-[family-name:var(--font-mono)] text-xs text-[#14161A] transition-all duration-200 hover:border-[#E5484D] hover:bg-[#E5484D]/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3355FF]/30"
+                title="Click to remove"
+                className="group inline-flex items-center gap-1.5 font-[family-name:var(--font-mono)] text-xs pl-2.5 pr-2 py-1.5 rounded-md bg-[#F0F0F2] border border-transparent hover:border-[#E5484D] hover:bg-[#E5484D]/5 transition-colors"
             >
-                <span>{item.name}</span>
-                <span className="inline-flex h-4 w-4 items-center justify-center rounded-full text-base leading-none text-[#5B5F66] transition-colors group-hover:text-[#E5484D]">
-                    ×
-                </span>
+                {item.name}
+                <span className="text-[#9A9DA3] group-hover:text-[#E5484D] transition-colors">×</span>
             </button>
         </form>
     );
