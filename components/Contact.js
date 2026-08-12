@@ -4,7 +4,7 @@ import { useState } from "react";
 import emailjs from "@emailjs/browser";
 import FormStatusModal from "./FormStatusModal";
 
-export default function Contact() {
+export default function Contact({ label = "04 — Contact", heading = "Let\u2019s work together" }) {
     const [form, setForm] = useState({ name: "", email: "", message: "" });
     const [status, setStatus] = useState("idle"); // idle | sending | success | error
 
@@ -41,9 +41,9 @@ export default function Contact() {
 
     return (
         <section id="contact" className="max-w-5xl mx-auto px-6 py-20 border-t border-[#E4E4E7]">
-            <p className="font-[family-name:var(--font-mono)] text-sm text-[#3355FF] mb-3">04 — Contact</p>
+            <p className="font-[family-name:var(--font-mono)] text-sm text-[#3355FF] mb-3">{label}</p>
             <h2 className="font-[family-name:var(--font-display)] text-3xl md:text-4xl font-medium tracking-tight mb-10 max-w-xl">
-                Let&rsquo;s work together
+                {heading}
             </h2>
 
             <form onSubmit={handleSubmit} className="max-w-xl space-y-4">

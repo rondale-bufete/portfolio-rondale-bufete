@@ -27,6 +27,17 @@ export default function ProjectCard({ project }) {
                     {project.description}
                 </p>
 
+                {project.highlights?.length > 0 && (
+                    <ul className="space-y-1 mb-4">
+                        {project.highlights.map((h, i) => (
+                            <li key={i} className="text-[#5B5F66] text-sm leading-relaxed flex gap-2">
+                                <span className="text-[#3355FF] shrink-0">—</span>
+                                <span>{h}</span>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+
                 <div className="flex flex-wrap gap-2 mb-5">
                     {project.tags.map((tag) => (
                         <span

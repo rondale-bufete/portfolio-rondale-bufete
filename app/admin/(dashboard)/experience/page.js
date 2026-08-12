@@ -1,47 +1,51 @@
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { MONTHS, yearOptions } from "@/lib/monthYear";
 import {
-    createEducationAction,
-    updateEducationAction,
-    deleteEducationAction,
-} from "../../actions/education";
+    createExperienceAction,
+    updateExperienceAction,
+    deleteExperienceAction,
+} from "../../actions/experience";
 
 const YEARS = yearOptions();
 
-export default async function EducationAdminPage() {
-    const { data: education } = await supabaseAdmin
-        .from("education")
+export default async function ExperienceAdminPage() {
+    const { data: experience } = await supabaseAdmin
+        .from("experience")
         .select("*")
         .order("sort_order");
 
     async function handleCreate(formData) {
         "use server";
-        await createEducationAction(formData);
+        await createExperienceAction(formData);
     }
 
     return (
         <div>
-            <h1 className="font-[family-name:var(--font-display)] text-2xl font-medium mb-1">Education</h1>
-            <p className="text-sm text-[#5B5F66] mb-8">Shown as a timeline under About.</p>
+            <h1 className="font-[family-name:var(--font-display)] text-2xl font-medium mb-1">Experience</h1>
+            <p className="text-sm text-[#5B5F66] mb-8">
+                Your work history. This section is hidden by default after setup — enable it from{" "}
+                <a href="/admin/sections" className="text-[#3355FF] hover:underline">Sections</a> once
+                you&rsquo;ve added your roles.
+            </p>
 
             <div className="space-y-4 mb-10">
-                {(education || []).map((edu) => (
-                    <EduRow key={edu.id} edu={edu} />
+                {(experience || []).map((exp) => (
+                    <ExperienceRow key={exp.id} exp={exp} />
                 ))}
-                {(!education || education.length === 0) && (
-                    <p className="text-sm text-[#5B5F66]">Nothing yet — add your first entry below.</p>
+                {(!experience || experience.length === 0) && (
+                    <p className="text-sm text-[#5B5F66]">No experience entries yet — add your first one below.</p>
                 )}
             </div>
 
             <details className="bg-white border border-[#E4E4E7] rounded-xl p-6">
-                <summary className="cursor-pointer font-medium text-sm">+ Add an entry</summary>
+                <summary className="cursor-pointer font-medium text-sm">+ Add a role</summary>
                 <form action={handleCreate} className="mt-5 space-y-4 max-w-xl">
-                    <EduFields />
+                    <ExperienceFields />
                     <button
                         type="submit"
                         className="px-6 py-2.5 rounded-md bg-[#14161A] text-white text-sm font-medium hover:bg-[#3355FF] transition-colors"
                     >
-                        Add entry
+                        Add role
                     </button>
                 </form>
             </details>
@@ -49,25 +53,27 @@ export default async function EducationAdminPage() {
     );
 }
 
-function EduRow({ edu }) {
+function ExperienceRow({ exp }) {
     async function handleUpdate(formData) {
         "use server";
-        await updateEducationAction(edu.id, formData);
+        await updateExperienceAction(exp.id, formData);
     }
     async function handleDelete() {
         "use server";
-        await deleteEducationAction(edu.id);
+        await deleteExperienceAction(exp.id);
     }
 
     return (
         <details className="bg-white border border-[#E4E4E7] rounded-xl p-6">
-            <summary className="cursor-pointer flex items-center justify-between">
-                <span className="font-medium text-sm">{edu.degree}</span>
-                <span className="text-xs text-[#5B5F66] font-[family-name:var(--font-mono)]">{edu.period}</span>
+            <summary className="cursor-pointer flex items-center justify-between gap-4">
+                <span className="font-medium text-sm truncate">{exp.role} · {exp.company}</span>
+                <span className="text-xs text-[#5B5F66] font-[family-name:var(--font-mono)] shrink-0">
+                    {exp.period}
+                </span>
             </summary>
 
             <form action={handleUpdate} className="mt-5 space-y-4 max-w-xl">
-                <EduFields edu={edu} />
+                <ExperienceFields exp={exp} />
                 <button
                     type="submit"
                     className="px-6 py-2.5 rounded-md bg-[#14161A] text-white text-sm font-medium hover:bg-[#3355FF] transition-colors"
@@ -78,21 +84,21 @@ function EduRow({ edu }) {
 
             <form action={handleDelete} className="mt-3">
                 <button type="submit" className="text-sm text-[#E5484D] hover:underline">
-                    Delete this entry
+                    Delete this role
                 </button>
             </form>
         </details>
     );
 }
 
-// Best-effort parse of an existing "Mon YYYY — Mon YYYY" / "... — Present"
-// string so the dropdowns preselect sensibly when editing. Entries created
-// before this update (e.g. "2022 — 2026") won't parse — that's fine, the
-// selects just start blank and the raw text is kept as a fallback via the
-// hidden period_fallback field until the admin picks real dates.
+// Parses the currently-stored "Mon YYYY — Mon YYYY"/"Mon YYYY — Present"
+// string just well enough to preselect the dropdowns when editing. If it
+// doesn't parse cleanly (e.g. hand-edited text), the selects just start
+// blank — no harm done, saving will overwrite `period` from whatever the
+// admin picks.
 function parseExistingPeriod(period) {
     if (!period) return {};
-    const [startRaw, endRaw] = period.split("—").map((s) => s?.trim());
+    const [startRaw, endRaw] = period.split("—").map((s) => s.trim());
     const parseOne = (s) => {
         const match = s?.match(/^([A-Za-z]{3,9})\s+(\d{4})$/);
         if (!match) return {};
@@ -105,15 +111,15 @@ function parseExistingPeriod(period) {
     return { start, end, isCurrent };
 }
 
-function EduFields({ edu }) {
-    const { start = {}, end = {}, isCurrent = false } = parseExistingPeriod(edu?.period);
+function ExperienceFields({ exp }) {
+    const { start = {}, end = {}, isCurrent = false } = parseExistingPeriod(exp?.period);
 
     return (
         <>
-            <Field label="Degree / Program" name="degree" defaultValue={edu?.degree} required />
-            <Field label="School" name="school" defaultValue={edu?.school} required />
-
-            <input type="hidden" name="period_fallback" value={edu?.period || ""} />
+            <Field label="Company" name="company" defaultValue={exp?.company} required />
+            <Field label="Role / Title" name="role" defaultValue={exp?.role} required />
+            <Field label="Location (optional)" name="location" defaultValue={exp?.location} placeholder="Manila, PH · Remote" />
+            <Field label="Company URL (optional)" name="company_url" defaultValue={exp?.company_url} />
 
             <div>
                 <label className="block text-sm text-[#5B5F66] mb-1.5">Start date</label>
@@ -125,32 +131,27 @@ function EduFields({ edu }) {
 
             <label className="flex items-center gap-2 text-sm text-[#5B5F66]">
                 <input type="checkbox" name="is_current" defaultChecked={isCurrent} className="accent-[#3355FF]" />
-                Currently studying here
+                I currently work here
             </label>
 
             <div>
-                <label className="block text-sm text-[#5B5F66] mb-1.5">End date (ignored if currently studying)</label>
+                <label className="block text-sm text-[#5B5F66] mb-1.5">End date (ignored if currently working)</label>
                 <div className="flex gap-2">
                     <MonthSelect name="end_month" defaultValue={end.month} />
                     <YearSelect name="end_year" defaultValue={end.year} />
                 </div>
             </div>
-            {!start.month && !edu?.period && (
-                <p className="text-xs text-[#5B5F66]">Leave both blank to keep no date shown.</p>
-            )}
-
-            <Field label="Description (optional)" name="description" defaultValue={edu?.description} textarea />
 
             <div>
                 <label className="block text-sm text-[#5B5F66] mb-1.5" htmlFor="bullets">
-                    Bullet points — coursework, honors, thesis (one per line, optional)
+                    Bullet points (one per line)
                 </label>
                 <textarea
                     id="bullets"
                     name="bullets"
-                    defaultValue={(edu?.bullets || []).join("\n")}
-                    rows={4}
-                    placeholder={"Dean's Lister, 2023–2025\nThesis: Real-time anomaly detection for IoT sensor networks"}
+                    defaultValue={(exp?.bullets || []).join("\n")}
+                    rows={5}
+                    placeholder={"Led a team of 4 engineers shipping the new checkout flow\nCut API response times by 40% by adding caching\nMentored 2 junior developers"}
                     className="w-full px-4 py-2.5 rounded-md border border-[#E4E4E7] bg-white focus:outline-none focus:border-[#3355FF] transition-colors resize-none"
                 />
             </div>
@@ -188,32 +189,20 @@ function YearSelect({ name, defaultValue }) {
     );
 }
 
-function Field({ label, name, defaultValue, placeholder, textarea = false, required = false }) {
+function Field({ label, name, defaultValue, placeholder, required = false }) {
     return (
         <div>
             <label className="block text-sm text-[#5B5F66] mb-1.5" htmlFor={name}>
                 {label}
             </label>
-            {textarea ? (
-                <textarea
-                    id={name}
-                    name={name}
-                    defaultValue={defaultValue}
-                    placeholder={placeholder}
-                    rows={3}
-                    required={required}
-                    className="w-full px-4 py-2.5 rounded-md border border-[#E4E4E7] bg-white focus:outline-none focus:border-[#3355FF] transition-colors resize-none"
-                />
-            ) : (
-                <input
-                    id={name}
-                    name={name}
-                    defaultValue={defaultValue}
-                    placeholder={placeholder}
-                    required={required}
-                    className="w-full px-4 py-2.5 rounded-md border border-[#E4E4E7] bg-white focus:outline-none focus:border-[#3355FF] transition-colors"
-                />
-            )}
+            <input
+                id={name}
+                name={name}
+                defaultValue={defaultValue}
+                placeholder={placeholder}
+                required={required}
+                className="w-full px-4 py-2.5 rounded-md border border-[#E4E4E7] bg-white focus:outline-none focus:border-[#3355FF] transition-colors"
+            />
         </div>
     );
 }

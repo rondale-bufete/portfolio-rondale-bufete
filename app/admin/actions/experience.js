@@ -6,7 +6,7 @@ import { composePeriod, parseBullets } from "@/lib/monthYear";
 
 function refresh() {
     revalidatePath("/");
-    revalidatePath("/admin/education");
+    revalidatePath("/admin/experience");
 }
 
 function buildPatch(formData) {
@@ -19,43 +19,41 @@ function buildPatch(formData) {
     });
 
     return {
-        degree: formData.get("degree")?.toString() || "",
-        school: formData.get("school")?.toString() || "",
-        // Falls back to whatever was typed directly if the month/year
-        // pickers were left blank (e.g. editing an older manually-entered
-        // period like "2022 — 2026").
-        period: period || formData.get("period_fallback")?.toString() || "",
-        description: formData.get("description")?.toString() || "",
+        company: formData.get("company")?.toString() || "",
+        role: formData.get("role")?.toString() || "",
+        location: formData.get("location")?.toString() || "",
+        company_url: formData.get("company_url")?.toString() || "",
+        period,
         bullets: parseBullets(formData.get("bullets")?.toString()),
     };
 }
 
-export async function createEducationAction(formData) {
+export async function createExperienceAction(formData) {
     const { data: existing } = await supabaseAdmin
-        .from("education")
+        .from("experience")
         .select("sort_order")
         .order("sort_order", { ascending: false })
         .limit(1);
     const nextOrder = existing?.[0] ? existing[0].sort_order + 1 : 0;
 
     const { error } = await supabaseAdmin
-        .from("education")
+        .from("experience")
         .insert({ ...buildPatch(formData), sort_order: nextOrder });
     if (error) throw new Error(error.message);
     refresh();
 }
 
-export async function updateEducationAction(id, formData) {
+export async function updateExperienceAction(id, formData) {
     const { error } = await supabaseAdmin
-        .from("education")
+        .from("experience")
         .update(buildPatch(formData))
         .eq("id", id);
     if (error) throw new Error(error.message);
     refresh();
 }
 
-export async function deleteEducationAction(id) {
-    const { error } = await supabaseAdmin.from("education").delete().eq("id", id);
+export async function deleteExperienceAction(id) {
+    const { error } = await supabaseAdmin.from("experience").delete().eq("id", id);
     if (error) throw new Error(error.message);
     refresh();
 }

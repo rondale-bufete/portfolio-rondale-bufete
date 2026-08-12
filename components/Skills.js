@@ -97,12 +97,12 @@ function SkillIcon({ name }) {
     );
 }
 
-export default function Skills({ skills = [] }) {
+export default function Skills({ skills = [], label = "02 — Skills", heading = "Tools I reach for" }) {
     return (
         <section id="skills" className="max-w-5xl mx-auto px-6 py-20 border-t border-[#E4E4E7]">
-            <p className="font-[family-name:var(--font-mono)] text-sm text-[#3355FF] mb-3">02 — Skills</p>
+            <p className="font-[family-name:var(--font-mono)] text-sm text-[#3355FF] mb-3">{label}</p>
             <h2 className="font-[family-name:var(--font-display)] text-3xl md:text-4xl font-medium tracking-tight mb-10 max-w-xl">
-                Tools I reach for
+                {heading}
             </h2>
 
             <div className="grid md:grid-cols-3 gap-x-10 gap-y-12">

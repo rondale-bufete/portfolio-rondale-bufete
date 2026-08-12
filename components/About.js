@@ -79,6 +79,11 @@ function CertificationCard({ cert }) {
                     {cert.title}
                 </h4>
                 <p className="text-[#5B5F66] text-sm mt-0.5">{cert.issuer}</p>
+                {cert.credentialId && (
+                    <p className="text-[#5B5F66] text-xs mt-1 font-[family-name:var(--font-mono)]">
+                        ID: {cert.credentialId}
+                    </p>
+                )}
                 {cert.description && (
                     <p className="text-[#5B5F66] text-sm mt-2 leading-relaxed">
                         {cert.description}
@@ -89,12 +94,18 @@ function CertificationCard({ cert }) {
     );
 }
 
-export default function About({ profile, education = [], certifications = [] }) {
+export default function About({
+    profile,
+    education = [],
+    certifications = [],
+    label = "01 — About",
+    heading = "A bit about how I work",
+}) {
     return (
         <section id="about" className="max-w-5xl mx-auto px-6 py-20 border-t border-[#E4E4E7]">
-            <p className="font-[family-name:var(--font-mono)] text-sm text-[#3355FF] mb-3">01 — About</p>
+            <p className="font-[family-name:var(--font-mono)] text-sm text-[#3355FF] mb-3">{label}</p>
             <h2 className="font-[family-name:var(--font-display)] text-3xl md:text-4xl font-medium tracking-tight mb-6 max-w-xl">
-                A bit about how I work
+                {heading}
             </h2>
             <p className="text-[#5B5F66] text-lg leading-relaxed max-w-2xl mb-14">
                 {profile?.bio}
@@ -126,6 +137,16 @@ export default function About({ profile, education = [], certifications = [] }) 
                                         <p className="text-[#5B5F66] text-sm mt-2 leading-relaxed">
                                             {edu.description}
                                         </p>
+                                    )}
+                                    {edu.bullets?.length > 0 && (
+                                        <ul className="mt-2 space-y-1">
+                                            {edu.bullets.map((bullet, bi) => (
+                                                <li key={bi} className="text-[#5B5F66] text-sm leading-relaxed flex gap-2">
+                                                    <span className="text-[#3355FF] shrink-0">—</span>
+                                                    <span>{bullet}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
                                     )}
                                 </div>
                             </div>

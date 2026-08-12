@@ -1,9 +1,12 @@
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { MONTHS, yearOptions } from "@/lib/monthYear";
 import {
     createCertificationAction,
     updateCertificationAction,
     deleteCertificationAction,
 } from "../../actions/certifications";
+
+const YEARS = yearOptions();
 
 export default async function CertificationsAdminPage() {
     const { data: certifications } = await supabaseAdmin
@@ -82,12 +85,56 @@ function CertRow({ cert }) {
     );
 }
 
+// Best-effort parse of an existing "Mon YYYY" string (or a bare year like
+// "2026" from before this update) so the pickers preselect sensibly.
+function parseExistingDate(date) {
+    if (!date) return {};
+    const full = date.match(/^([A-Za-z]{3,9})\s+(\d{4})$/);
+    if (full) {
+        const idx = MONTHS.findIndex((m) => m.toLowerCase().startsWith(full[1].toLowerCase().slice(0, 3)));
+        return idx === -1 ? {} : { month: idx + 1, year: Number(full[2]) };
+    }
+    const yearOnly = date.match(/^(\d{4})$/);
+    if (yearOnly) return { year: Number(yearOnly[1]) };
+    return {};
+}
+
 function CertFields({ cert }) {
+    const { month, year } = parseExistingDate(cert?.date);
+
     return (
         <>
             <Field label="Title" name="title" defaultValue={cert?.title} required />
             <Field label="Issuer" name="issuer" defaultValue={cert?.issuer} />
-            <Field label="Date" name="date" defaultValue={cert?.date} placeholder="2026" />
+
+            <input type="hidden" name="date_fallback" value={cert?.date || ""} />
+            <div>
+                <label className="block text-sm text-[#5B5F66] mb-1.5">Issued</label>
+                <div className="flex gap-2">
+                    <select
+                        name="issued_month"
+                        defaultValue={month || ""}
+                        className="flex-1 px-3 py-2.5 rounded-md border border-[#E4E4E7] bg-white focus:outline-none focus:border-[#3355FF] transition-colors"
+                    >
+                        <option value="">Month</option>
+                        {MONTHS.map((m, i) => (
+                            <option key={m} value={i + 1}>{m}</option>
+                        ))}
+                    </select>
+                    <select
+                        name="issued_year"
+                        defaultValue={year || ""}
+                        className="w-28 px-3 py-2.5 rounded-md border border-[#E4E4E7] bg-white focus:outline-none focus:border-[#3355FF] transition-colors"
+                    >
+                        <option value="">Year</option>
+                        {YEARS.map((y) => (
+                            <option key={y} value={y}>{y}</option>
+                        ))}
+                    </select>
+                </div>
+            </div>
+
+            <Field label="Credential ID (optional)" name="credential_id" defaultValue={cert?.credential_id} placeholder="UC-384c2ce8-fe37" />
             <Field label="Description" name="description" defaultValue={cert?.description} textarea />
             <Field
                 label="Verification URL (leave blank if you only have a PDF)"

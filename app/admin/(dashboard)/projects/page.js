@@ -100,6 +100,19 @@ function ProjectFields({ project }) {
                 defaultValue={(project?.tags || []).join(", ")}
                 placeholder="Next.js, Tailwind CSS, REST API"
             />
+            <div>
+                <label className="block text-sm text-[#5B5F66] mb-1.5" htmlFor="highlights">
+                    Highlights — key things you did (one per line, optional)
+                </label>
+                <textarea
+                    id="highlights"
+                    name="highlights"
+                    defaultValue={(project?.highlights || []).join("\n")}
+                    rows={4}
+                    placeholder={"Cut initial load time by 60% with route-level code splitting\nAdded infinite scroll with cursor-based pagination"}
+                    className="w-full px-4 py-2.5 rounded-md border border-[#E4E4E7] bg-white focus:outline-none focus:border-[#3355FF] transition-colors resize-none"
+                />
+            </div>
             <Field label="Live demo URL" name="live_url" defaultValue={project?.live_url} />
             <Field label="Repo URL" name="repo_url" defaultValue={project?.repo_url} />
             <div>

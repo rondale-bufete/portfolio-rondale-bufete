@@ -2,6 +2,12 @@
 
 import { revalidatePath } from "next/cache";
 import { supabaseAdmin, uploadAsset } from "@/lib/supabase/admin";
+import { parseBullets } from "@/lib/monthYear";
+
+function refresh() {
+    revalidatePath("/");
+    revalidatePath("/admin/projects");
+}
 
 async function nextSortOrder() {
     const { data } = await supabaseAdmin
@@ -27,15 +33,14 @@ export async function createProjectAction(formData) {
         title: formData.get("title")?.toString() || "",
         description: formData.get("description")?.toString() || "",
         tags: parseTags(formData.get("tags")?.toString()),
+        highlights: parseBullets(formData.get("highlights")?.toString()),
         live_url: formData.get("live_url")?.toString() || "",
         repo_url: formData.get("repo_url")?.toString() || "",
         image_url: imageUrl || "",
         sort_order: await nextSortOrder(),
     });
     if (error) throw new Error(error.message);
-
-    revalidatePath("/");
-    revalidatePath("/admin/projects");
+    refresh();
 }
 
 export async function updateProjectAction(id, formData) {
@@ -46,6 +51,7 @@ export async function updateProjectAction(id, formData) {
         title: formData.get("title")?.toString() || "",
         description: formData.get("description")?.toString() || "",
         tags: parseTags(formData.get("tags")?.toString()),
+        highlights: parseBullets(formData.get("highlights")?.toString()),
         live_url: formData.get("live_url")?.toString() || "",
         repo_url: formData.get("repo_url")?.toString() || "",
     };
@@ -53,15 +59,11 @@ export async function updateProjectAction(id, formData) {
 
     const { error } = await supabaseAdmin.from("projects").update(patch).eq("id", id);
     if (error) throw new Error(error.message);
-
-    revalidatePath("/");
-    revalidatePath("/admin/projects");
+    refresh();
 }
 
 export async function deleteProjectAction(id) {
     const { error } = await supabaseAdmin.from("projects").delete().eq("id", id);
     if (error) throw new Error(error.message);
-
-    revalidatePath("/");
-    revalidatePath("/admin/projects");
+    refresh();
 }
