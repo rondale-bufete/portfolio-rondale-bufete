@@ -8,6 +8,7 @@ import Contact from "@/components/Contact";
 import CustomSection from "@/components/CustomSection";
 import Footer from "@/components/Footer";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 import { getPortfolioData } from "@/lib/data";
 
 // Revalidate this page at most once a minute so admin edits show up
@@ -68,6 +69,7 @@ export default async function Home() {
                 <Hero profile={profile} />
                 {sections.map((section) => renderSection(section, data))}
                 <SpeedInsights />
+                <Analytics />
             </main>
             <Footer profile={profile} />
         </>
