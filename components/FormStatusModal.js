@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-export default function FormStatusModal({ status, onClose }) {
+export default function FormStatusModal({ status, onClose, title, message, buttonLabel }) {
     useEffect(() => {
         document.body.style.overflow = "hidden";
         return () => {
@@ -39,20 +39,20 @@ export default function FormStatusModal({ status, onClose }) {
                 </div>
 
                 <h3 className="font-[family-name:var(--font-display)] text-xl font-medium mb-2">
-                    {isSuccess ? "Message sent" : "Something went wrong"}
+                    {title || (isSuccess ? "Message sent" : "Something went wrong")}
                 </h3>
 
                 <p className="text-[#5B5F66] text-sm leading-relaxed mb-6">
-                    {isSuccess
+                    {message || (isSuccess
                         ? "Thanks for reaching out — I'll get back to you soon."
-                        : "Your message couldn't be sent. Please try again, or email me directly."}
+                        : "Your message couldn't be sent. Please try again, or email me directly.")}
                 </p>
 
                 <button
                     onClick={onClose}
                     className="px-6 py-2.5 rounded-md bg-[#14161A] text-white text-sm font-medium hover:bg-[#3355FF] transition-colors"
                 >
-                    Close
+                    {buttonLabel || "Close"}
                 </button>
             </div>
         </div>

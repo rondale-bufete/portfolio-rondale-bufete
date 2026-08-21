@@ -69,12 +69,17 @@ function ProjectRow({ project }) {
                 </button>
             </AdminActionForm>
 
-            <form action={handleDelete} className="mt-4">
+            <AdminActionForm
+                action={handleDelete}
+                className="mt-4"
+                confirmMessage="This project and its saved details will be permanently deleted."
+                successMessage="The project was deleted."
+            >
                 <button type="submit" className={linkDanger}>
                     <TrashIcon className="w-4 h-4" />
                     Delete this project
                 </button>
-            </form>
+            </AdminActionForm>
         </ItemRow>
     );
 }

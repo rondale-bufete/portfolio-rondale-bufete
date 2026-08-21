@@ -13,6 +13,7 @@ import EmptyState from "../../ui/EmptyState";
 import { ItemRow, AddNewRow } from "../../ui/CollapsibleRow";
 import { buttonPrimary, buttonSecondary, buttonIcon, linkDanger } from "../../ui/tokens";
 import { ArrowUpIcon, ArrowDownIcon, EyeIcon, EyeOffIcon, TrashIcon } from "../../ui/icons";
+import AdminActionForm from "../../ui/AdminActionForm";
 
 const KIND_LABELS = {
     about: "About",
@@ -43,7 +44,7 @@ export default async function SectionsAdminPage() {
 
             <div className="mb-6">
                 <AddNewRow label="Add a custom section">
-                    <form action={handleCreate} className="mt-4 space-y-4 max-w-xl">
+                    <AdminActionForm action={handleCreate} className="mt-4 space-y-4 max-w-xl">
                         <Field label="Label" name="label" placeholder="05 — Testimonials" required />
                         <Field label="Heading" name="heading" placeholder="What people say" required />
                         <Field
@@ -56,7 +57,7 @@ export default async function SectionsAdminPage() {
                         <button type="submit" className={buttonPrimary}>
                             Add section
                         </button>
-                    </form>
+                    </AdminActionForm>
                 </AddNewRow>
             </div>
 
@@ -112,17 +113,17 @@ function SectionRow({ section, isFirst, isLast }) {
     return (
         <ItemRow title={section.heading || "(untitled)"} badges={badges}>
             <div className="mt-4 flex items-center gap-2 flex-wrap">
-                <form action={handleMoveUp}>
+                <AdminActionForm action={handleMoveUp}>
                     <button type="submit" disabled={isFirst} className={buttonIcon} title="Move up" aria-label="Move up">
                         <ArrowUpIcon className="w-4 h-4" />
                     </button>
-                </form>
-                <form action={handleMoveDown}>
+                </AdminActionForm>
+                <AdminActionForm action={handleMoveDown}>
                     <button type="submit" disabled={isLast} className={buttonIcon} title="Move down" aria-label="Move down">
                         <ArrowDownIcon className="w-4 h-4" />
                     </button>
-                </form>
-                <form action={handleToggle}>
+                </AdminActionForm>
+                <AdminActionForm action={handleToggle}>
                     <button type="submit" className={buttonSecondary}>
                         {section.visible ? (
                             <>
@@ -136,10 +137,10 @@ function SectionRow({ section, isFirst, isLast }) {
                             </>
                         )}
                     </button>
-                </form>
+                </AdminActionForm>
             </div>
 
-            <form action={handleUpdate} className="mt-5 space-y-4 max-w-xl">
+            <AdminActionForm action={handleUpdate} className="mt-5 space-y-4 max-w-xl">
                 <Field label="Label" name="label" defaultValue={section.label} required />
                 <Field label="Heading" name="heading" defaultValue={section.heading} required />
                 {section.kind === "custom" && (
@@ -148,15 +149,20 @@ function SectionRow({ section, isFirst, isLast }) {
                 <button type="submit" className={buttonPrimary}>
                     Save changes
                 </button>
-            </form>
+            </AdminActionForm>
 
             {section.kind === "custom" && (
-                <form action={handleDelete} className="mt-4">
+                <AdminActionForm
+                    action={handleDelete}
+                    className="mt-4"
+                    confirmMessage="This custom section will be permanently deleted."
+                    successMessage="The custom section was deleted."
+                >
                     <button type="submit" className={linkDanger}>
                         <TrashIcon className="w-4 h-4" />
                         Delete this section
                     </button>
-                </form>
+                </AdminActionForm>
             )}
         </ItemRow>
     );

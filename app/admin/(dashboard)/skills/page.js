@@ -9,6 +9,7 @@ import PageHeader from "../../ui/PageHeader";
 import EmptyState from "../../ui/EmptyState";
 import { cardBase, inputBase, buttonPrimary, buttonSecondary, linkDanger } from "../../ui/tokens";
 import { TrashIcon } from "../../ui/icons";
+import AdminActionForm from "../../ui/AdminActionForm";
 
 export default async function SkillsAdminPage() {
     const { data: categories } = await supabaseAdmin
@@ -37,7 +38,7 @@ export default async function SkillsAdminPage() {
                 )}
             </div>
 
-            <form
+            <AdminActionForm
                 action={handleCreateCategory}
                 className={`${cardBase} p-5 flex items-end gap-3 max-w-md`}
             >
@@ -56,7 +57,7 @@ export default async function SkillsAdminPage() {
                 <button type="submit" className={buttonPrimary}>
                     Add
                 </button>
-            </form>
+            </AdminActionForm>
         </div>
     );
 }
@@ -77,12 +78,16 @@ function CategoryCard({ category }) {
         <div className={`${cardBase} p-5`}>
             <div className="flex items-center justify-between mb-4">
                 <h3 className="font-[family-name:var(--font-display)] font-medium">{category.category}</h3>
-                <form action={handleDeleteCategory}>
+                <AdminActionForm
+                    action={handleDeleteCategory}
+                    confirmMessage="This skill category and all of its skills will be permanently deleted."
+                    successMessage="The skill category was deleted."
+                >
                     <button type="submit" className={linkDanger}>
                         <TrashIcon className="w-4 h-4" />
                         Delete category
                     </button>
-                </form>
+                </AdminActionForm>
             </div>
 
             <div className="flex flex-wrap gap-2 mb-4">
@@ -94,7 +99,7 @@ function CategoryCard({ category }) {
                 )}
             </div>
 
-            <form action={handleAddItem} className="flex items-center gap-2">
+            <AdminActionForm action={handleAddItem} className="flex items-center gap-2">
                 <input
                     name="name"
                     placeholder="e.g. Redis"
@@ -104,7 +109,7 @@ function CategoryCard({ category }) {
                 <button type="submit" className={buttonSecondary}>
                     + Add skill
                 </button>
-            </form>
+            </AdminActionForm>
         </div>
     );
 }
@@ -116,7 +121,11 @@ function SkillItemTag({ item }) {
     }
 
     return (
-        <form action={handleDelete}>
+        <AdminActionForm
+            action={handleDelete}
+            confirmMessage="This skill will be permanently removed."
+            successMessage="The skill was removed."
+        >
             <button
                 type="submit"
                 title="Click to remove"
@@ -125,6 +134,6 @@ function SkillItemTag({ item }) {
                 {item.name}
                 <span className="text-[#9A9DA3] group-hover:text-[#E5484D] transition-colors">×</span>
             </button>
-        </form>
+        </AdminActionForm>
     );
 }

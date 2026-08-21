@@ -71,12 +71,17 @@ function CertRow({ cert }) {
                 </button>
             </AdminActionForm>
 
-            <form action={handleDelete} className="mt-4">
+            <AdminActionForm
+                action={handleDelete}
+                className="mt-4"
+                confirmMessage="This certification and its saved details will be permanently deleted."
+                successMessage="The certification was deleted."
+            >
                 <button type="submit" className={linkDanger}>
                     <TrashIcon className="w-4 h-4" />
                     Delete this certification
                 </button>
-            </form>
+            </AdminActionForm>
         </ItemRow>
     );
 }

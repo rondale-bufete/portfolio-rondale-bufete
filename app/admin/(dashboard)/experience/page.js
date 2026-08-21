@@ -12,6 +12,7 @@ import { ItemRow, AddNewRow } from "../../ui/CollapsibleRow";
 import { MonthYearFields, CurrentCheckbox } from "../../ui/MonthYearFields";
 import { buttonPrimary, linkDanger } from "../../ui/tokens";
 import { TrashIcon } from "../../ui/icons";
+import AdminActionForm from "../../ui/AdminActionForm";
 
 export default async function ExperienceAdminPage() {
     const { data: experience } = await supabaseAdmin
@@ -39,12 +40,12 @@ export default async function ExperienceAdminPage() {
 
             <div className="space-y-3 mb-6">
                 <AddNewRow label="Add a role">
-                    <form action={handleCreate} className="mt-4 space-y-4 max-w-xl">
+                    <AdminActionForm action={handleCreate} className="mt-4 space-y-4 max-w-xl">
                         <ExperienceFields />
                         <button type="submit" className={buttonPrimary}>
                             Add role
                         </button>
-                    </form>
+                    </AdminActionForm>
                 </AddNewRow>
             </div>
 
@@ -75,19 +76,24 @@ function ExperienceRow({ exp }) {
 
     return (
         <ItemRow title={`${exp.role} · ${exp.company}`} meta={exp.period}>
-            <form action={handleUpdate} className="mt-4 space-y-4 max-w-xl">
+            <AdminActionForm action={handleUpdate} className="mt-4 space-y-4 max-w-xl">
                 <ExperienceFields exp={exp} />
                 <button type="submit" className={buttonPrimary}>
                     Save changes
                 </button>
-            </form>
+            </AdminActionForm>
 
-            <form action={handleDelete} className="mt-4">
+            <AdminActionForm
+                action={handleDelete}
+                className="mt-4"
+                confirmMessage="This experience entry will be permanently deleted."
+                successMessage="The experience entry was deleted."
+            >
                 <button type="submit" className={linkDanger}>
                     <TrashIcon className="w-4 h-4" />
                     Delete this role
                 </button>
-            </form>
+            </AdminActionForm>
         </ItemRow>
     );
 }

@@ -12,6 +12,7 @@ import { ItemRow, AddNewRow } from "../../ui/CollapsibleRow";
 import { MonthYearFields, CurrentCheckbox } from "../../ui/MonthYearFields";
 import { buttonPrimary, linkDanger } from "../../ui/tokens";
 import { TrashIcon } from "../../ui/icons";
+import AdminActionForm from "../../ui/AdminActionForm";
 
 export default async function EducationAdminPage() {
     const { data: education } = await supabaseAdmin
@@ -30,12 +31,12 @@ export default async function EducationAdminPage() {
 
             <div className="mb-6">
                 <AddNewRow label="Add an entry">
-                    <form action={handleCreate} className="mt-4 space-y-4 max-w-xl">
+                    <AdminActionForm action={handleCreate} className="mt-4 space-y-4 max-w-xl">
                         <EduFields />
                         <button type="submit" className={buttonPrimary}>
                             Add entry
                         </button>
-                    </form>
+                    </AdminActionForm>
                 </AddNewRow>
             </div>
 
@@ -63,19 +64,24 @@ function EduRow({ edu }) {
 
     return (
         <ItemRow title={edu.degree} meta={edu.period}>
-            <form action={handleUpdate} className="mt-4 space-y-4 max-w-xl">
+            <AdminActionForm action={handleUpdate} className="mt-4 space-y-4 max-w-xl">
                 <EduFields edu={edu} />
                 <button type="submit" className={buttonPrimary}>
                     Save changes
                 </button>
-            </form>
+            </AdminActionForm>
 
-            <form action={handleDelete} className="mt-4">
+            <AdminActionForm
+                action={handleDelete}
+                className="mt-4"
+                confirmMessage="This education entry will be permanently deleted."
+                successMessage="The education entry was deleted."
+            >
                 <button type="submit" className={linkDanger}>
                     <TrashIcon className="w-4 h-4" />
                     Delete this entry
                 </button>
-            </form>
+            </AdminActionForm>
         </ItemRow>
     );
 }
