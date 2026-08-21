@@ -10,6 +10,7 @@ import EmptyState from "../../ui/EmptyState";
 import { ItemRow, AddNewRow } from "../../ui/CollapsibleRow";
 import { labelBase, buttonPrimary, linkDanger } from "../../ui/tokens";
 import { TrashIcon } from "../../ui/icons";
+import AdminActionForm from "../../ui/AdminActionForm";
 
 export default async function ProjectsAdminPage() {
     const { data: projects } = await supabaseAdmin
@@ -28,12 +29,12 @@ export default async function ProjectsAdminPage() {
 
             <div className="mb-6">
                 <AddNewRow label="Add a new project">
-                    <form action={handleCreate} className="mt-4 space-y-4 max-w-xl">
+                    <AdminActionForm action={handleCreate} className="mt-4 space-y-4 max-w-xl">
                         <ProjectFields />
                         <button type="submit" className={buttonPrimary}>
                             Add project
                         </button>
-                    </form>
+                    </AdminActionForm>
                 </AddNewRow>
             </div>
 
@@ -61,12 +62,12 @@ function ProjectRow({ project }) {
 
     return (
         <ItemRow title={project.title} meta={(project.tags || []).join(", ")}>
-            <form action={handleUpdate} className="mt-4 space-y-4 max-w-xl">
+            <AdminActionForm action={handleUpdate} className="mt-4 space-y-4 max-w-xl">
                 <ProjectFields project={project} />
                 <button type="submit" className={buttonPrimary}>
                     Save changes
                 </button>
-            </form>
+            </AdminActionForm>
 
             <form action={handleDelete} className="mt-4">
                 <button type="submit" className={linkDanger}>

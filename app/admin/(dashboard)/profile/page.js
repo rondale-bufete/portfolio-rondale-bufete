@@ -3,6 +3,7 @@ import { updateProfileAction } from "../../actions/profile";
 import PageHeader from "../../ui/PageHeader";
 import Card from "../../ui/Card";
 import Field from "../../ui/Field";
+import AdminActionForm from "../../ui/AdminActionForm";
 import { labelBase, buttonPrimary } from "../../ui/tokens";
 
 export default async function ProfileAdminPage() {
@@ -21,7 +22,7 @@ export default async function ProfileAdminPage() {
             />
 
             <Card className="max-w-xl">
-                <form action={handleSubmit} className="space-y-5">
+                <AdminActionForm action={handleSubmit} className="space-y-5">
                     <input type="hidden" name="existing_photo_url" value={profile?.photo_url || ""} />
                     <input type="hidden" name="existing_resume_url" value={profile?.resume_url || ""} />
 
@@ -59,7 +60,7 @@ export default async function ProfileAdminPage() {
                             Save changes
                         </button>
                     </div>
-                </form>
+                </AdminActionForm>
             </Card>
         </div>
     );

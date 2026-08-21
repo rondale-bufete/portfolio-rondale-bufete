@@ -12,6 +12,7 @@ import { ItemRow, AddNewRow } from "../../ui/CollapsibleRow";
 import { MonthYearFields } from "../../ui/MonthYearFields";
 import { labelBase, buttonPrimary, linkDanger } from "../../ui/tokens";
 import { TrashIcon } from "../../ui/icons";
+import AdminActionForm from "../../ui/AdminActionForm";
 
 export default async function CertificationsAdminPage() {
     const { data: certifications } = await supabaseAdmin
@@ -30,12 +31,12 @@ export default async function CertificationsAdminPage() {
 
             <div className="mb-6">
                 <AddNewRow label="Add a new certification">
-                    <form action={handleCreate} className="mt-4 space-y-4 max-w-xl">
+                    <AdminActionForm action={handleCreate} className="mt-4 space-y-4 max-w-xl">
                         <CertFields />
                         <button type="submit" className={buttonPrimary}>
                             Add certification
                         </button>
-                    </form>
+                    </AdminActionForm>
                 </AddNewRow>
             </div>
 
@@ -63,12 +64,12 @@ function CertRow({ cert }) {
 
     return (
         <ItemRow title={cert.title} meta={cert.issuer}>
-            <form action={handleUpdate} className="mt-4 space-y-4 max-w-xl">
+            <AdminActionForm action={handleUpdate} className="mt-4 space-y-4 max-w-xl">
                 <CertFields cert={cert} />
                 <button type="submit" className={buttonPrimary}>
                     Save changes
                 </button>
-            </form>
+            </AdminActionForm>
 
             <form action={handleDelete} className="mt-4">
                 <button type="submit" className={linkDanger}>
