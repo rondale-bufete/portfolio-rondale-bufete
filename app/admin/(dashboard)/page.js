@@ -53,7 +53,7 @@ export default async function AdminOverview() {
                 <div className="flex items-start justify-between gap-4 mb-4">
                     <div>
                         <p className="text-xs font-semibold uppercase tracking-wide text-[#5B5F66] mb-2">
-                            Web visits
+                            Web Views
                         </p>
                         <h2 className="text-2xl text-[#14161A]" style={{ fontFamily: "var(--font-display)" }}>
                             {analytics.available ? analytics.pageviews.toLocaleString() : "Unavailable"}
