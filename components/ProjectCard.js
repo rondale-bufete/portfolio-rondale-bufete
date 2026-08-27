@@ -38,7 +38,7 @@ export default function ProjectCard({ project }) {
                     {project.title}
                 </h3>
 
-                <p className="mb-2 text-[#5B5F66] text-sm leading-relaxed">
+                <p className="mb-2 text-[#5B5F66] text-sm leading-relaxed text-justify">
                     {descriptionPreview || "No description available."}
                 </p>
 

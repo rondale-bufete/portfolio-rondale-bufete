@@ -85,7 +85,7 @@ function CertificationCard({ cert }) {
                     </p>
                 )}
                 {cert.description && (
-                    <p className="text-[#5B5F66] text-sm mt-2 leading-relaxed">
+                    <p className="text-[#5B5F66] text-sm mt-2 leading-relaxed text-justify">
                         {cert.description}
                     </p>
                 )}
