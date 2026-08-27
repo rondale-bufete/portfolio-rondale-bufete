@@ -23,7 +23,7 @@ export default function Experience({
                             </p>
                         </div>
 
-                        <div className="rounded-xl border border-[#E4E4E7] bg-white p-5 shadow-[0_1px_2px_rgba(20,22,26,0.04)] transition-all hover:-translate-y-0.5 hover:border-[#3355FF]/40 hover:shadow-[0_8px_20px_rgba(20,22,26,0.06)] sm:p-6">
+                        <div className="rounded-xl border border-[#E4E4E7] bg-[#F6F6F8] p-5 shadow-[0_1px_2px_rgba(20,22,26,0.04)] transition-all hover:-translate-y-0.5 hover:border-[#3355FF]/40 hover:shadow-[0_8px_20px_rgba(20,22,26,0.06)] sm:p-6">
                             <h4 className="font-(family-name:--font-display) text-xl font-medium tracking-tight">
                                 {exp.role}
                             </h4>

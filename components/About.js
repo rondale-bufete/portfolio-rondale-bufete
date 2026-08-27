@@ -72,15 +72,15 @@ function CertificationCard({ cert }) {
             </div>
 
             <div className="p-5 flex-1 flex flex-col">
-                <p className="font-[family-name:var(--font-mono)] text-xs text-[#3355FF] mb-1">
+                <p className="font-mono text-xs text-[#3355FF] mb-1">
                     {cert.date}
                 </p>
-                <h4 className="font-[family-name:var(--font-display)] text-base font-medium leading-snug">
+                <h4 className="font-(family-name:--font-display) text-base font-medium leading-snug">
                     {cert.title}
                 </h4>
                 <p className="text-[#5B5F66] text-sm mt-0.5">{cert.issuer}</p>
                 {cert.credentialId && (
-                    <p className="text-[#5B5F66] text-xs mt-1 font-[family-name:var(--font-mono)]">
+                    <p className="text-[#5B5F66] text-xs mt-1 font-mono">
                         ID: {cert.credentialId}
                     </p>
                 )}
@@ -103,46 +103,51 @@ export default function About({
 }) {
     return (
         <section id="about" className="max-w-5xl mx-auto px-6 py-20 border-t border-[#E4E4E7]">
-            <p className="font-[family-name:var(--font-mono)] text-sm text-[#3355FF] mb-3">{label}</p>
-            <h2 className="font-[family-name:var(--font-display)] text-3xl md:text-4xl font-medium tracking-tight mb-6 max-w-xl">
+            <p className="font-mono text-sm text-[#3355FF] mb-3">{label}</p>
+            <h2 className="font-(family-name:--font-display) text-3xl md:text-4xl font-medium tracking-tight mb-6 max-w-xl">
                 {heading}
             </h2>
-            <p className="text-[#5B5F66] text-lg leading-relaxed max-w-2xl mb-14">
-                {profile?.bio}
-            </p>
+            <div className="mb-16 grid max-w-4xl gap-6 border-l-2 border-[#3355FF] pl-5 sm:pl-7 lg:grid-cols-[minmax(0,1.3fr)_minmax(14rem,0.7fr)] lg:items-start lg:gap-12">
+                <p className="font-(family-name:--font-display) text-lg leading-relaxed text-[#454951] sm:text-xl">
+                    {profile?.bio}
+                </p>
+                <div className="border-t border-[#E4E4E7] pt-4 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+                    <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.16em] text-[#3355FF]">
+                        Approach
+                    </p>
+                    <p className="text-sm leading-6 text-[#5B5F66]">
+                        Thoughtful interfaces, practical engineering, and a focus on work that lasts.
+                    </p>
+                </div>
+            </div>
 
             {education.length > 0 && (
                 <div>
-                    <h3 className="font-[family-name:var(--font-mono)] text-sm text-[#5B5F66] mb-6 uppercase tracking-wide">
+                    <h3 className="mb-6 font-mono text-sm uppercase tracking-wide text-[#5B5F66]">
                         Education
                     </h3>
-                    <div className="space-y-8 max-w-2xl">
+                    <div className="relative max-w-4xl space-y-5 before:absolute before:left-1.25 before:top-3 before:h-[calc(100%-1.5rem)] before:w-px before:bg-[#D9DDE5]">
                         {education.map((edu, i) => (
-                            <div key={i} className="flex gap-6">
-                                <div className="flex flex-col items-center pt-1.5">
-                                    <span className="w-2 h-2 rounded-full bg-[#3355FF] shrink-0" />
-                                    {i < education.length - 1 && (
-                                        <span className="w-px flex-1 bg-[#E4E4E7] mt-2" />
-                                    )}
-                                </div>
-                                <div className="pb-2">
-                                    <p className="font-[family-name:var(--font-mono)] text-xs text-[#3355FF] mb-1">
+                            <div key={i} className="relative pl-8 sm:pl-10">
+                                <span className="absolute left-0 top-5 z-10 h-3 w-3 rounded-full border-2 border-[#FAFAFA] bg-[#3355FF] shadow-[0_0_0_3px_#E8EDFF]" />
+                                <div className="rounded-xl border border-[#E4E4E7] bg-white p-5 shadow-[0_1px_2px_rgba(20,22,26,0.04)] transition-all hover:-translate-y-0.5 hover:border-[#3355FF]/40 hover:shadow-[0_8px_20px_rgba(20,22,26,0.06)] sm:p-6">
+                                    <p className="mb-2 font-mono text-[11px] text-[#3355FF]">
                                         {edu.period}
                                     </p>
-                                    <h4 className="font-[family-name:var(--font-display)] text-lg font-medium">
+                                    <h4 className="font-(family-name:--font-display) text-xl font-medium tracking-tight">
                                         {edu.degree}
                                     </h4>
-                                    <p className="text-[#5B5F66] text-sm mt-0.5">{edu.school}</p>
+                                    <p className="mt-1 text-sm font-medium text-[#5B5F66]">{edu.school}</p>
                                     {edu.description && (
-                                        <p className="text-[#5B5F66] text-sm mt-2 leading-relaxed">
+                                        <p className="mt-4 border-t border-[#E4E4E7] pt-4 text-sm leading-relaxed text-[#5B5F66]">
                                             {edu.description}
                                         </p>
                                     )}
                                     {edu.bullets?.length > 0 && (
-                                        <ul className="mt-2 space-y-1">
+                                        <ul className="mt-4 space-y-2 border-t border-[#E4E4E7] pt-4">
                                             {edu.bullets.map((bullet, bi) => (
-                                                <li key={bi} className="text-[#5B5F66] text-sm leading-relaxed flex gap-2">
-                                                    <span className="text-[#3355FF] shrink-0">—</span>
+                                                <li key={bi} className="flex gap-3 text-sm leading-relaxed text-[#5B5F66]">
+                                                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#3355FF]" />
                                                     <span>{bullet}</span>
                                                 </li>
                                             ))}
@@ -157,7 +162,7 @@ export default function About({
 
             {certifications.length > 0 && (
                 <div className="mt-16">
-                    <h3 className="font-[family-name:var(--font-mono)] text-sm text-[#5B5F66] mb-6 uppercase tracking-wide">
+                    <h3 className="font-mono text-sm text-[#5B5F66] mb-6 uppercase tracking-wide">
                         Certifications
                     </h3>
                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
