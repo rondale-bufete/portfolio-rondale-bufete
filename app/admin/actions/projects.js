@@ -4,9 +4,10 @@ import { revalidatePath } from "next/cache";
 import { supabaseAdmin, uploadAsset } from "@/lib/supabase/admin";
 import { parseBullets } from "@/lib/monthYear";
 
-function refresh() {
+function refresh(id) {
     revalidatePath("/");
     revalidatePath("/admin/projects");
+    if (id) revalidatePath(`/projects/${id}`);
 }
 
 async function nextSortOrder() {
@@ -59,11 +60,11 @@ export async function updateProjectAction(id, formData) {
 
     const { error } = await supabaseAdmin.from("projects").update(patch).eq("id", id);
     if (error) throw new Error(error.message);
-    refresh();
+    refresh(id);
 }
 
 export async function deleteProjectAction(id) {
     const { error } = await supabaseAdmin.from("projects").delete().eq("id", id);
     if (error) throw new Error(error.message);
-    refresh();
+    refresh(id);
 }

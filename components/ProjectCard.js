@@ -1,9 +1,23 @@
 import Image from "next/image";
+import Link from "next/link";
+
+const DESCRIPTION_PREVIEW_LENGTH = 200;
 
 export default function ProjectCard({ project }) {
+    const description = project.description || "";
+    const descriptionPreview = description.length > DESCRIPTION_PREVIEW_LENGTH
+        ? `${description.slice(0, DESCRIPTION_PREVIEW_LENGTH).trimEnd()}...`
+        : description;
+
     return (
-        <div className="group border border-[#E4E4E7] rounded-xl overflow-hidden bg-white hover:border-[#3355FF] transition-colors">
-            <div className="relative aspect-video bg-[#ffffff] overflow-hidden">
+        <article className="group relative border border-[#E4E4E7] rounded-xl overflow-hidden bg-white hover:border-[#3355FF] transition-colors">
+            <Link
+                href={`/projects/${project.id}`}
+                aria-label={`View ${project.title} project details`}
+                className="absolute inset-0 z-0 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[#3355FF] focus-visible:ring-inset"
+            />
+
+            <div className="relative z-10 aspect-video bg-[#ffffff] overflow-hidden pointer-events-none">
                 {project.imageUrl ? (
                     <Image
                         src={project.imageUrl}
@@ -13,51 +27,45 @@ export default function ProjectCard({ project }) {
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                 ) : (
-                    <div className="w-full h-full flex items-center justify-center text-[#9A9DA3] text-sm font-[family-name:var(--font-mono)]">
+                    <div className="w-full h-full flex items-center justify-center text-[#9A9DA3] text-sm font-mono">
                         [ screenshot placeholder ]
                     </div>
                 )}
             </div>
 
-            <div className="p-6">
-                <h3 className="font-[family-name:var(--font-display)] text-xl font-medium mb-2">
+            <div className="relative z-10 p-6 pointer-events-none">
+                <h3 className="font-(family-name:--font-display) text-xl font-medium mb-2">
                     {project.title}
                 </h3>
-                <p className="text-[#5B5F66] text-sm leading-relaxed mb-4">
-                    {project.description}
+
+                <p className="mb-2 text-[#5B5F66] text-sm leading-relaxed">
+                    {descriptionPreview || "No description available."}
                 </p>
 
-                {project.highlights?.length > 0 && (
-                    <ul className="space-y-1 mb-4">
-                        {project.highlights.map((h, i) => (
-                            <li key={i} className="text-[#5B5F66] text-sm leading-relaxed flex gap-2">
-                                <span className="text-[#3355FF] shrink-0">—</span>
-                                <span>{h}</span>
-                            </li>
-                        ))}
-                    </ul>
-                )}
+                <div className="flex items-center gap-4 text-sm font-medium mb-5">
+                    {project.liveUrl && (
+                        <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="relative z-20 pointer-events-auto text-[#3355FF] hover:underline">
+                            Live demo &rarr;
+                        </a>
+                    )}
+                    {project.repoUrl && (
+                        <a href={project.repoUrl} target="_blank" rel="noopener noreferrer" className="relative z-20 pointer-events-auto text-[#5B5F66] hover:text-[#14161A] transition-colors">
+                            View code
+                        </a>
+                    )}
+                </div>
 
-                <div className="flex flex-wrap gap-2 mb-5">
+                <div className="flex flex-wrap gap-2">
                     {project.tags.map((tag) => (
                         <span
                             key={tag}
-                            className="font-[family-name:var(--font-mono)] text-xs px-2.5 py-1 rounded bg-[#F0F0F2] text-[#5B5F66]"
+                            className="font-mono text-xs px-2.5 py-1 rounded bg-[#F0F0F2] text-[#5B5F66]"
                         >
                             {tag}
                         </span>
                     ))}
                 </div>
-
-                <div className="flex items-center gap-4 text-sm font-medium">
-                    <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="text-[#3355FF] hover:underline">
-                        Live demo →
-                    </a>
-                    <a href={project.repoUrl} target="_blank" rel="noopener noreferrer" className="text-[#5B5F66] hover:text-[#14161A] transition-colors">
-                        View code
-                    </a>
-                </div>
             </div>
-        </div>
+        </article>
     );
 }

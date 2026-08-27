@@ -10,7 +10,7 @@ export default function Projects({ projects = [], label = "03 — Projects", hea
 
             <div className="grid md:grid-cols-2 gap-6">
                 {projects.map((project) => (
-                    <ProjectCard key={project.title} project={project} />
+                    <ProjectCard key={project.id} project={project} />
                 ))}
             </div>
         </section>
