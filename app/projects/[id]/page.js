@@ -46,7 +46,7 @@ export default async function ProjectDetailsPage({ params }) {
                     </h1>
                 </header>
 
-                <section className="mb-12 grid gap-6 lg:grid-cols-[18rem_1fr]">
+                <section className="mb-6 grid gap-6 lg:grid-cols-[7fr_3fr]">
                     {project.imageUrl ? (
                         <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-[#E4E4E7] bg-[#14161A] shadow-[0_1px_2px_rgba(20,22,26,0.04)]">
                             <Image
@@ -54,7 +54,7 @@ export default async function ProjectDetailsPage({ params }) {
                                 alt={`${project.title} project preview`}
                                 fill
                                 priority
-                                sizes="(max-width: 1024px) 100vw, 288px"
+                                sizes="(max-width: 1024px) 100vw, 630px"
                                 className="object-contain"
                             />
                         </div>
@@ -82,28 +82,8 @@ export default async function ProjectDetailsPage({ params }) {
                             </div>
                         )}
 
-                        {project.repoUrl && (
-                            <div className="flex flex-col justify-between gap-4 rounded-xl border border-[#E4E4E7] bg-white p-5">
-                                <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#9A9DA3]">
-                                    Source code
-                                </p>
-                                <a
-                                    href={project.repoUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1.5 text-sm font-medium text-[#454951] hover:text-[#14161A] hover:underline focus:outline-none focus:ring-2 focus:ring-[#3355FF] focus:ring-offset-2"
-                                >
-                                    View repository
-                                    <span aria-hidden="true">&rarr;</span>
-                                </a>
-                            </div>
-                        )}
-
                         {project.tags.length > 0 && (
-                            <div
-                                className={`rounded-xl border border-[#E4E4E7] bg-white p-5 ${project.liveUrl && project.repoUrl ? "sm:col-span-2" : ""
-                                    }`}
-                            >
+                            <div className="rounded-xl border border-[#E4E4E7] bg-white p-5">
                                 <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.14em] text-[#9A9DA3]">
                                     Technology stack
                                 </p>
@@ -121,6 +101,23 @@ export default async function ProjectDetailsPage({ params }) {
                         )}
                     </div>
                 </section>
+
+                {project.repoUrl && (
+                    <div className="mb-12 flex flex-col justify-between gap-4 rounded-xl border border-[#E4E4E7] bg-white p-5 sm:flex-row sm:items-center">
+                        <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#9A9DA3]">
+                            Source code
+                        </p>
+                        <a
+                            href={project.repoUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 text-sm font-medium text-[#454951] hover:text-[#14161A] hover:underline focus:outline-none focus:ring-2 focus:ring-[#3355FF] focus:ring-offset-2"
+                        >
+                            View repository
+                            <span aria-hidden="true">&rarr;</span>
+                        </a>
+                    </div>
+                )}
 
                 <div className="space-y-12">
                     <section>
