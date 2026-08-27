@@ -47,7 +47,8 @@ export default async function ProjectDetailsPage({ params }) {
                 </header>
 
                 <section className="mb-6 grid gap-6 lg:grid-cols-[7fr_3fr]">
-                    {project.imageUrl ? (
+                    {project.imageUrl ? ( 
+                        // mb-12 flex flex-col justify-between gap-4 rounded-xl border border-[#E4E4E7] bg-white p-5 sm:flex-row sm:items-center
                         <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-[#E4E4E7] bg-[#14161A] shadow-[0_1px_2px_rgba(20,22,26,0.04)]">
                             <Image
                                 src={project.imageUrl}
@@ -83,7 +84,7 @@ export default async function ProjectDetailsPage({ params }) {
                         )}
 
                         {project.tags.length > 0 && (
-                            <div className="rounded-xl border border-[#E4E4E7] bg-white p-5">
+                            <div className="mb-12 flex flex-col justify-between gap-4 rounded-xl border border-[#E4E4E7] bg-white p-5 sm:flex-row sm:items-center">
                                 <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.14em] text-[#9A9DA3]">
                                     Technology stack
                                 </p>
