@@ -3,13 +3,14 @@ import {
     createProjectAction,
     updateProjectAction,
     deleteProjectAction,
+    moveProjectAction,
 } from "../../actions/projects";
 import PageHeader from "../../ui/PageHeader";
 import Field from "../../ui/Field";
 import EmptyState from "../../ui/EmptyState";
 import { ItemRow, AddNewRow } from "../../ui/CollapsibleRow";
-import { labelBase, buttonPrimary, linkDanger } from "../../ui/tokens";
-import { TrashIcon } from "../../ui/icons";
+import { labelBase, buttonPrimary, buttonIcon, linkDanger } from "../../ui/tokens";
+import { ArrowUpIcon, ArrowDownIcon, TrashIcon } from "../../ui/icons";
 import AdminActionForm from "../../ui/AdminActionForm";
 
 export default async function ProjectsAdminPage() {
@@ -39,8 +40,13 @@ export default async function ProjectsAdminPage() {
             </div>
 
             <div className="space-y-3">
-                {(projects || []).map((project) => (
-                    <ProjectRow key={project.id} project={project} />
+                {(projects || []).map((project, index) => (
+                    <ProjectRow
+                        key={project.id}
+                        project={project}
+                        isFirst={index === 0}
+                        isLast={index === (projects?.length || 0) - 1}
+                    />
                 ))}
                 {(!projects || projects.length === 0) && (
                     <EmptyState title="No projects yet" description="Add your first one above." />
@@ -50,7 +56,15 @@ export default async function ProjectsAdminPage() {
     );
 }
 
-function ProjectRow({ project }) {
+function ProjectRow({ project, isFirst, isLast }) {
+    async function handleMoveUp() {
+        "use server";
+        await moveProjectAction(project.id, "up");
+    }
+    async function handleMoveDown() {
+        "use server";
+        await moveProjectAction(project.id, "down");
+    }
     async function handleUpdate(formData) {
         "use server";
         await updateProjectAction(project.id, formData);
@@ -62,6 +76,19 @@ function ProjectRow({ project }) {
 
     return (
         <ItemRow title={project.title} meta={(project.tags || []).join(", ")}>
+            <div className="mt-4 flex items-center gap-2">
+                <AdminActionForm action={handleMoveUp}>
+                    <button type="submit" disabled={isFirst} className={buttonIcon} title="Move up" aria-label="Move up">
+                        <ArrowUpIcon className="w-4 h-4" />
+                    </button>
+                </AdminActionForm>
+                <AdminActionForm action={handleMoveDown}>
+                    <button type="submit" disabled={isLast} className={buttonIcon} title="Move down" aria-label="Move down">
+                        <ArrowDownIcon className="w-4 h-4" />
+                    </button>
+                </AdminActionForm>
+            </div>
+
             <AdminActionForm action={handleUpdate} className="mt-4 space-y-4 max-w-xl">
                 <ProjectFields project={project} />
                 <button type="submit" className={buttonPrimary}>

@@ -26,6 +26,32 @@ function parseTags(raw) {
         .filter(Boolean);
 }
 
+export async function moveProjectAction(id, direction) {
+    const { data: all, error: fetchError } = await supabaseAdmin
+        .from("projects")
+        .select("id, sort_order")
+        .order("sort_order");
+    if (fetchError) throw new Error(fetchError.message);
+    if (!all) return;
+
+    const index = all.findIndex((project) => project.id === id);
+    if (index === -1) return;
+
+    const swapIndex = direction === "up" ? index - 1 : index + 1;
+    if (swapIndex < 0 || swapIndex >= all.length) return;
+
+    const current = all[index];
+    const neighbor = all[swapIndex];
+    const results = await Promise.all([
+        supabaseAdmin.from("projects").update({ sort_order: neighbor.sort_order }).eq("id", current.id),
+        supabaseAdmin.from("projects").update({ sort_order: current.sort_order }).eq("id", neighbor.id),
+    ]);
+    const updateError = results.find(({ error }) => error)?.error;
+    if (updateError) throw new Error(updateError.message);
+
+    refresh();
+}
+
 export async function createProjectAction(formData) {
     const imageFile = formData.get("image");
     const imageUrl = await uploadAsset(imageFile, "projects");
