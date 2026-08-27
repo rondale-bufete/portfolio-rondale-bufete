@@ -19,7 +19,7 @@ export default function AdminNav({ logoutAction }) {
     const pathname = usePathname();
 
     return (
-        <aside className="md:w-60 gap-3 shrink-0 bg-white border-b md:border-b-0 md:border-r border-[#E4E4E7] md:min-h-screen w-20% flex flex-col">
+        <aside className="gap-3 shrink-0 bg-white border-b md:border-b-0 md:border-r border-[#E4E4E7] md:fixed md:inset-y-0 md:left-0 md:z-30 md:w-60 md:overflow-y-auto w-full flex flex-col">
             <div className="px-6 pt-7 pb-6">
                 <div className="flex items-center gap-2.5">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#3355FF]" />
