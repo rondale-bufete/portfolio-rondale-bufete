@@ -46,16 +46,15 @@ export default async function ProjectDetailsPage({ params }) {
                     </h1>
                 </header>
 
-                <section className="mb-6 grid gap-6 lg:grid-cols-[7fr_3fr]">
-                    {project.imageUrl ? ( 
-                        // mb-12 flex flex-col justify-between gap-4 rounded-xl border border-[#E4E4E7] bg-white p-5 sm:flex-row sm:items-center
+                <section className="mb-12 grid gap-6">
+                    {project.imageUrl ? (
                         <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-[#E4E4E7] bg-[#14161A] shadow-[0_1px_2px_rgba(20,22,26,0.04)]">
                             <Image
                                 src={project.imageUrl}
                                 alt={`${project.title} project preview`}
                                 fill
                                 priority
-                                sizes="(max-width: 1024px) 100vw, 630px"
+                                sizes="(max-width: 1024px) 100vw, 896px"
                                 className="object-contain"
                             />
                         </div>
@@ -65,60 +64,53 @@ export default async function ProjectDetailsPage({ params }) {
                         </div>
                     )}
 
-                    <div className="grid gap-4 sm:grid-cols-2">
-                        {project.liveUrl && (
-                            <div className="flex flex-col justify-between gap-4 rounded-xl border border-[#E4E4E7] bg-white p-5">
-                                <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#9A9DA3]">
-                                    Live demo
-                                </p>
+                    {(project.tags.length > 0 || project.liveUrl) && (
+                        <div className="rounded-xl border border-[#E4E4E7] bg-white p-5 sm:p-6">
+                            <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.14em] text-[#9A9DA3]">
+                                Technology stack
+                            </p>
+                            <div className="flex flex-wrap gap-2">
+                                {project.tags.map((tag) => (
+                                    <span
+                                        key={tag}
+                                        className="rounded-md border border-[#D9DDE5] bg-[#FAFAFA] px-3 py-1.5 font-mono text-xs text-[#454951]"
+                                    >
+                                        {tag}
+                                    </span>
+                                ))}
+                            </div>
+
+                            {project.liveUrl && (
                                 <a
                                     href={project.liveUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1.5 text-sm font-medium text-[#3355FF] hover:underline focus:outline-none focus:ring-2 focus:ring-[#3355FF] focus:ring-offset-2"
+                                    className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-[#3355FF] hover:underline focus:outline-none focus:ring-2 focus:ring-[#3355FF] focus:ring-offset-2"
                                 >
-                                    Visit site
+                                    Visit live site
                                     <span aria-hidden="true">&rarr;</span>
                                 </a>
-                            </div>
-                        )}
+                            )}
+                        </div>
+                    )}
 
-                        {project.tags.length > 0 && (
-                            <div className="mb-12 flex flex-col justify-between gap-4 rounded-xl border border-[#E4E4E7] bg-white p-5 sm:flex-row sm:items-center">
-                                <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.14em] text-[#9A9DA3]">
-                                    Technology stack
-                                </p>
-                                <div className="flex flex-wrap gap-2">
-                                    {project.tags.map((tag) => (
-                                        <span
-                                            key={tag}
-                                            className="rounded-md border border-[#D9DDE5] bg-[#FAFAFA] px-3 py-1.5 font-mono text-xs text-[#454951]"
-                                        >
-                                            {tag}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                    </div>
+                    {project.repoUrl && (
+                        <div className="flex flex-col justify-between gap-4 rounded-xl border border-[#E4E4E7] bg-white p-5 sm:flex-row sm:items-center sm:p-6">
+                            <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#9A9DA3]">
+                                Source code
+                            </p>
+                            <a
+                                href={project.repoUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 text-sm font-medium text-[#454951] hover:text-[#14161A] hover:underline focus:outline-none focus:ring-2 focus:ring-[#3355FF] focus:ring-offset-2"
+                            >
+                                View repository
+                                <span aria-hidden="true">&rarr;</span>
+                            </a>
+                        </div>
+                    )}
                 </section>
-
-                {project.repoUrl && (
-                    <div className="mb-12 flex flex-col justify-between gap-4 rounded-xl border border-[#E4E4E7] bg-white p-5 sm:flex-row sm:items-center">
-                        <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#9A9DA3]">
-                            Source code
-                        </p>
-                        <a
-                            href={project.repoUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 text-sm font-medium text-[#454951] hover:text-[#14161A] hover:underline focus:outline-none focus:ring-2 focus:ring-[#3355FF] focus:ring-offset-2"
-                        >
-                            View repository
-                            <span aria-hidden="true">&rarr;</span>
-                        </a>
-                    </div>
-                )}
 
                 <div className="space-y-12">
                     <section>
