@@ -133,17 +133,19 @@ function ProjectFields({ project }) {
             <Field label="Live demo URL" name="live_url" defaultValue={project?.live_url} />
             <Field label="Repo URL" name="repo_url" defaultValue={project?.repo_url} />
             <div>
-                <label className={labelBase}>Screenshot</label>
+                <label className={labelBase}>Showcase images</label>
                 <div className="flex items-center gap-4">
-                    {project?.image_url && (
+                    {(project?.image_urls?.length ? project.image_urls : project?.image_url ? [project.image_url] : []).map((imageUrl) => (
                         <img
-                            src={project.image_url}
+                            key={imageUrl}
+                            src={imageUrl}
                             alt=""
                             className="w-28 aspect-video object-cover rounded-md border border-[#E4E4E7] shrink-0"
                         />
-                    )}
-                    <input type="file" name="image" accept="image/*" className="text-sm text-[#5B5F66]" />
+                    ))}
+                    <input type="file" name="images" accept="image/*" multiple className="text-sm text-[#5B5F66]" />
                 </div>
+                <p className="mt-1 text-xs text-[#5B5F66]">Select multiple images to replace the current showcase gallery.</p>
             </div>
         </>
     );

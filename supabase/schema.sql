@@ -69,6 +69,7 @@ create table if not exists projects (
   live_url text not null default '',
   repo_url text not null default '',
   image_url text not null default '',
+  image_urls text[] not null default '{}',
   sort_order int not null default 0,
   created_at timestamptz not null default now()
 );

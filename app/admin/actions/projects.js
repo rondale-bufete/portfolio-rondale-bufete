@@ -53,8 +53,8 @@ export async function moveProjectAction(id, direction) {
 }
 
 export async function createProjectAction(formData) {
-    const imageFile = formData.get("image");
-    const imageUrl = await uploadAsset(imageFile, "projects");
+    const imageFiles = formData.getAll("images");
+    const imageUrls = (await Promise.all(imageFiles.map((file) => uploadAsset(file, "projects")))).filter(Boolean);
 
     const { error } = await supabaseAdmin.from("projects").insert({
         title: formData.get("title")?.toString() || "",
@@ -63,7 +63,8 @@ export async function createProjectAction(formData) {
         highlights: parseBullets(formData.get("highlights")?.toString()),
         live_url: formData.get("live_url")?.toString() || "",
         repo_url: formData.get("repo_url")?.toString() || "",
-        image_url: imageUrl || "",
+        image_url: imageUrls[0] || "",
+        image_urls: imageUrls,
         sort_order: await nextSortOrder(),
     });
     if (error) throw new Error(error.message);
@@ -71,8 +72,8 @@ export async function createProjectAction(formData) {
 }
 
 export async function updateProjectAction(id, formData) {
-    const imageFile = formData.get("image");
-    const imageUrl = await uploadAsset(imageFile, "projects");
+    const imageFiles = formData.getAll("images");
+    const imageUrls = (await Promise.all(imageFiles.map((file) => uploadAsset(file, "projects")))).filter(Boolean);
 
     const patch = {
         title: formData.get("title")?.toString() || "",
@@ -82,7 +83,10 @@ export async function updateProjectAction(id, formData) {
         live_url: formData.get("live_url")?.toString() || "",
         repo_url: formData.get("repo_url")?.toString() || "",
     };
-    if (imageUrl) patch.image_url = imageUrl;
+    if (imageUrls.length > 0) {
+        patch.image_url = imageUrls[0];
+        patch.image_urls = imageUrls;
+    }
 
     const { error } = await supabaseAdmin.from("projects").update(patch).eq("id", id);
     if (error) throw new Error(error.message);
