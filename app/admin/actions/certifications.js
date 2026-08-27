@@ -25,6 +25,32 @@ function resolvedDate(formData) {
     return composed || formData.get("date_fallback")?.toString() || "";
 }
 
+export async function moveCertificationAction(id, direction) {
+    const { data: all, error: fetchError } = await supabaseAdmin
+        .from("certifications")
+        .select("id, sort_order")
+        .order("sort_order");
+    if (fetchError) throw new Error(fetchError.message);
+    if (!all) return;
+
+    const index = all.findIndex((certification) => certification.id === id);
+    if (index === -1) return;
+
+    const swapIndex = direction === "up" ? index - 1 : index + 1;
+    if (swapIndex < 0 || swapIndex >= all.length) return;
+
+    const current = all[index];
+    const neighbor = all[swapIndex];
+    const results = await Promise.all([
+        supabaseAdmin.from("certifications").update({ sort_order: neighbor.sort_order }).eq("id", current.id),
+        supabaseAdmin.from("certifications").update({ sort_order: current.sort_order }).eq("id", neighbor.id),
+    ]);
+    const updateError = results.find(({ error }) => error)?.error;
+    if (updateError) throw new Error(updateError.message);
+
+    refresh();
+}
+
 export async function createCertificationAction(formData) {
     const imageFile = formData.get("image");
     const pdfFile = formData.get("pdf");

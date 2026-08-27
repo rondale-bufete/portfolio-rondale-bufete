@@ -4,14 +4,15 @@ import {
     createCertificationAction,
     updateCertificationAction,
     deleteCertificationAction,
+    moveCertificationAction,
 } from "../../actions/certifications";
 import PageHeader from "../../ui/PageHeader";
 import Field from "../../ui/Field";
 import EmptyState from "../../ui/EmptyState";
 import { ItemRow, AddNewRow } from "../../ui/CollapsibleRow";
 import { MonthYearFields } from "../../ui/MonthYearFields";
-import { labelBase, buttonPrimary, linkDanger } from "../../ui/tokens";
-import { TrashIcon } from "../../ui/icons";
+import { labelBase, buttonPrimary, buttonIcon, linkDanger } from "../../ui/tokens";
+import { ArrowUpIcon, ArrowDownIcon, TrashIcon } from "../../ui/icons";
 import AdminActionForm from "../../ui/AdminActionForm";
 
 export default async function CertificationsAdminPage() {
@@ -41,8 +42,13 @@ export default async function CertificationsAdminPage() {
             </div>
 
             <div className="space-y-3">
-                {(certifications || []).map((cert) => (
-                    <CertRow key={cert.id} cert={cert} />
+                {(certifications || []).map((cert, index) => (
+                    <CertRow
+                        key={cert.id}
+                        cert={cert}
+                        isFirst={index === 0}
+                        isLast={index === (certifications?.length || 0) - 1}
+                    />
                 ))}
                 {(!certifications || certifications.length === 0) && (
                     <EmptyState title="No certifications yet" description="Add your first one above." />
@@ -52,7 +58,15 @@ export default async function CertificationsAdminPage() {
     );
 }
 
-function CertRow({ cert }) {
+function CertRow({ cert, isFirst, isLast }) {
+    async function handleMoveUp() {
+        "use server";
+        await moveCertificationAction(cert.id, "up");
+    }
+    async function handleMoveDown() {
+        "use server";
+        await moveCertificationAction(cert.id, "down");
+    }
     async function handleUpdate(formData) {
         "use server";
         await updateCertificationAction(cert.id, formData);
@@ -64,6 +78,19 @@ function CertRow({ cert }) {
 
     return (
         <ItemRow title={cert.title} meta={cert.issuer}>
+            <div className="mt-4 flex items-center gap-2">
+                <AdminActionForm action={handleMoveUp}>
+                    <button type="submit" disabled={isFirst} className={buttonIcon} title="Move up" aria-label="Move up">
+                        <ArrowUpIcon className="w-4 h-4" />
+                    </button>
+                </AdminActionForm>
+                <AdminActionForm action={handleMoveDown}>
+                    <button type="submit" disabled={isLast} className={buttonIcon} title="Move down" aria-label="Move down">
+                        <ArrowDownIcon className="w-4 h-4" />
+                    </button>
+                </AdminActionForm>
+            </div>
+
             <AdminActionForm action={handleUpdate} className="mt-4 space-y-4 max-w-xl">
                 <CertFields cert={cert} />
                 <button type="submit" className={buttonPrimary}>
