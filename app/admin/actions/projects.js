@@ -26,6 +26,10 @@ function parseTags(raw) {
         .filter(Boolean);
 }
 
+function parseProjectCategory(raw) {
+    return (raw || "").toString().trim() || "General";
+}
+
 export async function moveProjectAction(id, direction) {
     const { data: all, error: fetchError } = await supabaseAdmin
         .from("projects")
@@ -59,6 +63,7 @@ export async function createProjectAction(formData) {
     const { error } = await supabaseAdmin.from("projects").insert({
         title: formData.get("title")?.toString() || "",
         description: formData.get("description")?.toString() || "",
+        category: parseProjectCategory(formData.get("category")),
         tags: parseTags(formData.get("tags")?.toString()),
         highlights: parseBullets(formData.get("highlights")?.toString()),
         live_url: formData.get("live_url")?.toString() || "",
@@ -78,6 +83,7 @@ export async function updateProjectAction(id, formData) {
     const patch = {
         title: formData.get("title")?.toString() || "",
         description: formData.get("description")?.toString() || "",
+        category: parseProjectCategory(formData.get("category")),
         tags: parseTags(formData.get("tags")?.toString()),
         highlights: parseBullets(formData.get("highlights")?.toString()),
         live_url: formData.get("live_url")?.toString() || "",

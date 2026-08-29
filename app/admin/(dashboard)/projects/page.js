@@ -75,7 +75,7 @@ function ProjectRow({ project, isFirst, isLast }) {
     }
 
     return (
-        <ItemRow title={project.title} meta={(project.tags || []).join(", ")}>
+        <ItemRow title={project.title} meta={project.category || "General"}>
             <div className="mt-4 flex items-center gap-2">
                 <AdminActionForm action={handleMoveUp}>
                     <button type="submit" disabled={isFirst} className={buttonIcon} title="Move up" aria-label="Move up">
@@ -115,6 +115,12 @@ function ProjectFields({ project }) {
     return (
         <>
             <Field label="Title" name="title" defaultValue={project?.title} required />
+            <Field
+                label="Category"
+                name="category"
+                defaultValue={project?.category || "General"}
+                placeholder="Front-end, Back end, Fullstack"
+            />
             <Field label="Description" name="description" defaultValue={project?.description} textarea />
             <Field
                 label="Tags (comma-separated)"
