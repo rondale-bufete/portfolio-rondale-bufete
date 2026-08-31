@@ -46,7 +46,6 @@ export default async function AdminOverview() {
         <div>
             <PageHeader
                 title="Overview"
-                description="Edits here go live on your site within a minute — every save also revalidates the homepage immediately."
             />
 
             <div className={`${cardBase} p-5 mb-6`}>
