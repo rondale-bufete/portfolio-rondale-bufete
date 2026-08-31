@@ -17,15 +17,6 @@ const WELCOME_MESSAGES = [
     "Hey! I'm Rondale's assistant here — ask about his projects, skills, or how to connect with him directly.",
 ];
 
-const INK = "#1C1F26";
-const INK_SOFT = "#4B5058";
-const MUTED = "#6B7280";
-const BORDER = "#E4E5E9";
-const SURFACE_MUTED = "#F4F5F7";
-const ACCENT = "#2E5F52";
-const ACCENT_HOVER = "#25493F";
-const ERROR = "#B4433A";
-
 function ChatIcon({ className }) {
     return (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
@@ -54,9 +45,9 @@ function SendIcon({ className }) {
 function TypingDots() {
     return (
         <span className="inline-flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#9CA0A8] animate-bounce [animation-delay:-0.3s]" />
-            <span className="w-1.5 h-1.5 rounded-full bg-[#9CA0A8] animate-bounce [animation-delay:-0.15s]" />
-            <span className="w-1.5 h-1.5 rounded-full bg-[#9CA0A8] animate-bounce" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#9A9DA3] animate-bounce [animation-delay:-0.3s]" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#9A9DA3] animate-bounce [animation-delay:-0.15s]" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#9A9DA3] animate-bounce" />
         </span>
     );
 }
@@ -97,11 +88,7 @@ function renderMarkdownContent(content) {
                         <thead>
                             <tr>
                                 {header.map((cell, cellIndex) => (
-                                    <th
-                                        key={`${blockIndex}-head-${cellIndex}`}
-                                        className="border px-2 py-1 font-semibold"
-                                        style={{ borderColor: BORDER, backgroundColor: SURFACE_MUTED, color: INK }}
-                                    >
+                                    <th key={`${blockIndex}-head-${cellIndex}`} className="border border-[#D4D4D8] bg-[#EAEAEA] px-2 py-1 font-semibold text-[#14161A]">
                                         {renderInlineMarkdown(cell)}
                                     </th>
                                 ))}
@@ -111,11 +98,7 @@ function renderMarkdownContent(content) {
                             {body.map((row, rowIndex) => (
                                 <tr key={`${blockIndex}-row-${rowIndex}`}>
                                     {row.map((cell, cellIndex) => (
-                                        <td
-                                            key={`${blockIndex}-cell-${rowIndex}-${cellIndex}`}
-                                            className="border px-2 py-1 align-top"
-                                            style={{ borderColor: BORDER }}
-                                        >
+                                        <td key={`${blockIndex}-cell-${rowIndex}-${cellIndex}`} className="border border-[#E4E4E7] px-2 py-1 align-top">
                                             {renderInlineMarkdown(cell)}
                                         </td>
                                     ))}
@@ -143,8 +126,7 @@ function renderMarkdownContent(content) {
                             if (labelMatch) {
                                 return (
                                     <li key={`${blockIndex}-${lineIndex}`}>
-                                        <span className="font-semibold" style={{ color: INK }}>{labelMatch[1]}:</span>{" "}
-                                        {renderInlineMarkdown(labelMatch[2].trim())}
+                                        <span className="font-semibold text-[#14161A]">{labelMatch[1]}:</span> {renderInlineMarkdown(labelMatch[2].trim())}
                                     </li>
                                 );
                             }
@@ -160,18 +142,14 @@ function renderMarkdownContent(content) {
             const level = Math.min(3, block.match(/^#+/)?.[0].length || 1);
             const headingText = block.replace(/^#{1,3}\s+/, "");
             const Tag = `h${level}`;
-            return (
-                <Tag key={blockIndex} className="font-semibold mt-1 mb-1" style={{ color: INK }}>
-                    {renderInlineMarkdown(headingText)}
-                </Tag>
-            );
+            return <Tag key={blockIndex} className="font-semibold text-[#14161A] mt-1 mb-1">{renderInlineMarkdown(headingText)}</Tag>;
         }
 
         if (/^(Quick answer|Short answer|Brief answer|Summary):\s*/i.test(block)) {
             const cleaned = block.replace(/^(Quick answer|Short answer|Brief answer|Summary):\s*/i, "");
             return (
                 <p key={blockIndex} className="leading-relaxed">
-                    <span className="font-semibold" style={{ color: INK }}>Quick answer:</span> {renderInlineMarkdown(cleaned)}
+                    <span className="font-semibold text-[#14161A]">Quick answer:</span> {renderInlineMarkdown(cleaned)}
                 </p>
             );
         }
@@ -180,7 +158,7 @@ function renderMarkdownContent(content) {
             const cleaned = block.replace(/^(Details|More details|Notes):\s*/i, "");
             return (
                 <div key={blockIndex} className="pt-1">
-                    <p className="font-semibold" style={{ color: INK }}>Details</p>
+                    <p className="font-semibold text-[#14161A]">Details</p>
                     <p className="leading-relaxed">{renderInlineMarkdown(cleaned)}</p>
                 </div>
             );
@@ -267,10 +245,7 @@ export default function ChatWidget() {
                 onClick={handleToggleChat}
                 aria-label={isOpen ? "Close chat" : "Open chat"}
                 aria-expanded={isOpen}
-                className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full text-white shadow-md transition-colors flex items-center justify-center"
-                style={{ backgroundColor: isOpen ? ACCENT_HOVER : INK }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = ACCENT)}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = isOpen ? ACCENT_HOVER : INK)}
+                className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-[#14161A] text-white shadow-lg hover:bg-[#3355FF] transition-colors flex items-center justify-center"
             >
                 {isOpen ? <CloseIcon className="w-5 h-5" /> : <ChatIcon className="w-6 h-6" />}
             </button>
@@ -279,26 +254,14 @@ export default function ChatWidget() {
                 <div
                     role="dialog"
                     aria-label="Portfolio assistant chat"
-                    className="fixed bottom-24 right-6 z-50 w-[360px] max-w-[calc(100vw-3rem)] h-[500px] max-h-[70vh] bg-white rounded-xl shadow-xl flex flex-col overflow-hidden"
-                    style={{ border: `1px solid ${BORDER}` }}
+                    className="fixed bottom-24 right-6 z-50 w-[360px] max-w-[calc(100vw-3rem)] h-[500px] max-h-[70vh] bg-white border border-[#E4E4E7] rounded-2xl shadow-2xl flex flex-col overflow-hidden"
                 >
-                    <div
-                        className="px-4 py-3.5 flex items-center justify-between shrink-0"
-                        style={{ borderBottom: `1px solid ${BORDER}` }}
-                    >
-                        <div className="flex items-center gap-2">
-                            <span className="inline-flex h-2 w-2 rounded-full" style={{ backgroundColor: ACCENT }} />
-                            <p className="font-[family-name:var(--font-display)] text-sm font-medium" style={{ color: INK }}>
-                                Ask me anything
-                            </p>
-                        </div>
+                    <div className="px-4 py-3.5 border-b border-[#E4E4E7] flex items-center justify-between shrink-0">
+                        <p className="font-[family-name:var(--font-display)] text-sm font-medium">Ask me anything</p>
                         <button
                             onClick={() => setIsOpen(false)}
                             aria-label="Close chat"
-                            className="transition-colors"
-                            style={{ color: MUTED }}
-                            onMouseEnter={(e) => (e.currentTarget.style.color = INK)}
-                            onMouseLeave={(e) => (e.currentTarget.style.color = MUTED)}
+                            className="text-[#5B5F66] hover:text-[#14161A] transition-colors"
                         >
                             <CloseIcon className="w-4 h-4" />
                         </button>
@@ -306,56 +269,50 @@ export default function ChatWidget() {
 
                     <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
                         {messages.length === 0 && (
-                            <div
-                                className="max-w-[88%] rounded-xl px-4 py-3"
-                                style={{ backgroundColor: SURFACE_MUTED, border: `1px solid ${BORDER}` }}
-                            >
-                                <p className="text-xs font-medium mb-1.5" style={{ color: MUTED }}>
-                                    Portfolio assistant
-                                </p>
-                                <p className="text-sm leading-relaxed" style={{ color: INK }}>
-                                    {welcomeMessage || WELCOME_MESSAGES[0]}
-                                </p>
+                            <div className="max-w-[88%]">
+                                <div className="relative bg-gradient-to-br from-[#F3F4F6] via-[#F0F0F2] to-[#EAEAF0] text-[#14161A] border border-[#E4E4E7] rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm">
+                                    <div className="absolute -left-2 top-3 h-3 w-3 rotate-45 bg-[#F0F0F2] border-l border-b border-[#E4E4E7]" />
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <span className="inline-flex h-2.5 w-2.5 rounded-full bg-[#3355FF]" />
+                                        <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#5B5F66]">
+                                            Portfolio assistant
+                                        </span>
+                                    </div>
+                                    <p className="text-sm leading-relaxed text-[#14161A]">
+                                        {welcomeMessage || WELCOME_MESSAGES[0]}
+                                    </p>
+                                </div>
                             </div>
                         )}
                         {messages.map((m, i) =>
                             m.role === "user" ? (
                                 <div
                                     key={i}
-                                    className="rounded-xl rounded-br-sm px-4 py-2.5 max-w-[85%] ml-auto text-sm leading-relaxed whitespace-pre-wrap text-white"
-                                    style={{ backgroundColor: INK }}
+                                    className="bg-[#14161A] text-white rounded-2xl rounded-br-sm px-4 py-2.5 max-w-[85%] ml-auto text-sm leading-relaxed whitespace-pre-wrap"
                                 >
                                     {m.content}
                                 </div>
                             ) : m.role === "error" ? (
-                                <div key={i} className="text-xs px-1" style={{ color: ERROR }}>
+                                <div key={i} className="text-xs text-[#E5484D] px-1">
                                     {m.content}
                                 </div>
                             ) : (
                                 <div
                                     key={i}
-                                    className="rounded-xl rounded-bl-sm px-4 py-2.5 max-w-[85%] text-sm leading-relaxed"
-                                    style={{ backgroundColor: SURFACE_MUTED, color: INK }}
+                                    className="bg-[#F0F0F2] text-[#14161A] rounded-2xl rounded-bl-sm px-4 py-2.5 max-w-[85%] text-sm leading-relaxed"
                                 >
                                     <div className="space-y-2">{renderMarkdownContent(m.content)}</div>
                                 </div>
                             )
                         )}
                         {isLoading && (
-                            <div
-                                className="rounded-xl rounded-bl-sm px-4 py-3 max-w-[85%] inline-block"
-                                style={{ backgroundColor: SURFACE_MUTED }}
-                            >
+                            <div className="bg-[#F0F0F2] rounded-2xl rounded-bl-sm px-4 py-3 max-w-[85%] inline-block">
                                 <TypingDots />
                             </div>
                         )}
                     </div>
 
-                    <form
-                        onSubmit={handleSend}
-                        className="p-3 flex items-end gap-2 shrink-0"
-                        style={{ borderTop: `1px solid ${BORDER}` }}
-                    >
+                    <form onSubmit={handleSend} className="border-t border-[#E4E4E7] p-3 flex items-end gap-2 shrink-0">
                         <textarea
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
@@ -363,27 +320,13 @@ export default function ChatWidget() {
                             placeholder="Type a question..."
                             rows={1}
                             disabled={isLoading}
-                            className="flex-1 resize-none px-3.5 py-2.5 rounded-lg bg-white text-sm focus:outline-none transition-colors disabled:opacity-60 max-h-24"
-                            style={{ border: `1px solid ${BORDER}`, color: INK }}
-                            onFocus={(e) => {
-                                e.currentTarget.style.borderColor = ACCENT;
-                                e.currentTarget.style.boxShadow = `0 0 0 3px ${ACCENT}22`;
-                            }}
-                            onBlur={(e) => {
-                                e.currentTarget.style.borderColor = BORDER;
-                                e.currentTarget.style.boxShadow = "none";
-                            }}
+                            className="flex-1 resize-none px-3.5 py-2.5 rounded-lg border border-[#E4E4E7] bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#3355FF]/20 focus:border-[#3355FF] transition-colors disabled:opacity-60 max-h-24"
                         />
                         <button
                             type="submit"
                             disabled={isLoading || !input.trim()}
                             aria-label="Send message"
-                            className="w-10 h-10 shrink-0 rounded-lg text-white flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                            style={{ backgroundColor: INK }}
-                            onMouseEnter={(e) => {
-                                if (!e.currentTarget.disabled) e.currentTarget.style.backgroundColor = ACCENT;
-                            }}
-                            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = INK)}
+                            className="w-10 h-10 shrink-0 rounded-lg bg-[#14161A] text-white flex items-center justify-center hover:bg-[#3355FF] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                             <SendIcon className="w-4 h-4" />
                         </button>
