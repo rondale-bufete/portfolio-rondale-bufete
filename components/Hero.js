@@ -66,7 +66,16 @@ export default function Hero({ profile }) {
                                 <p className="pl-4">
                                     <span className="text-[#9CDCFE]">focus</span><span className="text-[#D4D4D4]">:</span> <span className="text-[#D4D4D4]">[</span>
                                 </p>
-                                {["React", "Next.js", "PHP", "Node.js", "Python", "CI/CD", "MySQL", "PostgreSQL", "MongoDB", "Supabase"].map((item, i, arr) => (
+                                {["Systems Design",
+                                    "API Architecture",
+                                    "Data Modeling",
+                                    "Scalable Systems",
+                                    "Automation",
+                                    "Test-Driven Development",
+                                    "Performance",
+                                    "Security",
+                                    "Observability",
+                                    "Developer Experience"].map((item, i, arr) => (
                                     <p key={item} className="pl-8">
                                         <span className="text-[#CE9178]">&quot;{item}&quot;</span>
                                         {i < arr.length - 1 && <span className="text-[#D4D4D4]">,</span>}
