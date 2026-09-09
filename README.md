@@ -107,7 +107,7 @@ supabase/
 ## Getting started
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/rondale-bufete/portfolio-rondale-bufete.git
 cd portfolio
 npm install
 ```
