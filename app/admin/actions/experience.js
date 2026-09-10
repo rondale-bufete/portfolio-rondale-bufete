@@ -11,10 +11,8 @@ function refresh() {
 
 function buildPatch(formData) {
     const period = composePeriod({
-        startMonth: formData.get("start_month"),
-        startYear: formData.get("start_year"),
-        endMonth: formData.get("end_month"),
-        endYear: formData.get("end_year"),
+        start: formData.get("start")?.toString(),
+        end: formData.get("end")?.toString(),
         isCurrent: formData.get("is_current") === "on",
     });
 

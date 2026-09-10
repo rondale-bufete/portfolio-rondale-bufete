@@ -1,5 +1,5 @@
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { MONTHS } from "@/lib/monthYear";
+import { splitPeriod } from "@/lib/monthYear";
 import {
     createExperienceAction,
     updateExperienceAction,
@@ -9,7 +9,7 @@ import PageHeader from "../../ui/PageHeader";
 import Field from "../../ui/Field";
 import EmptyState from "../../ui/EmptyState";
 import { ItemRow, AddNewRow } from "../../ui/CollapsibleRow";
-import { MonthYearFields, CurrentCheckbox } from "../../ui/MonthYearFields";
+import { MonthField, CurrentCheckbox } from "../../ui/MonthYearFields";
 import { buttonPrimary, linkDanger } from "../../ui/tokens";
 import { TrashIcon } from "../../ui/icons";
 import AdminActionForm from "../../ui/AdminActionForm";
@@ -98,27 +98,8 @@ function ExperienceRow({ exp }) {
     );
 }
 
-// Best-effort parse of an existing "Mon YYYY — Mon YYYY"/"Mon YYYY — Present"
-// string so the dropdowns preselect sensibly when editing. If it doesn't
-// parse cleanly (e.g. hand-edited text), the selects just start blank —
-// saving will overwrite `period` from whatever the admin picks.
-function parseExistingPeriod(period) {
-    if (!period) return {};
-    const [startRaw, endRaw] = period.split("—").map((s) => s?.trim());
-    const parseOne = (s) => {
-        const match = s?.match(/^([A-Za-z]{3,9})\s+(\d{4})$/);
-        if (!match) return {};
-        const idx = MONTHS.findIndex((m) => m.toLowerCase().startsWith(match[1].toLowerCase().slice(0, 3)));
-        return idx === -1 ? {} : { month: idx + 1, year: Number(match[2]) };
-    };
-    const start = parseOne(startRaw);
-    const isCurrent = endRaw?.toLowerCase() === "present";
-    const end = isCurrent ? {} : parseOne(endRaw);
-    return { start, end, isCurrent };
-}
-
 function ExperienceFields({ exp }) {
-    const { start = {}, end = {}, isCurrent = false } = parseExistingPeriod(exp?.period);
+    const { start, end, isCurrent } = splitPeriod(exp?.period);
 
     return (
         <>
@@ -127,21 +108,9 @@ function ExperienceFields({ exp }) {
             <Field label="Location (optional)" name="location" defaultValue={exp?.location} placeholder="Manila, PH · Remote" />
             <Field label="Company URL (optional)" name="company_url" defaultValue={exp?.company_url} />
 
-            <MonthYearFields
-                label="Start date"
-                monthName="start_month"
-                yearName="start_year"
-                monthDefault={start.month}
-                yearDefault={start.year}
-            />
+            <MonthField label="Start date" name="start" defaultValue={start} />
             <CurrentCheckbox label="I currently work here" defaultChecked={isCurrent} />
-            <MonthYearFields
-                label="End date (ignored if currently working)"
-                monthName="end_month"
-                yearName="end_year"
-                monthDefault={end.month}
-                yearDefault={end.year}
-            />
+            <MonthField label="End date (ignored if currently working)" name="end" defaultValue={end} />
 
             <Field
                 label="Bullet points (one per line)"

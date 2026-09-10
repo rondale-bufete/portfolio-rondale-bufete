@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { supabaseAdmin, uploadAsset } from "@/lib/supabase/admin";
-import { formatMonthYear } from "@/lib/monthYear";
+import { monthValueToDisplay } from "@/lib/monthYear";
 
 function refresh() {
     revalidatePath("/");
@@ -16,13 +16,6 @@ async function nextSortOrder() {
         .order("sort_order", { ascending: false })
         .limit(1);
     return data?.[0] ? data[0].sort_order + 1 : 0;
-}
-
-function resolvedDate(formData) {
-    const composed = formatMonthYear(formData.get("issued_month"), formData.get("issued_year"));
-    // Falls back to a hand-typed value (or the previously-stored one) if
-    // the month/year pickers are left blank.
-    return composed || formData.get("date_fallback")?.toString() || "";
 }
 
 export async function moveCertificationAction(id, direction) {
@@ -63,7 +56,7 @@ export async function createCertificationAction(formData) {
     const { error } = await supabaseAdmin.from("certifications").insert({
         title: formData.get("title")?.toString() || "",
         issuer: formData.get("issuer")?.toString() || "",
-        date: resolvedDate(formData),
+        date: monthValueToDisplay(formData.get("issued")?.toString()),
         credential_id: formData.get("credential_id")?.toString() || "",
         description: formData.get("description")?.toString() || "",
         url: formData.get("url")?.toString() || "",
@@ -87,7 +80,7 @@ export async function updateCertificationAction(id, formData) {
     const patch = {
         title: formData.get("title")?.toString() || "",
         issuer: formData.get("issuer")?.toString() || "",
-        date: resolvedDate(formData),
+        date: monthValueToDisplay(formData.get("issued")?.toString()),
         credential_id: formData.get("credential_id")?.toString() || "",
         description: formData.get("description")?.toString() || "",
         url: formData.get("url")?.toString() || "",

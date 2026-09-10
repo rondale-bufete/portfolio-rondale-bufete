@@ -11,20 +11,15 @@ function refresh() {
 
 function buildPatch(formData) {
     const period = composePeriod({
-        startMonth: formData.get("start_month"),
-        startYear: formData.get("start_year"),
-        endMonth: formData.get("end_month"),
-        endYear: formData.get("end_year"),
+        start: formData.get("start")?.toString(),
+        end: formData.get("end")?.toString(),
         isCurrent: formData.get("is_current") === "on",
     });
 
     return {
         degree: formData.get("degree")?.toString() || "",
         school: formData.get("school")?.toString() || "",
-        // Falls back to whatever was typed directly if the month/year
-        // pickers were left blank (e.g. editing an older manually-entered
-        // period like "2022 — 2026").
-        period: period || formData.get("period_fallback")?.toString() || "",
+        period,
         description: formData.get("description")?.toString() || "",
         bullets: parseBullets(formData.get("bullets")?.toString()),
     };

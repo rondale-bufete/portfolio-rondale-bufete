@@ -1,34 +1,18 @@
-import { MONTHS, yearOptions } from "@/lib/monthYear";
 import { inputBase, labelBase } from "./tokens";
 
-const YEARS = yearOptions();
-
-export function MonthYearFields({ label, monthName, yearName, monthDefault, yearDefault }) {
+// A single native month picker ("YYYY-MM"). Replaces the old paired
+// Month/Year <select> — one field means no month-without-a-year state to
+// fall into, and no flex-width fight between two adjacent elements.
+export function MonthField({ label, name, defaultValue }) {
     return (
         <div>
             <label className={labelBase}>{label}</label>
-            <div className="flex gap-2">
-                <select
-                    name={monthName}
-                    defaultValue={monthDefault || ""}
-                    className={`${inputBase} flex-1`}
-                >
-                    <option value="">Month</option>
-                    {MONTHS.map((m, i) => (
-                        <option key={m} value={i + 1}>{m}</option>
-                    ))}
-                </select>
-                <select
-                    name={yearName}
-                    defaultValue={yearDefault || ""}
-                    className={`${inputBase} w-28 shrink-0`}
-                >
-                    <option value="">Year</option>
-                    {YEARS.map((y) => (
-                        <option key={y} value={y}>{y}</option>
-                    ))}
-                </select>
-            </div>
+            <input
+                type="month"
+                name={name}
+                defaultValue={defaultValue || ""}
+                className={inputBase}
+            />
         </div>
     );
 }

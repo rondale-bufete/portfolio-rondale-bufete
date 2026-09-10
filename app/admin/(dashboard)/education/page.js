@@ -1,5 +1,5 @@
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { MONTHS } from "@/lib/monthYear";
+import { splitPeriod } from "@/lib/monthYear";
 import {
     createEducationAction,
     updateEducationAction,
@@ -9,7 +9,7 @@ import PageHeader from "../../ui/PageHeader";
 import Field from "../../ui/Field";
 import EmptyState from "../../ui/EmptyState";
 import { ItemRow, AddNewRow } from "../../ui/CollapsibleRow";
-import { MonthYearFields, CurrentCheckbox } from "../../ui/MonthYearFields";
+import { MonthField, CurrentCheckbox } from "../../ui/MonthYearFields";
 import { buttonPrimary, linkDanger } from "../../ui/tokens";
 import { TrashIcon } from "../../ui/icons";
 import AdminActionForm from "../../ui/AdminActionForm";
@@ -86,51 +86,17 @@ function EduRow({ edu }) {
     );
 }
 
-// Best-effort parse of an existing "Mon YYYY — Mon YYYY" / "... — Present"
-// string so the dropdowns preselect sensibly when editing. Entries created
-// before the date pickers existed (e.g. "2022 — 2026") won't parse — that's
-// fine, the selects just start blank and the raw text is kept as a
-// fallback via the hidden period_fallback field until new dates are picked.
-function parseExistingPeriod(period) {
-    if (!period) return {};
-    const [startRaw, endRaw] = period.split("—").map((s) => s?.trim());
-    const parseOne = (s) => {
-        const match = s?.match(/^([A-Za-z]{3,9})\s+(\d{4})$/);
-        if (!match) return {};
-        const idx = MONTHS.findIndex((m) => m.toLowerCase().startsWith(match[1].toLowerCase().slice(0, 3)));
-        return idx === -1 ? {} : { month: idx + 1, year: Number(match[2]) };
-    };
-    const start = parseOne(startRaw);
-    const isCurrent = endRaw?.toLowerCase() === "present";
-    const end = isCurrent ? {} : parseOne(endRaw);
-    return { start, end, isCurrent };
-}
-
 function EduFields({ edu }) {
-    const { start = {}, end = {}, isCurrent = false } = parseExistingPeriod(edu?.period);
+    const { start, end, isCurrent } = splitPeriod(edu?.period);
 
     return (
         <>
             <Field label="Degree / Program" name="degree" defaultValue={edu?.degree} required />
             <Field label="School" name="school" defaultValue={edu?.school} required />
 
-            <input type="hidden" name="period_fallback" value={edu?.period || ""} />
-
-            <MonthYearFields
-                label="Start date"
-                monthName="start_month"
-                yearName="start_year"
-                monthDefault={start.month}
-                yearDefault={start.year}
-            />
+            <MonthField label="Start date" name="start" defaultValue={start} />
             <CurrentCheckbox label="Currently studying here" defaultChecked={isCurrent} />
-            <MonthYearFields
-                label="End date (ignored if currently studying)"
-                monthName="end_month"
-                yearName="end_year"
-                monthDefault={end.month}
-                yearDefault={end.year}
-            />
+            <MonthField label="End date (ignored if currently studying)" name="end" defaultValue={end} />
 
             <Field label="Description (optional)" name="description" defaultValue={edu?.description} textarea />
 

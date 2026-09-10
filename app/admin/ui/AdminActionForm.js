@@ -40,7 +40,7 @@ export default function AdminActionForm({
     }
 
     return (
-        <form action={formAction} onSubmit={handleSubmit} className={className}>
+        <form action={formAction} onSubmit={confirmMessage ? handleSubmit : undefined} className={className}>
             {children}
             {state.error && (
                 <p role="alert" className="text-sm text-[#E5484D]">

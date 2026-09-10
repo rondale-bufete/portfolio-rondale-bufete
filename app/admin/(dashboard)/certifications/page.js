@@ -1,5 +1,5 @@
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { MONTHS } from "@/lib/monthYear";
+import { displayToMonthValue } from "@/lib/monthYear";
 import {
     createCertificationAction,
     updateCertificationAction,
@@ -10,7 +10,7 @@ import PageHeader from "../../ui/PageHeader";
 import Field from "../../ui/Field";
 import EmptyState from "../../ui/EmptyState";
 import { ItemRow, AddNewRow } from "../../ui/CollapsibleRow";
-import { MonthYearFields } from "../../ui/MonthYearFields";
+import { MonthField } from "../../ui/MonthYearFields";
 import { labelBase, buttonPrimary, buttonIcon, linkDanger } from "../../ui/tokens";
 import { ArrowUpIcon, ArrowDownIcon, TrashIcon } from "../../ui/icons";
 import AdminActionForm from "../../ui/AdminActionForm";
@@ -113,36 +113,13 @@ function CertRow({ cert, isFirst, isLast }) {
     );
 }
 
-// Best-effort parse of an existing "Mon YYYY" string (or a bare year like
-// "2026" from before the date picker existed) so the pickers preselect.
-function parseExistingDate(date) {
-    if (!date) return {};
-    const full = date.match(/^([A-Za-z]{3,9})\s+(\d{4})$/);
-    if (full) {
-        const idx = MONTHS.findIndex((m) => m.toLowerCase().startsWith(full[1].toLowerCase().slice(0, 3)));
-        return idx === -1 ? {} : { month: idx + 1, year: Number(full[2]) };
-    }
-    const yearOnly = date.match(/^(\d{4})$/);
-    if (yearOnly) return { year: Number(yearOnly[1]) };
-    return {};
-}
-
 function CertFields({ cert }) {
-    const { month, year } = parseExistingDate(cert?.date);
-
     return (
         <>
             <Field label="Title" name="title" defaultValue={cert?.title} required />
             <Field label="Issuer" name="issuer" defaultValue={cert?.issuer} />
 
-            <input type="hidden" name="date_fallback" value={cert?.date || ""} />
-            <MonthYearFields
-                label="Issued"
-                monthName="issued_month"
-                yearName="issued_year"
-                monthDefault={month}
-                yearDefault={year}
-            />
+            <MonthField label="Issued" name="issued" defaultValue={displayToMonthValue(cert?.date)} />
 
             <Field label="Credential ID (optional)" name="credential_id" defaultValue={cert?.credential_id} placeholder="UC-384c2ce8-fe37" />
             <Field label="Description" name="description" defaultValue={cert?.description} textarea />
