@@ -3,6 +3,7 @@
 import { useState } from "react";
 import emailjs from "@emailjs/browser";
 import FormStatusModal from "./FormStatusModal";
+import SectionHeader, { sectionShell } from "./SectionHeader";
 
 export default function Contact({ label = "04 — Contact", heading = "Let\u2019s work together" }) {
     const [form, setForm] = useState({ name: "", email: "", message: "" });
@@ -40,15 +41,12 @@ export default function Contact({ label = "04 — Contact", heading = "Let\u2019
     }
 
     return (
-        <section id="contact" className="max-w-5xl mx-auto px-6 py-20 border-t border-[#E4E4E7]">
-            <p className="font-[family-name:var(--font-mono)] text-sm text-[#3355FF] mb-3">{label}</p>
-            <h2 className="font-[family-name:var(--font-display)] text-3xl md:text-4xl font-medium tracking-tight mb-10 max-w-xl">
-                {heading}
-            </h2>
+        <section id="contact" className={sectionShell}>
+            <SectionHeader label={label} heading={heading} />
 
             <form onSubmit={handleSubmit} className="max-w-xl space-y-4">
                 <div>
-                    <label className="block text-sm text-[#5B5F66] mb-1.5" htmlFor="name">
+                    <label className="block text-sm font-medium text-[var(--color-neutral-700)] mb-1.5" htmlFor="name">
                         Name
                     </label>
                     <input
@@ -59,12 +57,12 @@ export default function Contact({ label = "04 — Contact", heading = "Let\u2019
                         value={form.name}
                         onChange={handleChange}
                         disabled={status === "sending"}
-                        className="w-full px-4 py-2.5 rounded-md border border-[#E4E4E7] bg-white focus:outline-none focus:border-[#3355FF] transition-colors disabled:opacity-60"
+                        className="w-full px-4 py-2.5 border-2 border-[var(--color-divider)] bg-[var(--color-bg)] focus:outline-none focus:border-[var(--color-accent)] transition-colors disabled:opacity-60"
                     />
                 </div>
 
                 <div>
-                    <label className="block text-sm text-[#5B5F66] mb-1.5" htmlFor="email">
+                    <label className="block text-sm font-medium text-[var(--color-neutral-700)] mb-1.5" htmlFor="email">
                         Email
                     </label>
                     <input
@@ -75,12 +73,12 @@ export default function Contact({ label = "04 — Contact", heading = "Let\u2019
                         value={form.email}
                         onChange={handleChange}
                         disabled={status === "sending"}
-                        className="w-full px-4 py-2.5 rounded-md border border-[#E4E4E7] bg-white focus:outline-none focus:border-[#3355FF] transition-colors disabled:opacity-60"
+                        className="w-full px-4 py-2.5 border-2 border-[var(--color-divider)] bg-[var(--color-bg)] focus:outline-none focus:border-[var(--color-accent)] transition-colors disabled:opacity-60"
                     />
                 </div>
 
                 <div>
-                    <label className="block text-sm text-[#5B5F66] mb-1.5" htmlFor="message">
+                    <label className="block text-sm font-medium text-[var(--color-neutral-700)] mb-1.5" htmlFor="message">
                         Message
                     </label>
                     <textarea
@@ -91,14 +89,14 @@ export default function Contact({ label = "04 — Contact", heading = "Let\u2019
                         value={form.message}
                         onChange={handleChange}
                         disabled={status === "sending"}
-                        className="w-full px-4 py-2.5 rounded-md border border-[#E4E4E7] bg-white focus:outline-none focus:border-[#3355FF] transition-colors resize-none disabled:opacity-60"
+                        className="w-full px-4 py-2.5 border-2 border-[var(--color-divider)] bg-[var(--color-bg)] focus:outline-none focus:border-[var(--color-accent)] transition-colors resize-none disabled:opacity-60"
                     />
                 </div>
 
                 <button
                     type="submit"
                     disabled={status === "sending"}
-                    className="px-6 py-2.5 rounded-md bg-[#14161A] text-white text-sm font-medium hover:bg-[#3355FF] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="px-6 py-2.5 bg-[var(--color-text)] text-white text-sm font-bold hover:bg-[var(--color-accent)] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                     {status === "sending" ? "Sending..." : "Send Message"}
                 </button>

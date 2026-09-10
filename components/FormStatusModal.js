@@ -26,23 +26,23 @@ export default function FormStatusModal({ status, onClose, title, message, butto
             onClick={onClose}
         >
             <div
-                className="bg-white rounded-xl shadow-xl max-w-sm w-full p-8 text-center"
+                className="bg-[var(--color-bg)] border-2 border-[var(--color-text)] max-w-sm w-full p-8 text-center"
                 onClick={(e) => e.stopPropagation()}
             >
                 <div
-                    className={`w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-5 ${isSuccess ? "bg-[#27C93F]/10" : "bg-[#E5484D]/10"
+                    className={`w-14 h-14 flex items-center justify-center mx-auto mb-5 border-2 ${isSuccess ? "border-[var(--color-accent)]" : "border-[var(--color-text)]"
                         }`}
                 >
-                    <span className={`text-2xl ${isSuccess ? "text-[#27C93F]" : "text-[#E5484D]"}`}>
+                    <span className={`text-2xl font-bold ${isSuccess ? "text-[var(--color-accent)]" : "text-[var(--color-text)]"}`}>
                         {isSuccess ? "✓" : "✕"}
                     </span>
                 </div>
 
-                <h3 className="font-[family-name:var(--font-display)] text-xl font-medium mb-2">
+                <h3 className="font-[family-name:var(--font-display)] text-xl font-extrabold text-[var(--color-text)] mb-2">
                     {title || (isSuccess ? "Message sent" : "Something went wrong")}
                 </h3>
 
-                <p className="text-[#5B5F66] text-sm leading-relaxed mb-6">
+                <p className="text-[var(--color-neutral-700)] text-sm leading-relaxed mb-6">
                     {message || (isSuccess
                         ? "Thanks for reaching out — I'll get back to you soon."
                         : "Your message couldn't be sent. Please try again, or email me directly.")}
@@ -50,7 +50,7 @@ export default function FormStatusModal({ status, onClose, title, message, butto
 
                 <button
                     onClick={onClose}
-                    className="px-6 py-2.5 rounded-md bg-[#14161A] text-white text-sm font-medium hover:bg-[#3355FF] transition-colors"
+                    className="px-6 py-2.5 bg-[var(--color-text)] text-white text-sm font-bold hover:bg-[var(--color-accent)] transition-colors"
                 >
                     {buttonLabel || "Close"}
                 </button>

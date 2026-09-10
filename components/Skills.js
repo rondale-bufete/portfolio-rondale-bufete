@@ -1,3 +1,5 @@
+import SectionHeader, { sectionShell } from "./SectionHeader";
+
 // Maps a skill's display name to its Simple Icons slug (https://simpleicons.org).
 // Add to this as your skills list grows — anything not listed here falls back
 // to a plain monogram badge instead of a broken image.
@@ -34,8 +36,8 @@ const ICON_SLUGS = {
     vite: "vite",
     html: "html5",
     html5: "html5",
-    css: "css3",
-    css3: "css3",
+    css: "css",
+    css3: "css",
 };
 
 // Hand-picked icons for concepts that don't have a single "brand" logo.
@@ -49,10 +51,6 @@ const SPECIAL_ICONS = {
         </svg>
     ),
 };
-
-// One accent color per category, cycling if there are more categories than colors.
-// Keep the first slot as the site's existing blue so category 1 still feels "on brand".
-const CATEGORY_ACCENTS = ["#3355FF", "#7C3AED", "#059669", "#DB2777", "#D97706"];
 
 function getIcon(name) {
     const key = name.toLowerCase();
@@ -78,20 +76,14 @@ function SkillIcon({ name }) {
 
     if (icon.type === "svg") {
         return (
-            <span
-                className="w-4 h-4 transition-transform duration-200 group-hover:scale-110"
-                style={{ color: "var(--accent)" }}
-            >
+            <span className="w-4 h-4 text-[var(--color-accent-700)] transition-transform duration-200 group-hover:scale-110">
                 {icon.node}
             </span>
         );
     }
 
     return (
-        <span
-            className="w-4 h-4 rounded-[3px] flex items-center justify-center text-[9px] font-semibold transition-transform duration-200 group-hover:scale-110"
-            style={{ backgroundColor: "var(--accent-bg)", color: "var(--accent)" }}
-        >
+        <span className="w-4 h-4 flex items-center justify-center text-[9px] font-bold bg-[var(--color-neutral-200)] text-[var(--color-neutral-800)] transition-transform duration-200 group-hover:scale-110">
             {name.charAt(0).toUpperCase()}
         </span>
     );
@@ -99,45 +91,29 @@ function SkillIcon({ name }) {
 
 export default function Skills({ skills = [], label = "02 — Skills", heading = "Tools I reach for" }) {
     return (
-        <section id="skills" className="max-w-5xl mx-auto px-6 py-20 border-t border-[#E4E4E7]">
-            <p className="font-[family-name:var(--font-mono)] text-sm text-[#3355FF] mb-3">{label}</p>
-            <h2 className="font-[family-name:var(--font-display)] text-3xl md:text-4xl font-medium tracking-tight mb-10 max-w-xl">
-                {heading}
-            </h2>
+        <section id="skills" className={sectionShell}>
+            <SectionHeader label={label} heading={heading} />
 
             <div className="grid md:grid-cols-3 gap-x-10 gap-y-12">
-                {skills.map((group, gi) => {
-                    const accent = CATEGORY_ACCENTS[gi % CATEGORY_ACCENTS.length];
-                    return (
-                        <div
-                            key={group.category}
-                            style={{
-                                "--accent": accent,
-                                "--accent-border": `${accent}4d`,
-                                "--accent-bg": `${accent}14`,
-                            }}
-                        >
-                            <h3 className="flex items-center gap-2 font-[family-name:var(--font-mono)] text-xs uppercase tracking-wide text-[#5B5F66] font-medium mb-4">
+                {skills.map((group) => (
+                    <div key={group.category}>
+                        <h3 className="flex items-center gap-2 font-[family-name:var(--font-mono)] text-xs font-bold uppercase tracking-wide text-[var(--color-neutral-600)] mb-4">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)]" />
+                            {group.category}
+                        </h3>
+                        <div className="flex flex-wrap gap-2">
+                            {group.items.map((item) => (
                                 <span
-                                    className="w-1.5 h-1.5 rounded-full"
-                                    style={{ backgroundColor: "var(--accent)" }}
-                                />
-                                {group.category}
-                            </h3>
-                            <div className="flex flex-wrap gap-2">
-                                {group.items.map((item) => (
-                                    <span
-                                        key={item}
-                                        className="group inline-flex items-center gap-2 font-[family-name:var(--font-mono)] text-xs pl-2.5 pr-3 py-1.5 rounded-md bg-white border border-[#E4E4E7] text-[#14161A] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm hover:shadow-black/5 hover:border-[color:var(--accent-border)] hover:bg-[color:var(--accent-bg)]"
-                                    >
-                                        <SkillIcon name={item} />
-                                        {item}
-                                    </span>
-                                ))}
-                            </div>
+                                    key={item}
+                                    className="tag tag-neutral group inline-flex items-center gap-2 transition-colors duration-200 hover:bg-[var(--color-accent-100)] hover:text-[var(--color-accent-800)]"
+                                >
+                                    <SkillIcon name={item} />
+                                    {item}
+                                </span>
+                            ))}
                         </div>
-                    );
-                })}
+                    </div>
+                ))}
             </div>
         </section>
     );

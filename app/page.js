@@ -52,7 +52,13 @@ function renderSection(section, data) {
             return <Contact key={section.id} label={label} heading={heading} />;
         case "custom":
             return (
-                <CustomSection key={section.id} label={label} heading={heading} body={section.body} />
+                <CustomSection
+                    key={section.id}
+                    id={`section-${section.id}`}
+                    label={label}
+                    heading={heading}
+                    body={section.body}
+                />
             );
         default:
             return null;
@@ -65,7 +71,7 @@ export default async function Home() {
 
     return (
         <>
-            <Navbar profile={profile} />
+            <Navbar profile={profile} sections={sections} />
             <main>
                 <Hero profile={profile} />
                 {sections.map((section) => renderSection(section, data))}

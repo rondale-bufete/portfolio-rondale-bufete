@@ -10,14 +10,14 @@ export default function ProjectCard({ project }) {
         : description;
 
     return (
-        <article className="group relative border border-[#E4E4E7] rounded-xl overflow-hidden bg-white hover:border-[#3355FF] transition-colors">
+        <article className="group relative border-2 border-[var(--color-divider)] overflow-hidden bg-[var(--color-bg)] hover:border-[var(--color-text)] transition-colors">
             <Link
                 href={`/projects/${project.id}`}
                 aria-label={`View ${project.title} project details`}
-                className="absolute inset-0 z-0 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[#3355FF] focus-visible:ring-inset"
+                className="absolute inset-0 z-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-inset"
             />
 
-            <div className="relative z-10 aspect-video bg-[#ffffff] overflow-hidden pointer-events-none">
+            <div className="relative z-10 aspect-video bg-[var(--color-neutral-200)] overflow-hidden pointer-events-none">
                 {project.imageUrl ? (
                     <Image
                         src={project.imageUrl}
@@ -27,29 +27,29 @@ export default function ProjectCard({ project }) {
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                 ) : (
-                    <div className="w-full h-full flex items-center justify-center text-[#9A9DA3] text-sm font-mono">
+                    <div className="w-full h-full flex items-center justify-center text-[var(--color-neutral-500)] text-sm font-[family-name:var(--font-mono)]">
                         [ screenshot placeholder ]
                     </div>
                 )}
             </div>
 
             <div className="relative z-10 p-6 pointer-events-none">
-                <h3 className="font-(family-name:--font-display) text-xl font-medium mb-2">
+                <h3 className="font-[family-name:var(--font-display)] text-xl font-extrabold text-[var(--color-text)] mb-2">
                     {project.title}
                 </h3>
 
-                <p className="mb-2 text-[#5B5F66] text-sm leading-relaxed text-justify">
+                <p className="mb-2 text-[var(--color-neutral-700)] text-sm leading-relaxed text-justify">
                     {descriptionPreview || "No description available."}
                 </p>
 
-                <div className="flex items-center gap-4 text-sm font-medium mb-5">
+                <div className="flex items-center gap-4 text-sm font-bold mb-5">
                     {project.liveUrl && (
-                        <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="relative z-20 pointer-events-auto text-[#3355FF] hover:underline">
+                        <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="relative z-20 pointer-events-auto text-[var(--color-accent-700)] hover:underline">
                             Live demo &rarr;
                         </a>
                     )}
                     {project.repoUrl && (
-                        <a href={project.repoUrl} target="_blank" rel="noopener noreferrer" className="relative z-20 pointer-events-auto text-[#5B5F66] hover:text-[#14161A] transition-colors">
+                        <a href={project.repoUrl} target="_blank" rel="noopener noreferrer" className="relative z-20 pointer-events-auto text-[var(--color-neutral-700)] hover:text-[var(--color-text)] transition-colors">
                             View code
                         </a>
                     )}
@@ -57,10 +57,7 @@ export default function ProjectCard({ project }) {
 
                 <div className="flex flex-wrap gap-2">
                     {project.tags.map((tag) => (
-                        <span
-                            key={tag}
-                            className="font-mono text-xs px-2.5 py-1 rounded bg-[#F0F0F2] text-[#5B5F66]"
-                        >
+                        <span key={tag} className="tag tag-neutral">
                             {tag}
                         </span>
                     ))}

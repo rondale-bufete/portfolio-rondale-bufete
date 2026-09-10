@@ -29,22 +29,22 @@ export default function ResumeModal({ profile, onClose }) {
             onClick={onClose}
         >
             <div
-                className="bg-white rounded-xl shadow-2xl w-full max-w-3xl h-[85vh] flex flex-col"
+                className="bg-[var(--color-bg)] border-2 border-[var(--color-text)] w-full max-w-3xl h-[85vh] flex flex-col"
                 onClick={(e) => e.stopPropagation()}
             >
-                <div className="flex items-center justify-between px-5 py-3 border-b border-[#E4E4E7]">
-                    <h2 className="font-[family-name:var(--font-display)] text-lg">Resume</h2>
+                <div className="flex items-center justify-between px-5 py-3 border-b-2 border-[var(--color-divider)]">
+                    <h2 className="font-[family-name:var(--font-display)] text-lg font-extrabold text-[var(--color-text)]">Resume</h2>
                     <div className="flex items-center gap-2">
                         <a
                             href={profile?.resumeUrl}
                             download={getResumeFilename(profile?.name)}
-                            className="text-sm px-3 py-1.5 rounded-md bg-[#14161A] text-white hover:bg-[#3355FF] transition-colors"
+                            className="text-sm font-bold px-3 py-1.5 bg-[var(--color-text)] text-white hover:bg-[var(--color-accent)] transition-colors"
                         >
                             Download
                         </a>
                         <button
                             onClick={onClose}
-                            className="text-[#5B5F66] hover:text-[#14161A] text-xl leading-none px-2"
+                            className="text-[var(--color-neutral-600)] hover:text-[var(--color-text)] text-xl leading-none px-2"
                             aria-label="Close"
                         >
                             ×
@@ -61,9 +61,9 @@ export default function ResumeModal({ profile, onClose }) {
                 </div>
 
                 {/* Mobile fallback — some mobile browsers don't render PDFs inline */}
-                <p className="sm:hidden text-center text-xs text-[#5B5F66] py-3 border-t border-[#E4E4E7]">
+                <p className="sm:hidden text-center text-xs text-[var(--color-neutral-600)] py-3 border-t-2 border-[var(--color-divider)]">
                     Preview not showing?{" "}
-                    <a href={profile?.resumeUrl} download={getResumeFilename(profile?.name)} className="text-[#3355FF] hover:underline">
+                    <a href={profile?.resumeUrl} download={getResumeFilename(profile?.name)} className="text-[var(--color-accent-700)] hover:underline">
                         Download instead
                     </a>
                 </p>

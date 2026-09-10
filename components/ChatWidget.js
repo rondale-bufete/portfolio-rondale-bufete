@@ -45,9 +45,9 @@ function SendIcon({ className }) {
 function TypingDots() {
     return (
         <span className="inline-flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#9A9DA3] animate-bounce [animation-delay:-0.3s]" />
-            <span className="w-1.5 h-1.5 rounded-full bg-[#9A9DA3] animate-bounce [animation-delay:-0.15s]" />
-            <span className="w-1.5 h-1.5 rounded-full bg-[#9A9DA3] animate-bounce" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-neutral-500)] animate-bounce [animation-delay:-0.3s]" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-neutral-500)] animate-bounce [animation-delay:-0.15s]" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-neutral-500)] animate-bounce" />
         </span>
     );
 }
@@ -88,7 +88,7 @@ function renderMarkdownContent(content) {
                         <thead>
                             <tr>
                                 {header.map((cell, cellIndex) => (
-                                    <th key={`${blockIndex}-head-${cellIndex}`} className="border border-[#D4D4D8] bg-[#EAEAEA] px-2 py-1 font-semibold text-[#14161A]">
+                                    <th key={`${blockIndex}-head-${cellIndex}`} className="border border-[var(--color-divider)] bg-[var(--color-neutral-200)] px-2 py-1 font-bold text-[var(--color-text)]">
                                         {renderInlineMarkdown(cell)}
                                     </th>
                                 ))}
@@ -98,7 +98,7 @@ function renderMarkdownContent(content) {
                             {body.map((row, rowIndex) => (
                                 <tr key={`${blockIndex}-row-${rowIndex}`}>
                                     {row.map((cell, cellIndex) => (
-                                        <td key={`${blockIndex}-cell-${rowIndex}-${cellIndex}`} className="border border-[#E4E4E7] px-2 py-1 align-top">
+                                        <td key={`${blockIndex}-cell-${rowIndex}-${cellIndex}`} className="border border-[var(--color-divider)] px-2 py-1 align-top">
                                             {renderInlineMarkdown(cell)}
                                         </td>
                                     ))}
@@ -126,7 +126,7 @@ function renderMarkdownContent(content) {
                             if (labelMatch) {
                                 return (
                                     <li key={`${blockIndex}-${lineIndex}`}>
-                                        <span className="font-semibold text-[#14161A]">{labelMatch[1]}:</span> {renderInlineMarkdown(labelMatch[2].trim())}
+                                        <span className="font-semibold text-[var(--color-text)]">{labelMatch[1]}:</span> {renderInlineMarkdown(labelMatch[2].trim())}
                                     </li>
                                 );
                             }
@@ -142,14 +142,14 @@ function renderMarkdownContent(content) {
             const level = Math.min(3, block.match(/^#+/)?.[0].length || 1);
             const headingText = block.replace(/^#{1,3}\s+/, "");
             const Tag = `h${level}`;
-            return <Tag key={blockIndex} className="font-semibold text-[#14161A] mt-1 mb-1">{renderInlineMarkdown(headingText)}</Tag>;
+            return <Tag key={blockIndex} className="font-semibold text-[var(--color-text)] mt-1 mb-1">{renderInlineMarkdown(headingText)}</Tag>;
         }
 
         if (/^(Quick answer|Short answer|Brief answer|Summary):\s*/i.test(block)) {
             const cleaned = block.replace(/^(Quick answer|Short answer|Brief answer|Summary):\s*/i, "");
             return (
                 <p key={blockIndex} className="leading-relaxed">
-                    <span className="font-semibold text-[#14161A]">Quick answer:</span> {renderInlineMarkdown(cleaned)}
+                    <span className="font-semibold text-[var(--color-text)]">Quick answer:</span> {renderInlineMarkdown(cleaned)}
                 </p>
             );
         }
@@ -158,7 +158,7 @@ function renderMarkdownContent(content) {
             const cleaned = block.replace(/^(Details|More details|Notes):\s*/i, "");
             return (
                 <div key={blockIndex} className="pt-1">
-                    <p className="font-semibold text-[#14161A]">Details</p>
+                    <p className="font-semibold text-[var(--color-text)]">Details</p>
                     <p className="leading-relaxed">{renderInlineMarkdown(cleaned)}</p>
                 </div>
             );
@@ -245,7 +245,7 @@ export default function ChatWidget() {
                 onClick={handleToggleChat}
                 aria-label={isOpen ? "Close chat" : "Open chat"}
                 aria-expanded={isOpen}
-                className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-[#14161A] text-white shadow-lg hover:bg-[#3355FF] transition-colors flex items-center justify-center"
+                className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-[var(--color-text)] text-white border-2 border-[var(--color-text)] hover:bg-[var(--color-accent)] hover:border-[var(--color-accent)] transition-colors flex items-center justify-center"
             >
                 {isOpen ? <CloseIcon className="w-5 h-5" /> : <ChatIcon className="w-6 h-6" />}
             </button>
@@ -254,14 +254,14 @@ export default function ChatWidget() {
                 <div
                     role="dialog"
                     aria-label="Portfolio assistant chat"
-                    className="fixed bottom-24 right-6 z-50 w-[360px] max-w-[calc(100vw-3rem)] h-[500px] max-h-[70vh] bg-white border border-[#E4E4E7] rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+                    className="fixed bottom-24 right-6 z-50 w-[360px] max-w-[calc(100vw-3rem)] h-[500px] max-h-[70vh] bg-[var(--color-bg)] border-2 border-[var(--color-text)] flex flex-col overflow-hidden"
                 >
-                    <div className="px-4 py-3.5 border-b border-[#E4E4E7] flex items-center justify-between shrink-0">
-                        <p className="font-[family-name:var(--font-display)] text-sm font-medium">Ask me anything</p>
+                    <div className="px-4 py-3.5 border-b-2 border-[var(--color-divider)] flex items-center justify-between shrink-0">
+                        <p className="font-[family-name:var(--font-display)] text-sm font-bold text-[var(--color-text)]">Ask me anything</p>
                         <button
                             onClick={() => setIsOpen(false)}
                             aria-label="Close chat"
-                            className="text-[#5B5F66] hover:text-[#14161A] transition-colors"
+                            className="text-[var(--color-neutral-600)] hover:text-[var(--color-text)] transition-colors"
                         >
                             <CloseIcon className="w-4 h-4" />
                         </button>
@@ -270,15 +270,14 @@ export default function ChatWidget() {
                     <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
                         {messages.length === 0 && (
                             <div className="max-w-[88%]">
-                                <div className="relative bg-gradient-to-br from-[#F3F4F6] via-[#F0F0F2] to-[#EAEAF0] text-[#14161A] border border-[#E4E4E7] rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm">
-                                    <div className="absolute -left-2 top-3 h-3 w-3 rotate-45 bg-[#F0F0F2] border-l border-b border-[#E4E4E7]" />
+                                <div className="bg-[var(--color-neutral-100)] text-[var(--color-text)] border-2 border-[var(--color-divider)] px-4 py-3">
                                     <div className="flex items-center gap-2 mb-2">
-                                        <span className="inline-flex h-2.5 w-2.5 rounded-full bg-[#3355FF]" />
-                                        <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#5B5F66]">
+                                        <span className="inline-flex h-2.5 w-2.5 rounded-full bg-[var(--color-accent)]" />
+                                        <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--color-neutral-600)]">
                                             Portfolio assistant
                                         </span>
                                     </div>
-                                    <p className="text-sm leading-relaxed text-[#14161A]">
+                                    <p className="text-sm leading-relaxed text-[var(--color-text)]">
                                         {welcomeMessage || WELCOME_MESSAGES[0]}
                                     </p>
                                 </div>
@@ -288,31 +287,31 @@ export default function ChatWidget() {
                             m.role === "user" ? (
                                 <div
                                     key={i}
-                                    className="bg-[#14161A] text-white rounded-2xl rounded-br-sm px-4 py-2.5 max-w-[85%] ml-auto text-sm leading-relaxed whitespace-pre-wrap"
+                                    className="bg-[var(--color-text)] text-white px-4 py-2.5 max-w-[85%] ml-auto text-sm leading-relaxed whitespace-pre-wrap"
                                 >
                                     {m.content}
                                 </div>
                             ) : m.role === "error" ? (
-                                <div key={i} className="text-xs text-[#E5484D] px-1">
+                                <div key={i} className="text-xs text-[var(--color-accent-700)] px-1">
                                     {m.content}
                                 </div>
                             ) : (
                                 <div
                                     key={i}
-                                    className="bg-[#F0F0F2] text-[#14161A] rounded-2xl rounded-bl-sm px-4 py-2.5 max-w-[85%] text-sm leading-relaxed"
+                                    className="bg-[var(--color-neutral-100)] text-[var(--color-text)] border-2 border-[var(--color-divider)] px-4 py-2.5 max-w-[85%] text-sm leading-relaxed"
                                 >
                                     <div className="space-y-2">{renderMarkdownContent(m.content)}</div>
                                 </div>
                             )
                         )}
                         {isLoading && (
-                            <div className="bg-[#F0F0F2] rounded-2xl rounded-bl-sm px-4 py-3 max-w-[85%] inline-block">
+                            <div className="bg-[var(--color-neutral-100)] border-2 border-[var(--color-divider)] px-4 py-3 max-w-[85%] inline-block">
                                 <TypingDots />
                             </div>
                         )}
                     </div>
 
-                    <form onSubmit={handleSend} className="border-t border-[#E4E4E7] p-3 flex items-end gap-2 shrink-0">
+                    <form onSubmit={handleSend} className="border-t-2 border-[var(--color-divider)] p-3 flex items-end gap-2 shrink-0">
                         <textarea
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
@@ -320,13 +319,13 @@ export default function ChatWidget() {
                             placeholder="Type a question..."
                             rows={1}
                             disabled={isLoading}
-                            className="flex-1 resize-none px-3.5 py-2.5 rounded-lg border border-[#E4E4E7] bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#3355FF]/20 focus:border-[#3355FF] transition-colors disabled:opacity-60 max-h-24"
+                            className="flex-1 resize-none px-3.5 py-2.5 border-2 border-[var(--color-divider)] bg-[var(--color-bg)] text-sm focus:outline-none focus:border-[var(--color-accent)] transition-colors disabled:opacity-60 max-h-24"
                         />
                         <button
                             type="submit"
                             disabled={isLoading || !input.trim()}
                             aria-label="Send message"
-                            className="w-10 h-10 shrink-0 rounded-lg bg-[#14161A] text-white flex items-center justify-center hover:bg-[#3355FF] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="w-10 h-10 shrink-0 bg-[var(--color-text)] text-white flex items-center justify-center hover:bg-[var(--color-accent)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                             <SendIcon className="w-4 h-4" />
                         </button>

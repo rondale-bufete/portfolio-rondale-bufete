@@ -22,26 +22,26 @@ export default async function ProjectDetailsPage({ params }) {
     if (!project) notFound();
 
     return (
-        <main className="min-h-screen bg-[#FAFAFA] px-6 py-10 text-[#14161A] sm:py-14">
+        <main className="min-h-screen bg-[var(--color-bg)] px-6 py-10 text-[var(--color-text)] sm:py-14">
             <article className="mx-auto max-w-4xl">
                 <Link
                     href="/#projects"
-                    className="mb-10 inline-flex items-center gap-2 rounded-full py-1.5 pl-1.5 pr-3 text-sm font-medium text-[#5B5F66] transition-colors hover:bg-[#EEF0F3] hover:text-[#14161A] focus:outline-none focus:ring-2 focus:ring-[#3355FF] focus:ring-offset-2"
+                    className="mb-10 inline-flex items-center gap-2 py-1.5 pl-1.5 pr-3 text-sm font-semibold text-[var(--color-neutral-700)] transition-colors hover:bg-[var(--color-neutral-200)] hover:text-[var(--color-text)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2"
                 >
                     <span
                         aria-hidden="true"
-                        className="flex h-6 w-6 items-center justify-center rounded-full border border-[#D9DDE5] bg-white text-xs"
+                        className="flex h-6 w-6 items-center justify-center border-2 border-[var(--color-divider)] bg-[var(--color-bg)] text-xs"
                     >
                         &larr;
                     </span>
                     Back to projects
                 </Link>
 
-                <header className="mb-10 border-b border-[#E4E4E7] pb-8 sm:pb-10">
-                    <p className="mb-3 font-mono text-xs uppercase tracking-[0.16em] text-[#3355FF]">
+                <header className="mb-10 border-b-2 border-[var(--color-text)] pb-8 sm:pb-10">
+                    <p className="mb-3 font-[family-name:var(--font-mono)] text-xs font-bold uppercase tracking-[0.16em] text-[var(--color-accent-700)]">
                         Project details
                     </p>
-                    <h1 className="max-w-3xl font-(family-name:--font-display) text-justify text-3xl font-medium leading-tight sm:text-5xl">
+                    <h1 className="max-w-3xl font-[family-name:var(--font-display)] text-justify text-3xl font-extrabold leading-tight sm:text-5xl">
                         {project.title}
                     </h1>
                 </header>
@@ -50,16 +50,13 @@ export default async function ProjectDetailsPage({ params }) {
                     <ProjectImageCarousel images={project.imageUrls} title={project.title} />
 
                     {(project.tags.length > 0 || project.liveUrl) && (
-                        <div className="rounded-xl border border-[#E4E4E7] bg-white p-5 sm:p-6">
-                            <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.14em] text-[#9A9DA3]">
+                        <div className="border-2 border-[var(--color-divider)] bg-[var(--color-neutral-100)] p-5 sm:p-6">
+                            <p className="mb-3 font-[family-name:var(--font-mono)] text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-neutral-600)]">
                                 Technology stack
                             </p>
                             <div className="flex flex-wrap gap-2">
                                 {project.tags.map((tag) => (
-                                    <span
-                                        key={tag}
-                                        className="rounded-md border border-[#D9DDE5] bg-[#FAFAFA] px-3 py-1.5 font-mono text-xs text-[#454951]"
-                                    >
+                                    <span key={tag} className="tag tag-neutral">
                                         {tag}
                                     </span>
                                 ))}
@@ -70,7 +67,7 @@ export default async function ProjectDetailsPage({ params }) {
                                     href={project.liveUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-[#3355FF] hover:underline focus:outline-none focus:ring-2 focus:ring-[#3355FF] focus:ring-offset-2"
+                                    className="mt-5 inline-flex items-center gap-1.5 text-sm font-bold text-[var(--color-accent-700)] hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2"
                                 >
                                     Visit live site
                                     <span aria-hidden="true">&rarr;</span>
@@ -80,15 +77,15 @@ export default async function ProjectDetailsPage({ params }) {
                     )}
 
                     {project.repoUrl && (
-                        <div className="flex flex-col justify-between gap-4 rounded-xl border border-[#E4E4E7] bg-white p-5 sm:flex-row sm:items-center sm:p-6">
-                            <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#9A9DA3]">
+                        <div className="flex flex-col justify-between gap-4 border-2 border-[var(--color-divider)] bg-[var(--color-neutral-100)] p-5 sm:flex-row sm:items-center sm:p-6">
+                            <p className="font-[family-name:var(--font-mono)] text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-neutral-600)]">
                                 Source code
                             </p>
                             <a
                                 href={project.repoUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1.5 text-sm font-medium text-[#454951] hover:text-[#14161A] hover:underline focus:outline-none focus:ring-2 focus:ring-[#3355FF] focus:ring-offset-2"
+                                className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--color-neutral-700)] hover:text-[var(--color-text)] hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2"
                             >
                                 View repository
                                 <span aria-hidden="true">&rarr;</span>
@@ -99,28 +96,28 @@ export default async function ProjectDetailsPage({ params }) {
 
                 <div className="space-y-12">
                     <section>
-                        <h2 className="mb-4 flex items-center gap-3 font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-[#3355FF]">
-                            <span className="h-px w-6 bg-[#3355FF]" />
+                        <h2 className="mb-4 flex items-center gap-3 font-[family-name:var(--font-mono)] text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-accent-700)]">
+                            <span className="h-px w-6 bg-[var(--color-accent)]" />
                             Overview
                         </h2>
-                        <p className="whitespace-pre-line text-[15px] leading-7 text-[#454951] text-justify">
+                        <p className="whitespace-pre-line text-[15px] leading-7 text-[var(--color-neutral-800)] text-justify">
                             {project.description || "No description available."}
                         </p>
                     </section>
 
                     {project.highlights.length > 0 && (
                         <section>
-                            <h2 className="mb-4 flex items-center gap-3 font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-[#3355FF]">
-                                <span className="h-px w-6 bg-[#3355FF]" />
+                            <h2 className="mb-4 flex items-center gap-3 font-[family-name:var(--font-mono)] text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-accent-700)]">
+                                <span className="h-px w-6 bg-[var(--color-accent)]" />
                                 Key highlights
                             </h2>
                             <ul className="grid gap-3 sm:grid-cols-2">
                                 {project.highlights.map((highlight, index) => (
                                     <li
                                         key={index}
-                                        className="flex gap-3 rounded-lg border border-[#E4E4E7] bg-white p-4 text-sm leading-6 text-[#454951] transition-colors hover:border-[#D9DDE5]"
+                                        className="flex gap-3 border-2 border-[var(--color-divider)] bg-[var(--color-bg)] p-4 text-sm leading-6 text-[var(--color-neutral-800)] transition-colors hover:border-[var(--color-text)]"
                                     >
-                                        <span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#E8EDFF] font-mono text-xs text-[#3355FF]">
+                                        <span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center bg-[var(--color-accent-100)] font-[family-name:var(--font-mono)] text-xs font-bold text-[var(--color-accent-700)]">
                                             {String(index + 1).padStart(2, "0")}
                                         </span>
                                         <span className="text-justify">{highlight}</span>

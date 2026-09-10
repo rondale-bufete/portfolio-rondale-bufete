@@ -5,9 +5,9 @@ function SocialLink({ href, label, children }) {
             target={href?.startsWith("http") ? "_blank" : undefined}
             rel={href?.startsWith("http") ? "noopener noreferrer" : undefined}
             aria-label={label}
-            className="group inline-flex items-center gap-2 rounded-full border border-[#E4E4E7] bg-white px-3 py-2 text-sm font-medium text-[#454951] transition-all duration-200 hover:border-[#3355FF] hover:text-[#14161A] hover:shadow-sm"
+            className="group inline-flex items-center gap-2 border-2 border-[var(--color-divider)] bg-[var(--color-bg)] px-3 py-2 text-sm font-semibold text-[var(--color-neutral-800)] transition-colors duration-200 hover:border-[var(--color-text)] hover:text-[var(--color-text)]"
         >
-            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#EEF0F3] text-[#14161A] transition-colors group-hover:bg-[#E8EDFF] group-hover:text-[#3355FF]">
+            <span className="flex h-7 w-7 items-center justify-center bg-[var(--color-neutral-200)] text-[var(--color-text)] transition-colors group-hover:bg-[var(--color-accent-100)] group-hover:text-[var(--color-accent-700)]">
                 {children}
             </span>
             {label}
@@ -17,17 +17,16 @@ function SocialLink({ href, label, children }) {
 
 export default function Footer({ profile }) {
     return (
-        <footer className="border-t border-[#E4E4E7] bg-[#FAFAFA]">
+        <footer className="border-t-2 border-[var(--color-text)] bg-[var(--color-bg)]">
             <div className="mx-auto flex max-w-5xl flex-col gap-6 px-6 py-10 md:flex-row md:items-center md:justify-between">
                 <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#14161A] text-sm font-bold text-white">
+                    <div className="flex h-10 w-10 items-center justify-center bg-[var(--color-accent)] text-sm font-bold text-white">
                         {profile?.name?.charAt(0) || "R"}
                     </div>
                     <div>
-                        <p className="font-[family-name:var(--font-display)] text-lg font-medium text-[#14161A]">
+                        <p className="font-[family-name:var(--font-display)] text-lg font-extrabold text-[var(--color-text)]">
                             {profile?.name}
                         </p>
-                        {/* <p className="text-xs uppercase tracking-[0.18em] text-[#9A9DA3]">Available for work</p> */}
                     </div>
                 </div>
 
@@ -52,7 +51,7 @@ export default function Footer({ profile }) {
                 </div>
             </div>
 
-            <div className="mx-auto max-w-5xl border-t border-[#E4E4E7] px-6 py-4 text-center text-xs uppercase tracking-[0.16em] text-[#9A9DA3]">
+            <div className="mx-auto max-w-5xl border-t-2 border-[var(--color-divider)] px-6 py-4 text-center text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-neutral-500)]">
                 © {new Date().getFullYear()} {profile?.name}
             </div>
         </footer>
