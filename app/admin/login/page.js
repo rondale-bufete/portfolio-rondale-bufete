@@ -18,22 +18,22 @@ export default function LoginPage() {
     );
 
     return (
-        <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center px-6">
+        <div className="min-h-screen bg-[var(--color-bg)] flex items-center justify-center px-6">
             <form
                 action={formAction}
-                className="w-full max-w-sm bg-white border border-[#E4E4E7] rounded-xl shadow-[0_1px_2px_rgba(20,22,26,0.04)] p-8"
+                className="w-full max-w-sm bg-[var(--color-surface)] border-2 border-[var(--color-divider)] p-8"
             >
                 <div className="flex items-center gap-2.5 mb-6">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#3355FF]" />
-                    <p className="font-[family-name:var(--font-display)] text-lg font-medium tracking-tight">
+                    <span className="w-2.5 h-2.5 bg-[var(--color-accent)]" />
+                    <p className="font-[family-name:var(--font-display)] text-lg font-extrabold tracking-tight text-[var(--color-text)]">
                         Admin
                     </p>
                 </div>
 
-                <h1 className="font-[family-name:var(--font-display)] text-2xl font-medium mb-1">
+                <h1 className="font-[family-name:var(--font-display)] text-2xl font-extrabold mb-1 text-[var(--color-text)]">
                     Welcome back
                 </h1>
-                <p className="text-sm text-[#5B5F66] mb-6">Enter your password to continue.</p>
+                <p className="text-sm text-[var(--color-neutral-700)] mb-6">Enter your password to continue.</p>
 
                 <label className={labelBase} htmlFor="password">
                     Password
@@ -48,7 +48,7 @@ export default function LoginPage() {
                 />
 
                 {state?.error && (
-                    <p className="text-sm text-[#E5484D] mb-4">{state.error}</p>
+                    <p className="text-sm font-semibold text-[#E5484D] mb-4">{state.error}</p>
                 )}
 
                 <button type="submit" disabled={isPending} className={`${buttonPrimary} w-full mt-4`}>

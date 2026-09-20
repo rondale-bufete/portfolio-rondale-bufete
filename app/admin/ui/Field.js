@@ -37,7 +37,7 @@ export default function Field({
                         className={`${inputBase} px-3`}
                 />
             )}
-            {hint && <p className="mt-1.5 text-xs text-[#9A9DA3]">{hint}</p>}
+            {hint && <p className="mt-1.5 text-xs text-[var(--color-neutral-500)]">{hint}</p>}
         </div>
     );
 }

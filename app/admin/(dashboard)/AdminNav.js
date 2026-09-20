@@ -19,11 +19,11 @@ export default function AdminNav({ logoutAction }) {
     const pathname = usePathname();
 
     return (
-        <aside className="gap-3 shrink-0 bg-white border-b md:border-b-0 md:border-r border-[#E4E4E7] md:fixed md:inset-y-0 md:left-0 md:z-30 md:w-60 md:overflow-y-auto w-full flex flex-col">
+        <aside className="gap-3 shrink-0 bg-[var(--color-surface)] border-b-2 md:border-b-0 md:border-r-2 border-[var(--color-divider)] md:fixed md:inset-y-0 md:left-0 md:z-30 md:w-60 md:overflow-y-auto w-full flex flex-col">
             <div className="px-6 pt-7 pb-6">
                 <div className="flex items-center gap-2.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#3355FF]" />
-                    <p className="font-[family-name:var(--font-display)] text-lg font-medium tracking-tight text-[#14161A] mt-3">
+                    <span className="w-2.5 h-2.5 bg-[var(--color-accent)]" />
+                    <p className="font-[family-name:var(--font-display)] text-lg font-extrabold tracking-tight text-[var(--color-text)] mt-3">
                         Admin
                     </p>
                 </div>
@@ -40,10 +40,10 @@ export default function AdminNav({ logoutAction }) {
                         <Link
                             key={item.href}
                             href={item.href}
-                            className={`flex items-center gap-3.5 text-sm font-medium px-3 py-2.5 rounded-lg transition-colors whitespace-nowrap ${
+                            className={`flex items-center gap-3.5 text-sm font-bold px-3 py-2.5 transition-colors whitespace-nowrap ${
                                 active
-                                    ? "bg-[#3355FF]/10 text-[#3355FF]"
-                                    : "text-[#5B5F66] hover:bg-[#FAFAFA] hover:text-[#14161A]"
+                                    ? "bg-[var(--color-accent-100)] text-[var(--color-accent-700)]"
+                                    : "text-[var(--color-neutral-700)] hover:bg-[var(--color-neutral-200)] hover:text-[var(--color-text)]"
                             }`}
                         >
                             <Icon className="w-4 h-4 mx-3 shrink-0" />
@@ -53,11 +53,11 @@ export default function AdminNav({ logoutAction }) {
                 })}
             </nav>
 
-            <div className="px-3 pb-6 pt-3 border-t border-[#E4E4E7] flex flex-col gap-1">
+            <div className="px-3 pb-6 pt-3 border-t-2 border-[var(--color-divider)] flex flex-col gap-1">
                 <Link
                     href="/"
                     target="_blank"
-                    className="flex items-center gap-2.5 text-sm font-medium px-3 py-2.5 rounded-lg text-[#3355FF] hover:bg-[#3355FF]/[0.06] transition-colors"
+                    className="flex items-center gap-2.5 text-sm font-bold px-3 py-2.5 text-[var(--color-accent-700)] hover:bg-[var(--color-accent)]/[0.08] transition-colors"
                 >
                     <ExternalLinkIcon className="w-4 h-4 shrink-0" />
                     View site
@@ -65,7 +65,7 @@ export default function AdminNav({ logoutAction }) {
                 <form action={logoutAction}>
                     <button
                         type="submit"
-                        className="w-full flex items-center gap-2.5 text-sm font-medium px-3 py-2.5 rounded-lg text-[#5B5F66] hover:bg-[#FAFAFA] hover:text-[#14161A] transition-colors text-left"
+                        className="w-full flex items-center gap-2.5 text-sm font-bold px-3 py-2.5 text-[var(--color-neutral-700)] hover:bg-[var(--color-neutral-200)] hover:text-[var(--color-text)] transition-colors text-left"
                     >
                         <LogOutIcon className="w-4 h-4 shrink-0" />
                         Log out

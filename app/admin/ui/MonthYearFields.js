@@ -19,12 +19,12 @@ export function MonthField({ label, name, defaultValue }) {
 
 export function CurrentCheckbox({ label, defaultChecked }) {
     return (
-        <label className="flex items-center gap-2 text-sm text-[#5B5F66]">
+        <label className="flex items-center gap-2 text-sm text-[var(--color-neutral-700)]">
             <input
                 type="checkbox"
                 name="is_current"
                 defaultChecked={defaultChecked}
-                className="w-4 h-4 rounded border-[#E4E4E7] accent-[#3355FF]"
+                className="w-4 h-4 border-[var(--color-divider)] accent-[var(--color-accent)]"
             />
             {label}
         </label>
