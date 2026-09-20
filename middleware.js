@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import crypto from "crypto";
+import { expectedSessionToken, timingSafeEqualStrings } from "./lib/session-token";
 
 // Node's crypto (HMAC) isn't available in the default Edge runtime,
 // so this middleware explicitly opts into the Node.js runtime.
@@ -10,13 +10,6 @@ export const config = {
 
 const COOKIE_NAME = "admin_session";
 
-function expectedToken() {
-    return crypto
-        .createHmac("sha256", process.env.ADMIN_SESSION_SECRET)
-        .update("admin-authenticated")
-        .digest("hex");
-}
-
 export function middleware(request) {
     const { pathname } = request.nextUrl;
 
@@ -26,7 +19,7 @@ export function middleware(request) {
     }
 
     const token = request.cookies.get(COOKIE_NAME)?.value;
-    const authed = Boolean(token) && token === expectedToken();
+    const authed = Boolean(token) && timingSafeEqualStrings(token, expectedSessionToken());
 
     if (!authed) {
         const loginUrl = new URL("/admin/login", request.url);

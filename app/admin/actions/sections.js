@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { moveItem, nextSortOrder } from "@/lib/supabase/reorder";
+import { requireAdmin } from "@/lib/auth";
 
 function refresh() {
     revalidatePath("/");
@@ -9,30 +11,13 @@ function refresh() {
 }
 
 export async function moveSectionAction(id, direction) {
-    const { data: all } = await supabaseAdmin
-        .from("sections")
-        .select("id, sort_order")
-        .order("sort_order");
-    if (!all) return;
-
-    const idx = all.findIndex((s) => s.id === id);
-    if (idx === -1) return;
-
-    const swapIdx = direction === "up" ? idx - 1 : idx + 1;
-    if (swapIdx < 0 || swapIdx >= all.length) return;
-
-    const current = all[idx];
-    const neighbor = all[swapIdx];
-
-    await Promise.all([
-        supabaseAdmin.from("sections").update({ sort_order: neighbor.sort_order }).eq("id", current.id),
-        supabaseAdmin.from("sections").update({ sort_order: current.sort_order }).eq("id", neighbor.id),
-    ]);
-
+    await requireAdmin();
+    await moveItem("sections", id, direction);
     refresh();
 }
 
 export async function toggleSectionVisibilityAction(id, currentlyVisible) {
+    await requireAdmin();
     const { error } = await supabaseAdmin
         .from("sections")
         .update({ visible: !currentlyVisible })
@@ -42,6 +27,7 @@ export async function toggleSectionVisibilityAction(id, currentlyVisible) {
 }
 
 export async function updateSectionMetaAction(id, formData) {
+    await requireAdmin();
     const patch = {
         label: formData.get("label")?.toString() || "",
         heading: formData.get("heading")?.toString() || "",
@@ -57,19 +43,14 @@ export async function updateSectionMetaAction(id, formData) {
 }
 
 export async function createCustomSectionAction(formData) {
-    const { data: existing } = await supabaseAdmin
-        .from("sections")
-        .select("sort_order")
-        .order("sort_order", { ascending: false })
-        .limit(1);
-    const nextOrder = existing?.[0] ? existing[0].sort_order + 1 : 0;
+    await requireAdmin();
 
     const { error } = await supabaseAdmin.from("sections").insert({
         kind: "custom",
         label: formData.get("label")?.toString() || "",
         heading: formData.get("heading")?.toString() || "",
         body: formData.get("body")?.toString() || "",
-        sort_order: nextOrder,
+        sort_order: await nextSortOrder("sections"),
         visible: true,
     });
     if (error) throw new Error(error.message);
@@ -77,6 +58,8 @@ export async function createCustomSectionAction(formData) {
 }
 
 export async function deleteSectionAction(id) {
+    await requireAdmin();
+
     // Guard against deleting structural sections — they should only ever
     // be hidden, since deleting one would leave its data (projects, etc.)
     // with no home on the page.

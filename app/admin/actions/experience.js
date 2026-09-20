@@ -2,7 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { moveItem, nextSortOrder } from "@/lib/supabase/reorder";
 import { composePeriod, parseBullets } from "@/lib/monthYear";
+import { requireAdmin } from "@/lib/auth";
 
 function refresh() {
     revalidatePath("/");
@@ -26,22 +28,25 @@ function buildPatch(formData) {
     };
 }
 
+export async function moveExperienceAction(id, direction) {
+    await requireAdmin();
+    await moveItem("experience", id, direction);
+    refresh();
+}
+
 export async function createExperienceAction(formData) {
-    const { data: existing } = await supabaseAdmin
-        .from("experience")
-        .select("sort_order")
-        .order("sort_order", { ascending: false })
-        .limit(1);
-    const nextOrder = existing?.[0] ? existing[0].sort_order + 1 : 0;
+    await requireAdmin();
 
     const { error } = await supabaseAdmin
         .from("experience")
-        .insert({ ...buildPatch(formData), sort_order: nextOrder });
+        .insert({ ...buildPatch(formData), sort_order: await nextSortOrder("experience") });
     if (error) throw new Error(error.message);
     refresh();
 }
 
 export async function updateExperienceAction(id, formData) {
+    await requireAdmin();
+
     const { error } = await supabaseAdmin
         .from("experience")
         .update(buildPatch(formData))
@@ -51,6 +56,8 @@ export async function updateExperienceAction(id, formData) {
 }
 
 export async function deleteExperienceAction(id) {
+    await requireAdmin();
+
     const { error } = await supabaseAdmin.from("experience").delete().eq("id", id);
     if (error) throw new Error(error.message);
     refresh();

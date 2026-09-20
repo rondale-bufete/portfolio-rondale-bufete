@@ -2,6 +2,7 @@ import Link from "next/link";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { getVercelAnalyticsSummary } from "@/lib/vercel-analytics";
 import PageHeader from "../ui/PageHeader";
+import ErrorState from "../ui/ErrorState";
 import { cardBase } from "../ui/tokens";
 import { ChevronIcon } from "../ui/icons";
 
@@ -16,11 +17,11 @@ const SECTIONS = [
 
 export default async function AdminOverview() {
     const [
-        { count: experienceCount },
-        { count: projectCount },
-        { count: certCount },
-        { count: eduCount },
-        { count: skillCount },
+        experienceResult,
+        projectResult,
+        certResult,
+        eduResult,
+        skillResult,
         analytics,
     ] = await Promise.all([
         supabaseAdmin.from("experience").select("*", { count: "exact", head: true }),
@@ -31,13 +32,17 @@ export default async function AdminOverview() {
         getVercelAnalyticsSummary(),
     ]);
 
-    const counts = {
-        "/admin/experience": experienceCount,
-        "/admin/projects": projectCount,
-        "/admin/certifications": certCount,
-        "/admin/education": eduCount,
-        "/admin/skills": skillCount,
+    const countResults = {
+        "/admin/experience": experienceResult,
+        "/admin/projects": projectResult,
+        "/admin/certifications": certResult,
+        "/admin/education": eduResult,
+        "/admin/skills": skillResult,
     };
+    const counts = Object.fromEntries(
+        Object.entries(countResults).map(([href, result]) => [href, result.count])
+    );
+    const countsError = Object.values(countResults).find((result) => result.error)?.error;
 
     const trend = analytics.trend ?? [];
     const lastDay = trend.at(-1);
@@ -48,19 +53,26 @@ export default async function AdminOverview() {
                 title="Overview"
             />
 
+            {countsError && (
+                <ErrorState
+                    title="Some counts couldn't load"
+                    message={countsError.message}
+                />
+            )}
+
             <div className={`${cardBase} p-5 mb-6`}>
                 <div className="flex items-start justify-between gap-4 mb-4">
                     <div>
-                        <p className="text-xs font-semibold uppercase tracking-wide text-[#5B5F66] mb-2">
+                        <p className="field-label mb-2">
                             Web Views
                         </p>
-                        <h2 className="text-2xl text-[#14161A]" style={{ fontFamily: "var(--font-display)" }}>
+                        <h2 className="text-2xl text-[var(--color-text)]" style={{ fontFamily: "var(--font-display)" }}>
                             {analytics.available ? analytics.pageviews.toLocaleString() : "Unavailable"}
                         </h2>
                     </div>
                     <div className="text-right">
-                        <p className="text-xs uppercase tracking-wide text-[#5B5F66] mb-2">Visitors</p>
-                        <p className="text-sm text-[#14161A]" style={{ fontFamily: "var(--font-mono)" }}>
+                        <p className="field-label mb-2">Visitors</p>
+                        <p className="text-sm text-[var(--color-text)]" style={{ fontFamily: "var(--font-mono)" }}>
                             {analytics.available ? analytics.visitors.toLocaleString() : "—"}
                         </p>
                     </div>
@@ -68,7 +80,7 @@ export default async function AdminOverview() {
 
                 {analytics.available ? (
                     <div>
-                        <div className="flex items-center justify-between text-xs text-[#5B5F66] mb-3">
+                        <div className="flex items-center justify-between text-xs text-[var(--color-neutral-700)] mb-3">
                             <span>Last 7 days</span>
                             <span>
                                 {lastDay
@@ -86,23 +98,23 @@ export default async function AdminOverview() {
                                     return (
                                         <div key={`${point.date}-${point.pageviews}`} className="flex-1 flex flex-col items-center gap-1">
                                             <div
-                                                className="w-full rounded-t-md bg-[#3355FF] opacity-80"
+                                                className="w-full bg-[var(--color-accent)] opacity-80"
                                                 style={{ height: `${height}%` }}
                                                 title={`${point.date}: ${point.pageviews} pageviews`}
                                             />
-                                            <span className="text-[10px] text-[#5B5F66]" style={{ fontFamily: "var(--font-mono)" }}>
+                                            <span className="text-[10px] text-[var(--color-neutral-700)]" style={{ fontFamily: "var(--font-mono)" }}>
                                                 {point.date.slice(5)}
                                             </span>
                                         </div>
                                     );
                                 })
                             ) : (
-                                <div className="w-full text-sm text-[#5B5F66]">No analytics data for the selected range.</div>
+                                <div className="w-full text-sm text-[var(--color-neutral-700)]">No analytics data for the selected range.</div>
                             )}
                         </div>
                     </div>
                 ) : (
-                    <p className="text-sm text-[#5B5F66]">{analytics.message}</p>
+                    <p className="text-sm text-[var(--color-neutral-700)]">{analytics.message}</p>
                 )}
             </div>
 
@@ -111,22 +123,22 @@ export default async function AdminOverview() {
                     <Link
                         key={s.href}
                         href={s.href}
-                        className={`group block ${cardBase} p-5 transition-all hover:border-[#3355FF]/40 hover:shadow-[0_4px_12px_rgba(20,22,26,0.06)]`}
+                        className={`group block ${cardBase} p-5 transition-colors hover:border-[var(--color-accent)]/50`}
                     >
                         <div className="flex items-center justify-between mb-1.5">
-                            <h3 className="font-medium text-[#14161A]" style={{ fontFamily: "var(--font-display)" }}>
+                            <h3 className="font-bold text-[var(--color-text)]" style={{ fontFamily: "var(--font-display)" }}>
                                 {s.label}
                             </h3>
                             <div className="flex items-center gap-1.5 shrink-0">
                                 {counts[s.href] !== undefined && (
-                                    <span className="text-xs text-[#5B5F66]" style={{ fontFamily: "var(--font-mono)" }}>
+                                    <span className="text-xs text-[var(--color-neutral-700)]" style={{ fontFamily: "var(--font-mono)" }}>
                                         {counts[s.href]}
                                     </span>
                                 )}
-                                <ChevronIcon className="w-4 h-4 text-[#9A9DA3] transition-transform group-hover:translate-x-0.5" />
+                                <ChevronIcon className="w-4 h-4 text-[var(--color-neutral-500)] transition-transform group-hover:translate-x-0.5" />
                             </div>
                         </div>
-                        <p className="text-sm text-[#5B5F66] leading-relaxed">{s.desc}</p>
+                        <p className="text-sm text-[var(--color-neutral-700)] leading-relaxed">{s.desc}</p>
                     </Link>
                 ))}
             </div>

@@ -7,12 +7,13 @@ import {
 } from "../../actions/skills";
 import PageHeader from "../../ui/PageHeader";
 import EmptyState from "../../ui/EmptyState";
-import { cardBase, inputBase, buttonPrimary, buttonSecondary, linkDanger } from "../../ui/tokens";
+import ErrorState from "../../ui/ErrorState";
+import { cardBase, inputBase, labelBase, buttonPrimary, buttonSecondary, linkDanger } from "../../ui/tokens";
 import { TrashIcon } from "../../ui/icons";
 import AdminActionForm from "../../ui/AdminActionForm";
 
 export default async function SkillsAdminPage() {
-    const { data: categories } = await supabaseAdmin
+    const { data: categories, error } = await supabaseAdmin
         .from("skill_categories")
         .select("id, category, sort_order, skill_items(id, name, sort_order)")
         .order("sort_order");
@@ -29,11 +30,13 @@ export default async function SkillsAdminPage() {
                 description="Organized into categories — each category is a column on the homepage."
             />
 
+            {error && <ErrorState message={error.message} />}
+
             <div className="space-y-4 mb-6">
                 {(categories || []).map((cat) => (
                     <CategoryCard key={cat.id} category={cat} />
                 ))}
-                {(!categories || categories.length === 0) && (
+                {!error && (!categories || categories.length === 0) && (
                     <EmptyState title="No categories yet" description="Add one below to get started." />
                 )}
             </div>
@@ -43,7 +46,7 @@ export default async function SkillsAdminPage() {
                 className={`${cardBase} p-5 flex items-end gap-3 max-w-md`}
             >
                 <div className="flex-1">
-                    <label className="block text-xs font-semibold uppercase tracking-wide text-[#5B5F66] mb-1.5" htmlFor="category">
+                    <label className={labelBase} htmlFor="category">
                         New category name
                     </label>
                     <input
@@ -95,7 +98,7 @@ function CategoryCard({ category }) {
                     <SkillItemTag key={item.id} item={item} />
                 ))}
                 {items.length === 0 && (
-                    <p className="text-sm text-[#5B5F66]">No skills in this category yet.</p>
+                    <p className="text-sm text-[var(--color-neutral-700)]">No skills in this category yet.</p>
                 )}
             </div>
 
@@ -128,11 +131,12 @@ function SkillItemTag({ item }) {
         >
             <button
                 type="submit"
-                title="Click to remove"
-                className="group inline-flex items-center gap-1.5 font-[family-name:var(--font-mono)] text-xs pl-2.5 pr-2 py-1.5 rounded-md bg-[#F0F0F2] border border-transparent hover:border-[#E5484D] hover:bg-[#E5484D]/5 transition-colors"
+                title="Remove this skill"
+                aria-label={`Remove ${item.name}`}
+                className="group tag tag-neutral gap-1.5 pl-2.5 pr-2 py-1.5 border border-transparent hover:border-[#E5484D] hover:bg-[#E5484D]/5 transition-colors"
             >
                 {item.name}
-                <span className="text-[#9A9DA3] group-hover:text-[#E5484D] transition-colors">×</span>
+                <TrashIcon className="w-3 h-3 text-[var(--color-neutral-500)] group-hover:text-[#E5484D] transition-colors" />
             </button>
         </AdminActionForm>
     );

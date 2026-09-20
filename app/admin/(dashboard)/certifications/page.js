@@ -9,6 +9,7 @@ import {
 import PageHeader from "../../ui/PageHeader";
 import Field from "../../ui/Field";
 import EmptyState from "../../ui/EmptyState";
+import ErrorState from "../../ui/ErrorState";
 import { ItemRow, AddNewRow } from "../../ui/CollapsibleRow";
 import { MonthField } from "../../ui/MonthYearFields";
 import { labelBase, buttonPrimary, buttonIcon, linkDanger } from "../../ui/tokens";
@@ -16,7 +17,7 @@ import { ArrowUpIcon, ArrowDownIcon, TrashIcon } from "../../ui/icons";
 import AdminActionForm from "../../ui/AdminActionForm";
 
 export default async function CertificationsAdminPage() {
-    const { data: certifications } = await supabaseAdmin
+    const { data: certifications, error } = await supabaseAdmin
         .from("certifications")
         .select("*")
         .order("sort_order");
@@ -41,19 +42,23 @@ export default async function CertificationsAdminPage() {
                 </AddNewRow>
             </div>
 
-            <div className="space-y-3">
-                {(certifications || []).map((cert, index) => (
-                    <CertRow
-                        key={cert.id}
-                        cert={cert}
-                        isFirst={index === 0}
-                        isLast={index === (certifications?.length || 0) - 1}
-                    />
-                ))}
-                {(!certifications || certifications.length === 0) && (
-                    <EmptyState title="No certifications yet" description="Add your first one above." />
-                )}
-            </div>
+            {error && <ErrorState message={error.message} />}
+
+            {!error && (
+                <div className="space-y-3">
+                    {(certifications || []).map((cert, index) => (
+                        <CertRow
+                            key={cert.id}
+                            cert={cert}
+                            isFirst={index === 0}
+                            isLast={index === (certifications?.length || 0) - 1}
+                        />
+                    ))}
+                    {(!certifications || certifications.length === 0) && (
+                        <EmptyState title="No certifications yet" description="Add your first one above." />
+                    )}
+                </div>
+            )}
         </div>
     );
 }
@@ -132,16 +137,16 @@ function CertFields({ cert }) {
                 <label className={labelBase}>Badge image</label>
                 <div className="flex items-center gap-4">
                     {cert?.image_url && (
-                        <img src={cert.image_url} alt="" className="w-20 h-14 object-cover rounded-md border border-[#E4E4E7] shrink-0" />
+                        <img src={cert.image_url} alt="" className="w-20 h-14 object-cover border-2 border-[var(--color-divider)] shrink-0" />
                     )}
-                    <input type="file" name="image" accept="image/*" className="text-sm text-[#5B5F66]" />
+                    <input type="file" name="image" accept="image/*" className="text-sm text-[var(--color-neutral-700)]" />
                 </div>
             </div>
             <div>
                 <label className={labelBase}>
-                    Certificate PDF {cert?.pdf_url && <span className="text-[#3355FF] font-normal normal-case">— currently set, used only if no URL is set</span>}
+                    Certificate PDF {cert?.pdf_url && <span className="text-[var(--color-accent-700)] font-normal normal-case">— currently set, used only if no URL is set</span>}
                 </label>
-                <input type="file" name="pdf" accept="application/pdf" className="text-sm text-[#5B5F66]" />
+                <input type="file" name="pdf" accept="application/pdf" className="text-sm text-[var(--color-neutral-700)]" />
             </div>
         </>
     );

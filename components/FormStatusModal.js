@@ -49,8 +49,9 @@ export default function FormStatusModal({ status, onClose, title, message, butto
                 </p>
 
                 <button
+                    type="button"
                     onClick={onClose}
-                    className="px-6 py-2.5 bg-[var(--color-text)] text-white text-sm font-bold hover:bg-[var(--color-accent)] transition-colors"
+                    className="btn btn-primary btn-lg"
                 >
                     {buttonLabel || "Close"}
                 </button>

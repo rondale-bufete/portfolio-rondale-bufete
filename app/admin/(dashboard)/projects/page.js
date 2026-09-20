@@ -8,13 +8,14 @@ import {
 import PageHeader from "../../ui/PageHeader";
 import Field from "../../ui/Field";
 import EmptyState from "../../ui/EmptyState";
+import ErrorState from "../../ui/ErrorState";
 import { ItemRow, AddNewRow } from "../../ui/CollapsibleRow";
-import { labelBase, buttonPrimary, buttonIcon, linkDanger } from "../../ui/tokens";
+import { labelBase, inputBase, buttonPrimary, buttonIcon, linkDanger } from "../../ui/tokens";
 import { ArrowUpIcon, ArrowDownIcon, TrashIcon } from "../../ui/icons";
 import AdminActionForm from "../../ui/AdminActionForm";
 
 export default async function ProjectsAdminPage() {
-    const { data: projects } = await supabaseAdmin
+    const { data: projects, error } = await supabaseAdmin
         .from("projects")
         .select("*")
         .order("sort_order");
@@ -39,19 +40,23 @@ export default async function ProjectsAdminPage() {
                 </AddNewRow>
             </div>
 
-            <div className="space-y-3">
-                {(projects || []).map((project, index) => (
-                    <ProjectRow
-                        key={project.id}
-                        project={project}
-                        isFirst={index === 0}
-                        isLast={index === (projects?.length || 0) - 1}
-                    />
-                ))}
-                {(!projects || projects.length === 0) && (
-                    <EmptyState title="No projects yet" description="Add your first one above." />
-                )}
-            </div>
+            {error && <ErrorState message={error.message} />}
+
+            {!error && (
+                <div className="space-y-3">
+                    {(projects || []).map((project, index) => (
+                        <ProjectRow
+                            key={project.id}
+                            project={project}
+                            isFirst={index === 0}
+                            isLast={index === (projects?.length || 0) - 1}
+                        />
+                    ))}
+                    {(!projects || projects.length === 0) && (
+                        <EmptyState title="No projects yet" description="Add your first one above." />
+                    )}
+                </div>
+            )}
         </div>
     );
 }
@@ -128,6 +133,38 @@ function ProjectFields({ project }) {
                 defaultValue={(project?.tags || []).join(", ")}
                 placeholder="Next.js, Tailwind CSS, REST API"
             />
+
+            <div>
+                <label className={labelBase}>Origin</label>
+                <select
+                    name="provenance"
+                    defaultValue={project?.provenance || "Personal"}
+                    className={`${inputBase} px-3`}
+                >
+                    <option value="Client">Client</option>
+                    <option value="Capstone">Capstone</option>
+                    <option value="Personal">Personal</option>
+                </select>
+            </div>
+            <Field label="Year (optional)" name="year" defaultValue={project?.year} placeholder="2026" />
+            <Field
+                label="Outcome — shown in the project table (optional)"
+                name="outcome"
+                defaultValue={project?.outcome}
+                placeholder="300+ accounts · +60% collected"
+            />
+            <Field
+                label="Your role — shown on the project's page (optional)"
+                name="role"
+                defaultValue={project?.role}
+                placeholder="Sole developer"
+            />
+            <Field
+                label="Timeline — shown on the project's page (optional)"
+                name="timeline"
+                defaultValue={project?.timeline}
+                placeholder="6 weeks"
+            />
             <Field
                 label="Highlights — key things you did (one per line, optional)"
                 name="highlights"
@@ -146,12 +183,12 @@ function ProjectFields({ project }) {
                             key={imageUrl}
                             src={imageUrl}
                             alt=""
-                            className="w-28 aspect-video object-cover rounded-md border border-[#E4E4E7] shrink-0"
+                            className="w-28 aspect-video object-cover border-2 border-[var(--color-divider)] shrink-0"
                         />
                     ))}
-                    <input type="file" name="images" accept="image/*" multiple className="text-sm text-[#5B5F66]" />
+                    <input type="file" name="images" accept="image/*" multiple className="text-sm text-[var(--color-neutral-700)]" />
                 </div>
-                <p className="mt-1 text-xs text-[#5B5F66]">Select multiple images to replace the current showcase gallery.</p>
+                <p className="mt-1 text-xs text-[var(--color-neutral-700)]">Select multiple images to replace the current showcase gallery.</p>
             </div>
         </>
     );

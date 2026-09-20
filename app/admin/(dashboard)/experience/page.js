@@ -4,18 +4,20 @@ import {
     createExperienceAction,
     updateExperienceAction,
     deleteExperienceAction,
+    moveExperienceAction,
 } from "../../actions/experience";
 import PageHeader from "../../ui/PageHeader";
 import Field from "../../ui/Field";
 import EmptyState from "../../ui/EmptyState";
+import ErrorState from "../../ui/ErrorState";
 import { ItemRow, AddNewRow } from "../../ui/CollapsibleRow";
 import { MonthField, CurrentCheckbox } from "../../ui/MonthYearFields";
-import { buttonPrimary, linkDanger } from "../../ui/tokens";
-import { TrashIcon } from "../../ui/icons";
+import { buttonPrimary, buttonIcon, linkDanger } from "../../ui/tokens";
+import { ArrowUpIcon, ArrowDownIcon, TrashIcon } from "../../ui/icons";
 import AdminActionForm from "../../ui/AdminActionForm";
 
 export default async function ExperienceAdminPage() {
-    const { data: experience } = await supabaseAdmin
+    const { data: experience, error } = await supabaseAdmin
         .from("experience")
         .select("*")
         .order("sort_order");
@@ -32,7 +34,7 @@ export default async function ExperienceAdminPage() {
                 description={
                     <>
                         Your work history. This section is hidden by default after setup — enable it from{" "}
-                        <a href="/admin/sections" className="text-[#3355FF] hover:underline">Sections</a> once
+                        <a href="/admin/sections" className="text-[var(--color-accent-700)] hover:underline">Sections</a> once
                         you&rsquo;ve added your roles.
                     </>
                 }
@@ -49,22 +51,39 @@ export default async function ExperienceAdminPage() {
                 </AddNewRow>
             </div>
 
-            <div className="space-y-3">
-                {(experience || []).map((exp) => (
-                    <ExperienceRow key={exp.id} exp={exp} />
-                ))}
-                {(!experience || experience.length === 0) && (
-                    <EmptyState
-                        title="No experience entries yet"
-                        description="Add your first role above — company, role, dates, and a few bullet points."
-                    />
-                )}
-            </div>
+            {error && <ErrorState message={error.message} />}
+
+            {!error && (
+                <div className="space-y-3">
+                    {(experience || []).map((exp, index) => (
+                        <ExperienceRow
+                            key={exp.id}
+                            exp={exp}
+                            isFirst={index === 0}
+                            isLast={index === (experience?.length || 0) - 1}
+                        />
+                    ))}
+                    {(!experience || experience.length === 0) && (
+                        <EmptyState
+                            title="No experience entries yet"
+                            description="Add your first role above — company, role, dates, and a few bullet points."
+                        />
+                    )}
+                </div>
+            )}
         </div>
     );
 }
 
-function ExperienceRow({ exp }) {
+function ExperienceRow({ exp, isFirst, isLast }) {
+    async function handleMoveUp() {
+        "use server";
+        await moveExperienceAction(exp.id, "up");
+    }
+    async function handleMoveDown() {
+        "use server";
+        await moveExperienceAction(exp.id, "down");
+    }
     async function handleUpdate(formData) {
         "use server";
         await updateExperienceAction(exp.id, formData);
@@ -76,6 +95,19 @@ function ExperienceRow({ exp }) {
 
     return (
         <ItemRow title={`${exp.role} · ${exp.company}`} meta={exp.period}>
+            <div className="mt-4 flex items-center gap-2">
+                <AdminActionForm action={handleMoveUp}>
+                    <button type="submit" disabled={isFirst} className={buttonIcon} title="Move up" aria-label="Move up">
+                        <ArrowUpIcon className="w-4 h-4" />
+                    </button>
+                </AdminActionForm>
+                <AdminActionForm action={handleMoveDown}>
+                    <button type="submit" disabled={isLast} className={buttonIcon} title="Move down" aria-label="Move down">
+                        <ArrowDownIcon className="w-4 h-4" />
+                    </button>
+                </AdminActionForm>
+            </div>
+
             <AdminActionForm action={handleUpdate} className="mt-4 space-y-4 max-w-xl">
                 <ExperienceFields exp={exp} />
                 <button type="submit" className={buttonPrimary}>
