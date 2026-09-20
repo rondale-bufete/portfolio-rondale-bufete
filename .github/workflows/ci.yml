@@ -21,8 +21,3 @@ jobs:
       - run: npm run lint
 
       - run: npm test
-
-      # `npm run build` isn't run here — this project fetches from Supabase
-      # at build time (lib/data.js), so a build step would need
-      # NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY (and the
-      # rest of .env.example) added as repository secrets first.
