@@ -8,7 +8,7 @@ export default function ProjectImageCarousel({ images = [], title }) {
 
     if (images.length === 0) {
         return (
-            <div className="flex aspect-video w-full items-center justify-center border-2 border-[var(--color-text)] bg-[var(--color-text)] text-center font-[family-name:var(--font-mono)] text-xs font-bold uppercase tracking-[0.14em] text-[var(--color-neutral-400)]">
+            <div className="eyebrow flex aspect-video w-full items-center justify-center border-2 border-[var(--color-text)] bg-[var(--color-text)] text-center text-[var(--color-neutral-400)]">
                 Preview unavailable
             </div>
         );

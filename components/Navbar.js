@@ -2,19 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import ResumeModal from "./ResumeModal";
-
-// Anchor id for each section kind — matches the id every section component
-// already renders (About -> #about, Experience -> #experience, etc). Custom
-// sections don't share one id since there can be several, so they use their
-// own row id instead (see CustomSection.js).
-const KIND_TO_ID = {
-    about: "about",
-    experience: "experience",
-    skills: "skills",
-    projects: "projects",
-    contact: "contact",
-};
+import { container } from "./SectionHeader";
 
 // Nav tabs read as short uppercase words ("EXPERIENCE"), while the same
 // section's on-page eyebrow keeps its full "02 — Experience" form — strip
@@ -23,14 +13,34 @@ function tabLabel(label) {
     return (label || "").replace(/^\d+\s*[—-]\s*/, "");
 }
 
+// WORK, About, Projects, and Contact are real routes now (see
+// app/about/page.js, app/projects/page.js, app/contact/page.js) rather than
+// anchors on one scrolling page. WORK (home) still carries its own
+// "Selected work" preview linking into Projects, so the two overlap by
+// design — Projects is the full list, WORK is the highlight reel.
+// Experience/Skills are folded into About and never get a tab.
 export default function Navbar({ profile, sections = [] }) {
     const [isOpen, setIsOpen] = useState(false);
     const [showResume, setShowResume] = useState(false);
+    const pathname = usePathname();
 
-    const tabs = sections.map((section) => ({
-        href: `#${KIND_TO_ID[section.kind] || `section-${section.id}`}`,
-        label: tabLabel(section.label) || section.kind,
-    }));
+    const aboutSection = sections.find((s) => s.kind === "about");
+    const projectsSection = sections.find((s) => s.kind === "projects");
+    const contactSection = sections.find((s) => s.kind === "contact");
+    const customSections = sections.filter((s) => s.kind === "custom");
+
+    const tabs = [
+        { href: "/", label: "Work" },
+        ...(aboutSection ? [{ href: "/about", label: tabLabel(aboutSection.label) || "About" }] : []),
+        ...(projectsSection ? [{ href: "/projects", label: tabLabel(projectsSection.label) || "Projects" }] : []),
+        ...customSections.map((s) => ({ href: `/#section-${s.id}`, label: tabLabel(s.label) || "More" })),
+        ...(contactSection ? [{ href: "/contact", label: tabLabel(contactSection.label) || "Contact" }] : []),
+    ];
+
+    function isActive(href) {
+        if (href === "/") return pathname === "/";
+        return pathname === href || (href.startsWith("/") && !href.includes("#") && pathname.startsWith(href));
+    }
 
     function handleLinkClick() {
         setIsOpen(false);
@@ -38,9 +48,9 @@ export default function Navbar({ profile, sections = [] }) {
 
     return (
         <>
-            <header className="sticky top-0 z-40 bg-[var(--color-bg)] border-b-2 border-[var(--color-text)]">
-                <nav className="max-w-5xl mx-auto px-6 h-[52px] flex items-center justify-between gap-4">
-                    <Link href="#" className="flex items-center gap-3.5 min-w-0">
+            <header className="sticky top-0 z-40 bg-[var(--color-bg)] border-b-2 border-[var(--color-divider)]">
+                <nav className={`${container} h-[52px] flex items-center justify-between gap-4`}>
+                    <Link href="/" className="flex items-center gap-3.5 min-w-0">
                         <span className="w-[26px] h-[26px] shrink-0 bg-[var(--color-accent)] text-white font-[family-name:var(--font-display)] font-extrabold text-[11px] flex items-center justify-center">
                             {profile?.name
                                 ?.split(" ")
@@ -73,8 +83,14 @@ export default function Navbar({ profile, sections = [] }) {
                             onClick={() => setShowResume(true)}
                             className="font-bold text-[11.5px] px-3 py-1.5 bg-[var(--color-text)] text-white hover:bg-[var(--color-accent)] transition-colors"
                         >
-                            Résumé ↓
+                            Resumé ↓
                         </button>
+                        {profile?.available && (
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-[var(--color-accent)] text-white font-bold text-[10px] tracking-[0.06em] uppercase">
+                                <span className="w-[5px] h-[5px] rounded-full bg-white" />
+                                {profile.statusLabel || "OPEN TO WORK"}
+                            </span>
+                        )}
                     </div>
 
                     <button
@@ -89,31 +105,32 @@ export default function Navbar({ profile, sections = [] }) {
                     </button>
                 </nav>
 
-                {tabs.length > 0 && (
-                    <div className="hidden md:flex max-w-5xl mx-auto px-6 border-t-2 border-[var(--color-text)] bg-[var(--color-neutral-100)] overflow-x-auto">
-                        {tabs.map((tab) => (
-                            <a
+                <div className={`hidden md:flex items-center ${container} border-t-2 border-[var(--color-divider)] bg-[var(--color-neutral-100)] overflow-x-auto`}>
+                    {tabs.map((tab) => {
+                        const active = isActive(tab.href);
+                        return (
+                            <Link
                                 key={tab.href}
                                 href={tab.href}
-                                className="px-4 pt-[11px] pb-[9px] font-bold text-[11.5px] tracking-[0.04em] uppercase text-[var(--color-neutral-600)] hover:text-[var(--color-text)] whitespace-nowrap transition-colors"
+                                className={`px-4 pt-[11px] pb-[9px] font-bold text-[11.5px] tracking-[0.04em] uppercase whitespace-nowrap transition-colors ${active ? "text-[var(--color-text)] shadow-[inset_0_-3px_0_var(--color-accent)]" : "text-[var(--color-neutral-600)] hover:text-[var(--color-text)]"}`}
                             >
-                                {tab.label}
-                            </a>
-                        ))}
-                    </div>
-                )}
+                                {tab.label.toUpperCase()}
+                            </Link>
+                        );
+                    })}
+                </div>
 
-                <div className={`md:hidden overflow-hidden transition-all duration-300 border-t-2 border-[var(--color-text)] ${isOpen ? "max-h-64" : "max-h-0 border-t-0"}`}>
+                <div className={`md:hidden overflow-hidden transition-all duration-300 border-t-2 border-[var(--color-divider)] ${isOpen ? "max-h-64" : "max-h-0 border-t-0"}`}>
                     <div className="px-6 py-5 flex flex-col gap-4">
                         {tabs.map((tab) => (
-                            <a
+                            <Link
                                 key={tab.href}
                                 href={tab.href}
                                 onClick={handleLinkClick}
                                 className="font-bold text-xs uppercase tracking-[0.06em] text-[var(--color-neutral-700)] hover:text-[var(--color-text)] transition-colors"
                             >
-                                {tab.label}
-                            </a>
+                                {tab.label.toUpperCase()}
+                            </Link>
                         ))}
                         <button
                             onClick={() => {

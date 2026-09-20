@@ -273,7 +273,7 @@ export default function ChatWidget() {
                                 <div className="bg-[var(--color-neutral-100)] text-[var(--color-text)] border-2 border-[var(--color-divider)] px-4 py-3">
                                     <div className="flex items-center gap-2 mb-2">
                                         <span className="inline-flex h-2.5 w-2.5 rounded-full bg-[var(--color-accent)]" />
-                                        <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--color-neutral-600)]">
+                                        <span className="eyebrow text-[var(--color-neutral-600)]">
                                             Portfolio assistant
                                         </span>
                                     </div>
@@ -319,7 +319,7 @@ export default function ChatWidget() {
                             placeholder="Type a question..."
                             rows={1}
                             disabled={isLoading}
-                            className="flex-1 resize-none px-3.5 py-2.5 border-2 border-[var(--color-divider)] bg-[var(--color-bg)] text-sm focus:outline-none focus:border-[var(--color-accent)] transition-colors disabled:opacity-60 max-h-24"
+                            className="flex-1 resize-none px-4 py-2.5 border-2 border-[var(--color-divider)] bg-[var(--color-bg)] text-sm focus:outline-none focus:border-[var(--color-accent)] transition-colors disabled:opacity-60 max-h-24"
                         />
                         <button
                             type="submit"

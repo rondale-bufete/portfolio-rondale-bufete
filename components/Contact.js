@@ -3,9 +3,11 @@
 import { useState } from "react";
 import emailjs from "@emailjs/browser";
 import FormStatusModal from "./FormStatusModal";
-import SectionHeader, { sectionShell } from "./SectionHeader";
+import SectionHeader, { pageShell } from "./SectionHeader";
+import InfoRow from "./InfoRow";
+import { stripProtocol } from "@/lib/format";
 
-export default function Contact({ label = "04 — Contact", heading = "Let\u2019s work together" }) {
+export default function Contact({ profile, label = "04 — Contact", heading ="Let\u2019s work together" }) {
     const [form, setForm] = useState({ name: "", email: "", message: "" });
     const [status, setStatus] = useState("idle"); // idle | sending | success | error
 
@@ -41,9 +43,10 @@ export default function Contact({ label = "04 — Contact", heading = "Let\u2019
     }
 
     return (
-        <section id="contact" className={sectionShell}>
+        <section className={pageShell}>
             <SectionHeader label={label} heading={heading} />
 
+            <div className="grid md:grid-cols-[1fr_320px] gap-10">
             <form onSubmit={handleSubmit} className="max-w-xl space-y-4">
                 <div>
                     <label className="block text-sm font-medium text-[var(--color-neutral-700)] mb-1.5" htmlFor="name">
@@ -96,11 +99,24 @@ export default function Contact({ label = "04 — Contact", heading = "Let\u2019
                 <button
                     type="submit"
                     disabled={status === "sending"}
-                    className="px-6 py-2.5 bg-[var(--color-text)] text-white text-sm font-bold hover:bg-[var(--color-accent)] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="btn btn-primary btn-lg disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                     {status === "sending" ? "Sending..." : "Send Message"}
                 </button>
             </form>
+
+            <div className="bg-[var(--color-neutral-100)]">
+                <p className="field-label px-6 pt-5 mb-1 text-[var(--color-accent-700)]">
+                    Direct
+                </p>
+                <InfoRow label="Email" value={profile?.email} href={profile?.email ? `mailto:${profile.email}` : undefined} />
+                <InfoRow label="Phone" value={profile?.phone} />
+                <InfoRow label="Location" value={profile?.location} />
+                <InfoRow label="Open to" value={profile?.openTo} />
+                <InfoRow label="GitHub" value={stripProtocol(profile?.github)} href={profile?.github} />
+                <InfoRow label="LinkedIn" value={stripProtocol(profile?.linkedin)} href={profile?.linkedin} />
+            </div>
+            </div>
 
             {(status === "success" || status === "error") && (
                 <FormStatusModal status={status} onClose={closeModal} />

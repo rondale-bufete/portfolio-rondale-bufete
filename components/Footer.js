@@ -1,3 +1,5 @@
+import { container } from "./SectionHeader";
+
 function SocialLink({ href, label, children }) {
     return (
         <a
@@ -17,8 +19,8 @@ function SocialLink({ href, label, children }) {
 
 export default function Footer({ profile }) {
     return (
-        <footer className="border-t-2 border-[var(--color-text)] bg-[var(--color-bg)]">
-            <div className="mx-auto flex max-w-5xl flex-col gap-6 px-6 py-10 md:flex-row md:items-center md:justify-between">
+        <footer className="border-t-2 border-[var(--color-divider)] bg-[var(--color-bg)]">
+            <div className={`${container} flex flex-col gap-6 py-10 md:flex-row md:items-center md:justify-between`}>
                 <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center bg-[var(--color-accent)] text-sm font-bold text-white">
                         {profile?.name?.charAt(0) || "R"}
@@ -51,7 +53,7 @@ export default function Footer({ profile }) {
                 </div>
             </div>
 
-            <div className="mx-auto max-w-5xl border-t-2 border-[var(--color-divider)] px-6 py-4 text-center text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-neutral-500)]">
+            <div className={`${container} border-t-2 border-[var(--color-divider)] py-4 text-center text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-neutral-500)]`}>
                 © {new Date().getFullYear()} {profile?.name}
             </div>
         </footer>

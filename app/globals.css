@@ -59,6 +59,31 @@ body {
 .tag-neutral { background: var(--color-neutral-100); color: var(--color-neutral-800); }
 .tag-outline { border: 1px solid var(--color-accent); color: var(--color-accent-700); }
 
+/* — field-label — small mono caption over a value (InfoRow labels, table
+   headers, project meta labels). One size/weight/tracking everywhere
+   instead of each component hand-picking a nearby px value. */
+.field-label {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-neutral-600);
+}
+
+/* — eyebrow — the larger mono marker above a section/subsection heading
+   (SectionHeader's label, About's Experience/Skills headers, a project's
+   Overview/Key highlights headers). Defaults to the accent color; override
+   with a text-[var(--color-*)] class where a muted/neutral tone is needed. */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--color-accent-700);
+}
+
 /* — buttons — */
 .btn {
   display: inline-flex;
@@ -71,8 +96,14 @@ body {
   font-weight: 700;
   font-size: 13px;
   padding: 10px 16px;
+  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
 }
 .btn-primary { background: var(--color-text); color: var(--color-bg); }
 .btn-primary:hover { background: var(--color-accent); }
 .btn-secondary { border: 2px solid var(--color-text); color: var(--color-text); }
 .btn-secondary:hover { background: var(--color-text); color: var(--color-bg); }
+
+/* — btn-lg — a roomier primary CTA for a form/modal's single main action
+   (Contact's submit, FormStatusModal's close), vs .btn's default compact
+   size used for inline links like Hero's CTAs. Combine with .btn.btn-primary. */
+.btn-lg { padding: 10px 24px; font-size: 14px; }

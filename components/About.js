@@ -1,155 +1,170 @@
-import SectionHeader, { sectionShell } from "./SectionHeader";
+import { pageShell } from "./SectionHeader";
 
-// Fallback badge shown when a certification has no `image` yet — keeps the
-// grid from ever showing a broken image while you backfill assets.
-function CertBadgeFallback() {
-    return (
-        <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="w-9 h-9 text-[var(--color-neutral-400)]"
-        >
-            <path d="M12 15a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z" />
-            <path d="M8.5 13.5 7 21l5-2.5L17 21l-1.5-7.5" />
-        </svg>
-    );
-}
-
-function CertificationCard({ cert }) {
-    const link = cert.url || cert.pdf;
-    const isPdf = !cert.url && !!cert.pdf;
-    const Wrapper = link ? "a" : "div";
-    const wrapperProps = link
-        ? { href: link, target: "_blank", rel: "noopener noreferrer" }
-        : {};
-
-    return (
-        <Wrapper
-            {...wrapperProps}
-            className="group flex flex-col border-2 border-[var(--color-divider)] bg-[var(--color-bg)] overflow-hidden transition-colors duration-200 hover:border-[var(--color-text)]"
-        >
-            <div className="relative h-48 bg-[var(--color-neutral-200)] border-b-2 border-[var(--color-divider)] overflow-hidden">
-                {cert.image ? (
-                    <img
-                        src={cert.image}
-                        alt={cert.title}
-                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
-                ) : (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <CertBadgeFallback />
-                    </div>
-                )}
-
-                {link && (
-                    <span className="tag tag-neutral absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                        {isPdf ? "PDF" : "VIEW →"}
-                    </span>
-                )}
-            </div>
-
-            <div className="p-5 flex-1 flex flex-col">
-                <p className="font-[family-name:var(--font-mono)] text-xs font-bold text-[var(--color-accent-700)] mb-1">
-                    {cert.date}
-                </p>
-                <h4 className="font-[family-name:var(--font-display)] text-base font-bold leading-snug text-[var(--color-text)]">
-                    {cert.title}
-                </h4>
-                <p className="text-[var(--color-neutral-700)] text-sm mt-0.5">{cert.issuer}</p>
-                {cert.credentialId && (
-                    <p className="text-[var(--color-neutral-600)] text-xs mt-1 font-[family-name:var(--font-mono)]">
-                        ID: {cert.credentialId}
-                    </p>
-                )}
-                {cert.description && (
-                    <p className="text-[var(--color-neutral-700)] text-sm mt-2 leading-relaxed text-justify">
-                        {cert.description}
-                    </p>
-                )}
-            </div>
-        </Wrapper>
-    );
-}
+const JUMP_LINKS = [
+    { href: "#about-summary", label: "Summary" },
+    { href: "#about-experience", label: "Experience" },
+    { href: "#about-skills", label: "Skills" },
+    { href: "#about-education", label: "Education" },
+    { href: "#about-certifications", label: "Certifications" },
+];
 
 export default function About({
     profile,
+    experience = [],
+    skills = [],
     education = [],
     certifications = [],
-    label = "01 — About",
-    heading = "A bit about how I work",
 }) {
     return (
-        <section id="about" className={sectionShell}>
-            <SectionHeader label={label} heading={heading} className="mb-6" />
-            <div className="mb-16 grid max-w-4xl gap-6 border-l-2 border-[var(--color-accent)] pl-5 sm:pl-7 lg:grid-cols-[minmax(0,1.3fr)_minmax(14rem,0.7fr)] lg:items-start lg:gap-12">
-                <p className="font-[family-name:var(--font-display)] text-lg leading-relaxed text-[var(--color-neutral-800)] sm:text-xl">
-                    {profile?.bio}
-                </p>
-                <div className="border-t-2 border-[var(--color-divider)] pt-4 lg:border-l-2 lg:border-t-0 lg:pl-6 lg:pt-0">
-                    <p className="mb-2 font-[family-name:var(--font-mono)] text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--color-accent-700)]">
-                        Approach
-                    </p>
-                    <p className="text-sm leading-6 text-[var(--color-neutral-700)]">
-                        Thoughtful interfaces, practical engineering, and a focus on work that lasts.
-                    </p>
+        <section className={pageShell}>
+            <div className="grid md:grid-cols-[236px_1fr] gap-0">
+                {/* Sidebar */}
+                <div className="border-b-2 md:border-b-0 md:border-r-2 border-[var(--color-divider)] px-6 py-6 md:pl-0 md:pr-6">
+                    {profile?.photo && (
+                        <img
+                            src={profile.photo}
+                            alt={`${profile.name}, portrait photo`}
+                            className="w-full aspect-square object-cover border-2 border-[var(--color-text)]"
+                        />
+                    )}
+                    <nav className="mt-6 border-t-2 border-[var(--color-divider)]">
+                        {JUMP_LINKS.map((link) => (
+                            <a
+                                key={link.href}
+                                href={link.href}
+                                className="block py-2.5 border-b border-[var(--color-divider)] font-semibold text-[11px] text-[var(--color-neutral-800)] hover:text-[var(--color-accent-700)] transition-colors"
+                            >
+                                {link.label}
+                            </a>
+                        ))}
+                    </nav>
+                    <div className="mt-6 pt-4 border-t-2 border-[var(--color-divider)] text-[11px] leading-relaxed text-[var(--color-neutral-700)]">
+                        {profile?.email && <div>{profile.email}</div>}
+                        {profile?.phone && <div>{profile.phone}</div>}
+                        {profile?.location && <div>{profile.location}</div>}
+                    </div>
                 </div>
-            </div>
 
-            {education.length > 0 && (
-                <div>
-                    <h3 className="mb-6 font-[family-name:var(--font-mono)] text-sm font-bold uppercase tracking-wide text-[var(--color-neutral-600)]">
-                        Education
-                    </h3>
-                    <div className="relative max-w-4xl space-y-5 before:absolute before:left-1.25 before:top-3 before:h-[calc(100%-1.5rem)] before:w-px before:bg-[var(--color-divider)]">
-                        {education.map((edu, i) => (
-                            <div key={i} className="relative pl-8 sm:pl-10">
-                                <span className="absolute left-0 top-5 z-10 h-3 w-3 rounded-full border-2 border-[var(--color-bg)] bg-[var(--color-accent)]" />
-                                <div className="border-2 border-[var(--color-divider)] bg-[var(--color-bg)] p-5 transition-colors hover:border-[var(--color-text)] sm:p-6">
-                                    <p className="mb-2 font-[family-name:var(--font-mono)] text-[11px] font-bold text-[var(--color-accent-700)]">
-                                        {edu.period}
-                                    </p>
-                                    <h4 className="font-[family-name:var(--font-display)] text-xl font-extrabold tracking-tight text-[var(--color-text)]">
-                                        {edu.degree}
-                                    </h4>
-                                    <p className="mt-1 text-sm font-medium text-[var(--color-neutral-700)]">{edu.school}</p>
-                                    {edu.description && (
-                                        <p className="mt-4 border-t-2 border-[var(--color-divider)] pt-4 text-sm leading-relaxed text-[var(--color-neutral-700)]">
-                                            {edu.description}
-                                        </p>
-                                    )}
-                                    {edu.bullets?.length > 0 && (
-                                        <ul className="mt-4 space-y-2 border-t-2 border-[var(--color-divider)] pt-4">
-                                            {edu.bullets.map((bullet, bi) => (
-                                                <li key={bi} className="flex gap-3 text-sm leading-relaxed text-[var(--color-neutral-700)]">
-                                                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]" />
-                                                    <span>{bullet}</span>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    )}
+                {/* Main column */}
+                <div className="px-6 py-6 md:py-8 md:pl-8 md:pr-0">
+                    <div id="about-summary" className="scroll-mt-24">
+                        <h1 className="font-[family-name:var(--font-display)] text-3xl font-extrabold tracking-tight text-[var(--color-text)] max-w-xl">
+                            {profile?.tagline}
+                        </h1>
+                        <p className="mt-4 text-[13.5px] leading-relaxed text-[var(--color-neutral-800)] max-w-2xl">
+                            {profile?.bio}
+                        </p>
+                    </div>
+
+                    {experience.length > 0 && (
+                        <div id="about-experience" className="mt-8 scroll-mt-24">
+                            <h2 className="eyebrow mb-3.5">
+                                Experience
+                            </h2>
+                            {experience.map((exp, i) => (
+                                <div
+                                    key={i}
+                                    className="grid sm:grid-cols-[150px_1fr] gap-3 sm:gap-5 py-3.5 border-t-2 border-[var(--color-divider)]"
+                                >
+                                    <div>
+                                        <div className="font-[family-name:var(--font-mono)] text-[11px] font-bold text-[var(--color-neutral-600)]">
+                                            {exp.period}
+                                        </div>
+                                        <div className="mt-1 text-[10.5px] font-semibold text-[var(--color-neutral-500)]">
+                                            {exp.company}
+                                            {exp.location ? ` · ${exp.location}` : ""}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div className="font-[family-name:var(--font-display)] text-[15px] font-extrabold text-[var(--color-text)]">
+                                            {exp.role}
+                                        </div>
+                                        {exp.bullets?.length > 0 && (
+                                            <ul className="mt-2 space-y-1.5">
+                                                {exp.bullets.map((bullet, bi) => (
+                                                    <li key={bi} className="flex gap-2.5 text-[12.5px] leading-relaxed text-[var(--color-neutral-800)]">
+                                                        <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-[var(--color-accent)]" />
+                                                        <span>{bullet}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    <div className="mt-8 grid sm:grid-cols-2 gap-8 border-t-2 border-[var(--color-divider)] pt-6">
+                        {skills.length > 0 && (
+                            <div id="about-skills" className="scroll-mt-24">
+                                <h2 className="eyebrow mb-3">
+                                    Skills
+                                </h2>
+                                <div className="space-y-3">
+                                    {skills.map((group) => (
+                                        <div key={group.category}>
+                                            <div className="field-label mb-1.5">
+                                                {group.category}
+                                            </div>
+                                            <div className="flex flex-wrap gap-1.5">
+                                                {group.items.map((item) => (
+                                                    <span key={item} className="tag tag-neutral">{item}</span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
-                        ))}
-                    </div>
-                </div>
-            )}
+                        )}
 
-            {certifications.length > 0 && (
-                <div className="mt-16">
-                    <h3 className="font-[family-name:var(--font-mono)] text-sm font-bold text-[var(--color-neutral-600)] mb-6 uppercase tracking-wide">
-                        Certifications
-                    </h3>
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {certifications.map((cert, i) => (
-                            <CertificationCard key={i} cert={cert} />
-                        ))}
+                        {(education.length > 0 || certifications.length > 0) && (
+                            <div>
+                                <h2 className="eyebrow mb-3">
+                                    Education &amp; Certifications
+                                </h2>
+                                {education.length > 0 && (
+                                    <div id="about-education" className="scroll-mt-24 space-y-3 pb-3 border-b-2 border-[var(--color-divider)]">
+                                        {education.map((edu, i) => (
+                                            <div key={i}>
+                                                <div className="font-[family-name:var(--font-display)] text-[13.5px] font-extrabold text-[var(--color-text)]">
+                                                    {edu.degree}
+                                                </div>
+                                                <div className="mt-0.5 text-[12px] text-[var(--color-neutral-700)]">
+                                                    {edu.school}
+                                                    {edu.period ? ` · ${edu.period}` : ""}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                                {certifications.length > 0 && (
+                                    <ul id="about-certifications" className="scroll-mt-24 mt-3 space-y-1.5">
+                                        {certifications.map((cert, i) => {
+                                            const link = cert.url || cert.pdf;
+                                            return (
+                                                <li key={i} className="text-[12px] leading-relaxed text-[var(--color-neutral-800)]">
+                                                    {link ? (
+                                                        <a href={link} target="_blank" rel="noopener noreferrer" className="hover:text-[var(--color-accent-700)] transition-colors">
+                                                            {cert.title}
+                                                            {cert.issuer ? ` — ${cert.issuer}` : ""}
+                                                        </a>
+                                                    ) : (
+                                                        <>
+                                                            {cert.title}
+                                                            {cert.issuer ? ` — ${cert.issuer}` : ""}
+                                                        </>
+                                                    )}
+                                                </li>
+                                            );
+                                        })}
+                                    </ul>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
-            )}
+            </div>
         </section>
     );
 }
