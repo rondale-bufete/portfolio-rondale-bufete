@@ -6,19 +6,10 @@ import { usePathname } from "next/navigation";
 import ResumeModal from "./ResumeModal";
 import { container } from "./SectionHeader";
 
-// Nav tabs read as short uppercase words ("EXPERIENCE"), while the same
-// section's on-page eyebrow keeps its full "02 — Experience" form — strip
-// the leading index here rather than storing the label twice.
 function tabLabel(label) {
     return (label || "").replace(/^\d+\s*[—-]\s*/, "");
 }
 
-// WORK, About, Projects, and Contact are real routes now (see
-// app/about/page.js, app/projects/page.js, app/contact/page.js) rather than
-// anchors on one scrolling page. WORK (home) still carries its own
-// "Selected work" preview linking into Projects, so the two overlap by
-// design — Projects is the full list, WORK is the highlight reel.
-// Experience/Skills are folded into About and never get a tab.
 export default function Navbar({ profile, sections = [] }) {
     const [isOpen, setIsOpen] = useState(false);
     const [showResume, setShowResume] = useState(false);
