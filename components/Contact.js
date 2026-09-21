@@ -4,8 +4,35 @@ import { useState } from "react";
 import emailjs from "@emailjs/browser";
 import FormStatusModal from "./FormStatusModal";
 import SectionHeader, { pageShell } from "./SectionHeader";
-import InfoRow from "./InfoRow";
 import { stripProtocol } from "@/lib/format";
+import { MailIcon, LinkedInIcon, FacebookIcon, InstagramIcon } from "./SocialIcons";
+
+// A single "Direct" contact method — its own bordered card with an icon,
+// instead of one shared box listing every method as a row. Renders as a
+// link when href is given (and a value exists), otherwise a plain card.
+function ContactCard({ icon: Icon, label, value, href }) {
+    if (!value) return null;
+
+    const Wrapper = href ? "a" : "div";
+    const linkProps = href
+        ? { href, target: href.startsWith("http") ? "_blank" : undefined, rel: "noopener noreferrer" }
+        : {};
+
+    return (
+        <Wrapper
+            {...linkProps}
+            className="group flex items-center gap-3 border-2 border-[var(--color-divider)] bg-[var(--color-neutral-100)] px-4 py-3 transition-colors hover:border-[var(--color-text)]"
+        >
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center bg-[var(--color-accent-100)] text-[var(--color-accent-700)] transition-colors group-hover:bg-[var(--color-text)] group-hover:text-white">
+                <Icon className="h-4 w-4" />
+            </span>
+            <span className="min-w-0">
+                <span className="field-label block">{label}</span>
+                <span className="block truncate text-xs font-bold text-[var(--color-text)]" title={value}>{value}</span>
+            </span>
+        </Wrapper>
+    );
+}
 
 export default function Contact({ profile, label = "04 — Contact", heading ="Let\u2019s work together" }) {
     const [form, setForm] = useState({ name: "", email: "", message: "" });
@@ -46,76 +73,94 @@ export default function Contact({ profile, label = "04 — Contact", heading ="L
         <section className={pageShell}>
             <SectionHeader label={label} heading={heading} />
 
-            <div className="grid md:grid-cols-[1fr_320px] gap-10">
-            <form onSubmit={handleSubmit} className="max-w-xl space-y-4">
-                <div>
-                    <label className="block text-sm font-medium text-[var(--color-neutral-700)] mb-1.5" htmlFor="name">
-                        Name
-                    </label>
-                    <input
-                        id="name"
-                        name="name"
-                        type="text"
-                        required
-                        value={form.name}
-                        onChange={handleChange}
+            <div className="grid md:grid-cols-[1fr_440px] items-start gap-8 max-w-5xl">
+                <form onSubmit={handleSubmit} className="space-y-3">
+                    <div>
+                        <label className="block text-xs font-medium text-[var(--color-neutral-700)] mb-1" htmlFor="name">
+                            Name
+                        </label>
+                        <input
+                            id="name"
+                            name="name"
+                            type="text"
+                            required
+                            value={form.name}
+                            onChange={handleChange}
+                            disabled={status === "sending"}
+                            className="w-full px-3.5 py-2 border-2 border-[var(--color-divider)] bg-[var(--color-bg)] text-sm focus:outline-none focus:border-[var(--color-accent)] transition-colors disabled:opacity-60"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-medium text-[var(--color-neutral-700)] mb-1" htmlFor="email">
+                            Email
+                        </label>
+                        <input
+                            id="email"
+                            name="email"
+                            type="email"
+                            required
+                            value={form.email}
+                            onChange={handleChange}
+                            disabled={status === "sending"}
+                            className="w-full px-3.5 py-2 border-2 border-[var(--color-divider)] bg-[var(--color-bg)] text-sm focus:outline-none focus:border-[var(--color-accent)] transition-colors disabled:opacity-60"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-medium text-[var(--color-neutral-700)] mb-1" htmlFor="message">
+                            Message
+                        </label>
+                        <textarea
+                            id="message"
+                            name="message"
+                            required
+                            rows={3}
+                            value={form.message}
+                            onChange={handleChange}
+                            disabled={status === "sending"}
+                            className="w-full px-3.5 py-2 border-2 border-[var(--color-divider)] bg-[var(--color-bg)] text-sm focus:outline-none focus:border-[var(--color-accent)] transition-colors resize-none disabled:opacity-60"
+                        />
+                    </div>
+
+                    <button
+                        type="submit"
                         disabled={status === "sending"}
-                        className="w-full px-4 py-2.5 border-2 border-[var(--color-divider)] bg-[var(--color-bg)] focus:outline-none focus:border-[var(--color-accent)] transition-colors disabled:opacity-60"
-                    />
+                        className="btn btn-primary disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                        {status === "sending" ? "Sending..." : "Send Message"}
+                    </button>
+                </form>
+
+                <div className="space-y-2.5">
+                    <p className="field-label text-[var(--color-accent-700)]">Direct</p>
+                    <div className="grid grid-cols-2 gap-2">
+                        <ContactCard
+                            icon={MailIcon}
+                            label="Email"
+                            value={profile?.email}
+                            href={profile?.email ? `mailto:${profile.email}` : undefined}
+                        />
+                        <ContactCard
+                            icon={LinkedInIcon}
+                            label="LinkedIn"
+                            value={stripProtocol(profile?.linkedin)}
+                            href={profile?.linkedin}
+                        />
+                        <ContactCard
+                            icon={FacebookIcon}
+                            label="Facebook"
+                            value={stripProtocol(profile?.facebook)}
+                            href={profile?.facebook}
+                        />
+                        <ContactCard
+                            icon={InstagramIcon}
+                            label="Instagram"
+                            value={stripProtocol(profile?.instagram)}
+                            href={profile?.instagram}
+                        />
+                    </div>
                 </div>
-
-                <div>
-                    <label className="block text-sm font-medium text-[var(--color-neutral-700)] mb-1.5" htmlFor="email">
-                        Email
-                    </label>
-                    <input
-                        id="email"
-                        name="email"
-                        type="email"
-                        required
-                        value={form.email}
-                        onChange={handleChange}
-                        disabled={status === "sending"}
-                        className="w-full px-4 py-2.5 border-2 border-[var(--color-divider)] bg-[var(--color-bg)] focus:outline-none focus:border-[var(--color-accent)] transition-colors disabled:opacity-60"
-                    />
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium text-[var(--color-neutral-700)] mb-1.5" htmlFor="message">
-                        Message
-                    </label>
-                    <textarea
-                        id="message"
-                        name="message"
-                        required
-                        rows={4}
-                        value={form.message}
-                        onChange={handleChange}
-                        disabled={status === "sending"}
-                        className="w-full px-4 py-2.5 border-2 border-[var(--color-divider)] bg-[var(--color-bg)] focus:outline-none focus:border-[var(--color-accent)] transition-colors resize-none disabled:opacity-60"
-                    />
-                </div>
-
-                <button
-                    type="submit"
-                    disabled={status === "sending"}
-                    className="btn btn-primary btn-lg disabled:opacity-60 disabled:cursor-not-allowed"
-                >
-                    {status === "sending" ? "Sending..." : "Send Message"}
-                </button>
-            </form>
-
-            <div className="bg-[var(--color-neutral-100)]">
-                <p className="field-label px-6 pt-5 mb-1 text-[var(--color-accent-700)]">
-                    Direct
-                </p>
-                <InfoRow label="Email" value={profile?.email} href={profile?.email ? `mailto:${profile.email}` : undefined} />
-                <InfoRow label="Phone" value={profile?.phone} />
-                <InfoRow label="Location" value={profile?.location} />
-                <InfoRow label="Open to" value={profile?.openTo} />
-                <InfoRow label="GitHub" value={stripProtocol(profile?.github)} href={profile?.github} />
-                <InfoRow label="LinkedIn" value={stripProtocol(profile?.linkedin)} href={profile?.linkedin} />
-            </div>
             </div>
 
             {(status === "success" || status === "error") && (

@@ -16,6 +16,8 @@ const profile = {
     openTo: "Full-time",
     github: "https://github.com/example",
     linkedin: "https://linkedin.com/in/example",
+    facebook: "https://facebook.com/example",
+    instagram: "https://instagram.com/example",
 };
 
 beforeEach(() => {
@@ -23,11 +25,37 @@ beforeEach(() => {
 });
 
 describe("Contact", () => {
-    it("renders the direct info panel from profile data", () => {
+    it("renders the direct info grid from profile data", () => {
         render(<Contact profile={profile} />);
         expect(screen.getByText("me@example.com")).toBeInTheDocument();
-        expect(screen.getByText("555-0100")).toBeInTheDocument();
-        expect(screen.getByText("Manila, PH")).toBeInTheDocument();
+        expect(screen.getByText("linkedin.com/in/example")).toBeInTheDocument();
+    });
+
+    it("only shows Email, LinkedIn, Facebook, and Instagram — not Phone, Location, Open to, or GitHub", () => {
+        render(<Contact profile={profile} />);
+        expect(screen.queryByText("Phone")).not.toBeInTheDocument();
+        expect(screen.queryByText("Location")).not.toBeInTheDocument();
+        expect(screen.queryByText("Open to")).not.toBeInTheDocument();
+        expect(screen.queryByText("GitHub")).not.toBeInTheDocument();
+    });
+
+    it("renders Facebook and Instagram cards linking out when the profile has them", () => {
+        render(<Contact profile={profile} />);
+        expect(screen.getByRole("link", { name: /facebook.com\/example/ })).toHaveAttribute(
+            "href",
+            "https://facebook.com/example"
+        );
+        expect(screen.getByRole("link", { name: /instagram.com\/example/ })).toHaveAttribute(
+            "href",
+            "https://instagram.com/example"
+        );
+    });
+
+    it("omits Facebook and Instagram rows when the profile has no links for them", () => {
+        const { facebook, instagram, ...rest } = profile;
+        render(<Contact profile={rest} />);
+        expect(screen.queryByText("Facebook")).not.toBeInTheDocument();
+        expect(screen.queryByText("Instagram")).not.toBeInTheDocument();
     });
 
     it("submits the form and shows a success modal", async () => {

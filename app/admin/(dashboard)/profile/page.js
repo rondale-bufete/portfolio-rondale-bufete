@@ -39,6 +39,8 @@ export default async function ProfileAdminPage() {
                     <Field label="Location (optional)" name="location" defaultValue={profile?.location} placeholder="Camarines Sur, PH · Remote" />
                     <Field label="GitHub URL" name="github" defaultValue={profile?.github} />
                     <Field label="LinkedIn URL" name="linkedin" defaultValue={profile?.linkedin} />
+                    <Field label="Facebook URL (optional)" name="facebook" defaultValue={profile?.facebook} />
+                    <Field label="Instagram URL (optional)" name="instagram" defaultValue={profile?.instagram} />
                     <Field
                         label="Open to (optional)"
                         name="open_to"

@@ -1,7 +1,4 @@
-// Shared "label / value" row used by Hero's info panel and Contact's direct
-// info panel. Pass `placeholder` to keep the row visible with dimmed filler
-// text when `value` is empty (Hero's "info panel shouldn't collapse" case);
-// omit it to hide the row entirely when there's no value (Contact's case).
+
 export default function InfoRow({ label, value, placeholder, href }) {
     if (!value && !placeholder) return null;
 

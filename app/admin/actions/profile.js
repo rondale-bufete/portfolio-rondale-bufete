@@ -11,10 +11,14 @@ export async function updateProfileAction(formData) {
     const email = formData.get("email")?.toString() || "";
     const github = formData.get("github")?.toString() || "";
     const linkedin = formData.get("linkedin")?.toString() || "";
+    const facebook = formData.get("facebook")?.toString() || "";
+    const instagram = formData.get("instagram")?.toString() || "";
 
     if (!isValidEmail(email)) throw new Error("Please enter a valid email address.");
     if (!isValidUrl(github)) throw new Error("GitHub URL must be a valid http(s) link.");
     if (!isValidUrl(linkedin)) throw new Error("LinkedIn URL must be a valid http(s) link.");
+    if (!isValidUrl(facebook)) throw new Error("Facebook URL must be a valid http(s) link.");
+    if (!isValidUrl(instagram)) throw new Error("Instagram URL must be a valid http(s) link.");
 
     const photoFile = formData.get("photo");
     const resumeFile = formData.get("resume");
@@ -35,6 +39,8 @@ export async function updateProfileAction(formData) {
         email,
         github,
         linkedin,
+        facebook,
+        instagram,
         resume_url: resumeUrl || existingResumeUrl,
         photo_url: photoUrl || existingPhotoUrl,
         location: formData.get("location")?.toString() || "",
