@@ -1,12 +1,6 @@
 import AdminNav from "./AdminNav";
 import { logoutAction } from "../auth-actions";
 
-// The admin dashboard must never be statically prerendered — every page
-// under here reads live content the owner is actively editing, and a
-// cached/static snapshot would keep showing stale data after a save
-// (exactly what happened with the Origin field: the write succeeded, but
-// the page serving it back was a build-time snapshot). Every nested page
-// inherits this from the layout, so none of them need their own copy.
 export const dynamic = "force-dynamic";
 
 export default function AdminLayout({ children }) {
