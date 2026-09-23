@@ -7,9 +7,7 @@ import SectionHeader, { pageShell } from "./SectionHeader";
 import { stripProtocol } from "@/lib/format";
 import { MailIcon, LinkedInIcon, FacebookIcon, InstagramIcon } from "./SocialIcons";
 
-// A single "Direct" contact method — its own bordered card with an icon,
-// instead of one shared box listing every method as a row. Renders as a
-// link when href is given (and a value exists), otherwise a plain card.
+// A single "Direct" contact method
 function ContactCard({ icon: Icon, label, value, href }) {
     if (!value) return null;
 
