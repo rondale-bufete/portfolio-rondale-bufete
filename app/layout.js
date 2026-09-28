@@ -1,6 +1,5 @@
 import { Archivo, JetBrains_Mono } from "next/font/google";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
+import PublicAnalytics from "@/components/PublicAnalytics";
 import "./globals.css";
 
 const archivo = Archivo({
@@ -30,8 +29,7 @@ export default function RootLayout({ children }) {
     <html lang="en" className={`${archivo.variable} ${jetbrainsMono.variable}`}>
       <body className="bg-[var(--color-bg)] text-[var(--color-text)] font-[family-name:var(--font-display)] antialiased">
         {children}
-        <SpeedInsights />
-        <Analytics />
+        <PublicAnalytics />
       </body>
     </html>
   );
