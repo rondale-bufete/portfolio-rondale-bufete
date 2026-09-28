@@ -45,6 +45,7 @@ next-env.d.ts
 
 .env.local
 *.sql
+*.pdf
 
 /production
 *.md
