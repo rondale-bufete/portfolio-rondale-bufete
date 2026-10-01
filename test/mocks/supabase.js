@@ -1,18 +1,5 @@
 import { vi } from "vitest";
 
-/**
- * A minimal chainable stand-in for the Supabase JS query builder, covering
- * the methods this project's admin actions/pages actually call
- * (select/insert/update/upsert/delete/eq/order/single). Every chain method
- * returns `this` so calls can be chained in any order the real client
- * allows, and the chain is `await`-able because it implements `.then`,
- * resolving to whatever `result` was configured for it.
- *
- * Usage:
- *   const table = createQueryBuilder({ data: [{ id: 1 }], error: null });
- *   const client = createSupabaseMock({ from: () => table });
- *   vi.doMock("@/lib/supabase/admin", () => ({ supabaseAdmin: client, ... }));
- */
 export function createQueryBuilder(result = { data: null, error: null }) {
     const builder = {
         select: vi.fn(() => builder),

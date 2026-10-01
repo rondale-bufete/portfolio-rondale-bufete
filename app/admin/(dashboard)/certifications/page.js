@@ -50,6 +50,7 @@ export default async function CertificationsAdminPage() {
                         <CertRow
                             key={cert.id}
                             cert={cert}
+                            index={index}
                             isFirst={index === 0}
                             isLast={index === (certifications?.length || 0) - 1}
                         />
@@ -63,7 +64,7 @@ export default async function CertificationsAdminPage() {
     );
 }
 
-function CertRow({ cert, isFirst, isLast }) {
+function CertRow({ cert, index, isFirst, isLast }) {
     async function handleMoveUp() {
         "use server";
         await moveCertificationAction(cert.id, "up");
@@ -82,7 +83,7 @@ function CertRow({ cert, isFirst, isLast }) {
     }
 
     return (
-        <ItemRow title={cert.title} meta={cert.issuer}>
+        <ItemRow index={index} title={cert.title} meta={cert.issuer}>
             <div className="mt-4 flex items-center gap-2">
                 <AdminActionForm action={handleMoveUp}>
                     <button type="submit" disabled={isFirst} className={buttonIcon} title="Move up" aria-label="Move up">
@@ -137,16 +138,16 @@ function CertFields({ cert }) {
                 <label className={labelBase}>Badge image</label>
                 <div className="flex items-center gap-4">
                     {cert?.image_url && (
-                        <img src={cert.image_url} alt="" className="w-20 h-14 object-cover border-2 border-[var(--color-divider)] shrink-0" />
+                        <img src={cert.image_url} alt="" className="w-20 h-14 rounded-[var(--radius-md)] object-cover border border-[var(--color-border-strong)] shrink-0" />
                     )}
-                    <input type="file" name="image" accept="image/*" className="text-sm text-[var(--color-neutral-700)]" />
+                    <input type="file" name="image" accept="image/*" className="text-sm text-[var(--color-body)]" />
                 </div>
             </div>
             <div>
                 <label className={labelBase}>
-                    Certificate PDF {cert?.pdf_url && <span className="text-[var(--color-accent-700)] font-normal normal-case">— currently set, used only if no URL is set</span>}
+                    Certificate PDF {cert?.pdf_url && <span className="text-[var(--color-accent)] font-normal normal-case">— currently set, used only if no URL is set</span>}
                 </label>
-                <input type="file" name="pdf" accept="application/pdf" className="text-sm text-[var(--color-neutral-700)]" />
+                <input type="file" name="pdf" accept="application/pdf" className="text-sm text-[var(--color-body)]" />
             </div>
         </>
     );

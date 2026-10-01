@@ -2,160 +2,71 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LogOutIcon, ExternalLinkIcon } from "../ui/icons";
 
 const NAV = [
-    { href: "/admin", label: "Overview", icon: OverviewIcon },
-    { href: "/admin/sections", label: "Sections", icon: LayersIcon },
-    { href: "/admin/profile", label: "Profile", icon: UserIcon },
-    { href: "/admin/experience", label: "Experience", icon: BriefcaseIcon },
-    { href: "/admin/projects", label: "Projects", icon: FolderIcon },
-    { href: "/admin/certifications", label: "Certifications", icon: BadgeIcon },
-    { href: "/admin/education", label: "Education", icon: GradCapIcon },
-    { href: "/admin/skills", label: "Skills", icon: SparkIcon },
+    { href: "/admin", label: "overview", countKey: null },
+    { href: "/admin/sections", label: "sections", countKey: "sections" },
+    { href: "/admin/profile", label: "profile", countKey: null },
+    { href: "/admin/experience", label: "experience", countKey: "experience" },
+    { href: "/admin/projects", label: "projects", countKey: "projects" },
+    { href: "/admin/certifications", label: "certifications", countKey: "certifications" },
+    { href: "/admin/education", label: "education", countKey: "education" },
+    { href: "/admin/skills", label: "skills", countKey: "skills" },
 ];
 
-export default function AdminNav({ logoutAction }) {
+export default function AdminNav({ logoutAction, counts = {} }) {
     const pathname = usePathname();
 
     return (
-        <aside className="gap-3 shrink-0 bg-[var(--color-surface)] border-b-2 md:border-b-0 md:border-r-2 border-[var(--color-divider)] md:fixed md:inset-y-0 md:left-0 md:z-30 md:w-60 md:overflow-y-auto w-full flex flex-col">
-            <div className="px-6 pt-7 pb-6">
-                <div className="flex items-center gap-2.5">
-                    <span className="w-2.5 h-2.5 bg-[var(--color-accent)]" />
-                    <p className="font-[family-name:var(--font-display)] text-lg font-extrabold tracking-tight text-[var(--color-text)] mt-3">
-                        Admin
-                    </p>
-                </div>
+        <aside className="gap-3 shrink-0 bg-[var(--color-bg)] border-b md:border-b-0 md:border-r border-[var(--color-border)] md:fixed md:inset-y-0 md:left-0 md:z-30 md:w-60 md:overflow-y-auto w-full flex flex-col font-[family-name:var(--font-mono)] text-[13px]">
+            <div className="px-4 pt-6 pb-4">
+                <span className="text-[var(--color-accent)]">~/</span>
+                <span className="text-[var(--color-text)]">admin</span>
             </div>
 
-            <nav className="flex-1 px-3 flex flex-row md:flex-col gap-1 flex-wrap overflow-x-auto md:overflow-visible pb-4 md:pb-0">
+            <nav className="flex-1 px-2 flex flex-row md:flex-col gap-0.5 flex-wrap overflow-x-auto md:overflow-visible pb-4 md:pb-0">
                 {NAV.map((item) => {
                     const active =
                         item.href === "/admin"
                             ? pathname === "/admin"
                             : pathname.startsWith(item.href);
-                    const Icon = item.icon;
+                    const count = item.countKey ? counts[item.countKey] : undefined;
                     return (
                         <Link
                             key={item.href}
                             href={item.href}
-                            className={`flex items-center gap-3.5 text-sm font-bold px-3 py-2.5 transition-colors whitespace-nowrap ${
+                            className={`flex items-center justify-between gap-3 rounded-[var(--radius-md)] px-3 py-2.5 transition-colors whitespace-nowrap ${
                                 active
-                                    ? "bg-[var(--color-accent-100)] text-[var(--color-accent-700)]"
-                                    : "text-[var(--color-neutral-700)] hover:bg-[var(--color-neutral-200)] hover:text-[var(--color-text)]"
+                                    ? "bg-[var(--color-raised)] text-[var(--color-text)]"
+                                    : "text-[var(--color-muted)] hover:bg-[var(--color-raised)]/60 hover:text-[var(--color-text)]"
                             }`}
                         >
-                            <Icon className="w-4 h-4 mx-3 shrink-0" />
-                            {item.label}
+                            <span>{item.label}</span>
+                            {count !== undefined && count !== null && (
+                                <span className="text-[11px] text-[var(--color-faint)]">{count}</span>
+                            )}
                         </Link>
                     );
                 })}
             </nav>
 
-            <div className="px-3 pb-6 pt-3 border-t-2 border-[var(--color-divider)] flex flex-col gap-1">
+            <div className="px-2 pb-6 pt-3 border-t border-[var(--color-border)] flex flex-col gap-0.5">
                 <Link
                     href="/"
                     target="_blank"
-                    className="flex items-center gap-2.5 text-sm font-bold px-3 py-2.5 text-[var(--color-accent-700)] hover:bg-[var(--color-accent)]/[0.08] transition-colors"
+                    className="rounded-[var(--radius-md)] px-3 py-2.5 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/[0.08] transition-colors"
                 >
-                    <ExternalLinkIcon className="w-4 h-4 shrink-0" />
-                    View site
+                    view site ↗
                 </Link>
                 <form action={logoutAction}>
                     <button
                         type="submit"
-                        className="w-full flex items-center gap-2.5 text-sm font-bold px-3 py-2.5 text-[var(--color-neutral-700)] hover:bg-[var(--color-neutral-200)] hover:text-[var(--color-text)] transition-colors text-left"
+                        className="w-full rounded-[var(--radius-md)] px-3 py-2.5 text-[var(--color-muted)] hover:bg-[var(--color-raised)] hover:text-[var(--color-text)] transition-colors text-left"
                     >
-                        <LogOutIcon className="w-4 h-4 shrink-0" />
-                        Log out
+                        sign out
                     </button>
                 </form>
             </div>
         </aside>
-    );
-}
-
-function iconBase(props) {
-    return {
-        viewBox: "0 0 24 24",
-        fill: "none",
-        stroke: "currentColor",
-        strokeWidth: 1.75,
-        strokeLinecap: "round",
-        strokeLinejoin: "round",
-        ...props,
-    };
-}
-
-function OverviewIcon({ className }) {
-    return (
-        <svg {...iconBase({ className })}>
-            <rect x="3" y="3" width="7" height="9" rx="1.5" />
-            <rect x="14" y="3" width="7" height="5" rx="1.5" />
-            <rect x="14" y="12" width="7" height="9" rx="1.5" />
-            <rect x="3" y="16" width="7" height="5" rx="1.5" />
-        </svg>
-    );
-}
-
-function LayersIcon({ className }) {
-    return (
-        <svg {...iconBase({ className })}>
-            <path d="M12 3 2 8l10 5 10-5-10-5Z" />
-            <path d="M2 13l10 5 10-5" />
-        </svg>
-    );
-}
-
-function UserIcon({ className }) {
-    return (
-        <svg {...iconBase({ className })}>
-            <circle cx="12" cy="8" r="4" />
-            <path d="M4 21c0-4 3.5-6 8-6s8 2 8 6" />
-        </svg>
-    );
-}
-
-function BriefcaseIcon({ className }) {
-    return (
-        <svg {...iconBase({ className })}>
-            <rect x="2" y="7" width="20" height="14" rx="2" />
-            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
-        </svg>
-    );
-}
-
-function FolderIcon({ className }) {
-    return (
-        <svg {...iconBase({ className })}>
-            <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" />
-        </svg>
-    );
-}
-
-function BadgeIcon({ className }) {
-    return (
-        <svg {...iconBase({ className })}>
-            <circle cx="12" cy="8" r="6" />
-            <path d="M9 14 7 22l5-3 5 3-2-8" />
-        </svg>
-    );
-}
-
-function GradCapIcon({ className }) {
-    return (
-        <svg {...iconBase({ className })}>
-            <path d="M22 10 12 5 2 10l10 5 10-5Z" />
-            <path d="M6 12v5c0 1.5 3 3 6 3s6-1.5 6-3v-5" />
-        </svg>
-    );
-}
-
-function SparkIcon({ className }) {
-    return (
-        <svg {...iconBase({ className })}>
-            <path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8" />
-        </svg>
     );
 }

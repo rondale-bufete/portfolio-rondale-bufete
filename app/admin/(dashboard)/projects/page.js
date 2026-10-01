@@ -48,6 +48,7 @@ export default async function ProjectsAdminPage() {
                         <ProjectRow
                             key={project.id}
                             project={project}
+                            index={index}
                             isFirst={index === 0}
                             isLast={index === (projects?.length || 0) - 1}
                         />
@@ -61,7 +62,7 @@ export default async function ProjectsAdminPage() {
     );
 }
 
-function ProjectRow({ project, isFirst, isLast }) {
+function ProjectRow({ project, index, isFirst, isLast }) {
     async function handleMoveUp() {
         "use server";
         await moveProjectAction(project.id, "up");
@@ -80,7 +81,7 @@ function ProjectRow({ project, isFirst, isLast }) {
     }
 
     return (
-        <ItemRow title={project.title} meta={project.category || "General"}>
+        <ItemRow index={index} title={project.title} meta={project.category || "General"}>
             <div className="mt-4 flex items-center gap-2">
                 <AdminActionForm action={handleMoveUp}>
                     <button type="submit" disabled={isFirst} className={buttonIcon} title="Move up" aria-label="Move up">
@@ -183,12 +184,12 @@ function ProjectFields({ project }) {
                             key={imageUrl}
                             src={imageUrl}
                             alt=""
-                            className="w-28 aspect-video object-cover border-2 border-[var(--color-divider)] shrink-0"
+                            className="w-28 aspect-video rounded-[var(--radius-md)] object-cover border border-[var(--color-border-strong)] shrink-0"
                         />
                     ))}
-                    <input type="file" name="images" accept="image/*" multiple className="text-sm text-[var(--color-neutral-700)]" />
+                    <input type="file" name="images" accept="image/*" multiple className="text-sm text-[var(--color-body)]" />
                 </div>
-                <p className="mt-1 text-xs text-[var(--color-neutral-700)]">Select multiple images to replace the current showcase gallery.</p>
+                <p className="mt-1 text-xs text-[var(--color-faint)]">Select multiple images to replace the current showcase gallery.</p>
             </div>
         </>
     );

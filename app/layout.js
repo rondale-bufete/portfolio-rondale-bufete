@@ -1,16 +1,29 @@
-import { Archivo, JetBrains_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Space_Grotesk, DM_Sans } from "next/font/google";
 import PublicAnalytics from "@/components/PublicAnalytics";
 import "./globals.css";
 
-const archivo = Archivo({
+const geist = Geist({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
+  weight: "variable",
   variable: "--font-display",
 });
 
-const jetbrainsMono = JetBrains_Mono({
+const geistMono = Geist_Mono({
   subsets: ["latin"],
+  weight: "variable",
   variable: "--font-mono",
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  weight: "variable",
+  variable: "--font-space",
+});
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  weight: "variable",
+  variable: "--font-body",
 });
 
 export const metadata = {
@@ -21,12 +34,12 @@ export const metadata = {
 export const viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#f3f2f2",
+  themeColor: "#f1f4ef",
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${archivo.variable} ${jetbrainsMono.variable}`}>
+    <html lang="en" className={`${geist.variable} ${geistMono.variable} ${spaceGrotesk.variable} ${dmSans.variable}`}>
       <body className="bg-[var(--color-bg)] text-[var(--color-text)] font-[family-name:var(--font-display)] antialiased">
         {children}
         <PublicAnalytics />

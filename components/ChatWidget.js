@@ -17,21 +17,7 @@ const WELCOME_MESSAGES = [
     "Hey! I'm Rondale's assistant here — ask about his projects, skills, or how to connect with him directly.",
 ];
 
-function ChatIcon({ className }) {
-    return (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z" />
-        </svg>
-    );
-}
-
-function CloseIcon({ className }) {
-    return (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-            <path d="M18 6 6 18M6 6l12 12" />
-        </svg>
-    );
-}
+const SUGGESTED_QUESTIONS = ["What is your strongest stack?", "Are you open to remote work?", "Show me client projects"];
 
 function SendIcon({ className }) {
     return (
@@ -45,9 +31,9 @@ function SendIcon({ className }) {
 function TypingDots() {
     return (
         <span className="inline-flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-neutral-500)] animate-bounce [animation-delay:-0.3s]" />
-            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-neutral-500)] animate-bounce [animation-delay:-0.15s]" />
-            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-neutral-500)] animate-bounce" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-faint)] animate-bounce [animation-delay:-0.3s]" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-faint)] animate-bounce [animation-delay:-0.15s]" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-faint)] animate-bounce" />
         </span>
     );
 }
@@ -84,11 +70,11 @@ function renderMarkdownContent(content) {
 
             return (
                 <div key={blockIndex} className="overflow-x-auto my-2">
-                    <table className="w-full border-collapse text-left text-[11px] sm:text-xs">
+                    <table className="w-full border-collapse text-left text-[11px] sm:text-xs font-[family-name:var(--font-mono)]">
                         <thead>
                             <tr>
                                 {header.map((cell, cellIndex) => (
-                                    <th key={`${blockIndex}-head-${cellIndex}`} className="border border-[var(--color-divider)] bg-[var(--color-neutral-200)] px-2 py-1 font-bold text-[var(--color-text)]">
+                                    <th key={`${blockIndex}-head-${cellIndex}`} className="border border-[var(--color-border)] bg-[var(--color-raised)] px-2 py-1.5 font-medium text-[var(--color-muted)]">
                                         {renderInlineMarkdown(cell)}
                                     </th>
                                 ))}
@@ -98,7 +84,7 @@ function renderMarkdownContent(content) {
                             {body.map((row, rowIndex) => (
                                 <tr key={`${blockIndex}-row-${rowIndex}`}>
                                     {row.map((cell, cellIndex) => (
-                                        <td key={`${blockIndex}-cell-${rowIndex}-${cellIndex}`} className="border border-[var(--color-divider)] px-2 py-1 align-top">
+                                        <td key={`${blockIndex}-cell-${rowIndex}-${cellIndex}`} className="border border-[var(--color-border)] px-2 py-1.5 align-top text-[var(--color-body)]">
                                             {renderInlineMarkdown(cell)}
                                         </td>
                                     ))}
@@ -199,12 +185,28 @@ export default function ChatWidget() {
         });
     }
 
-    async function handleSend(e) {
-        e.preventDefault();
-        const text = input.trim();
-        if (!text || isLoading) return;
+    // ⌘K / Ctrl+K toggles the palette from anywhere on the page; Esc closes
+    // it while open (the textarea's own Enter-to-send is handled separately
+    // below, since Escape here needs to fire even when the input isn't focused).
+    useEffect(() => {
+        function handleGlobalKeyDown(e) {
+            if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+                e.preventDefault();
+                setWelcomeMessage(WELCOME_MESSAGES[Math.floor(Math.random() * WELCOME_MESSAGES.length)]);
+                setIsOpen((current) => !current);
+            } else if (e.key === "Escape") {
+                setIsOpen(false);
+            }
+        }
+        window.addEventListener("keydown", handleGlobalKeyDown);
+        return () => window.removeEventListener("keydown", handleGlobalKeyDown);
+    }, []);
 
-        const nextMessages = [...messages, { role: "user", content: text }];
+    async function sendMessage(text) {
+        const trimmed = text.trim();
+        if (!trimmed || isLoading) return;
+
+        const nextMessages = [...messages, { role: "user", content: trimmed }];
         setMessages(nextMessages);
         setInput("");
         setIsLoading(true);
@@ -233,105 +235,126 @@ export default function ChatWidget() {
         }
     }
 
+    function handleSend(e) {
+        e.preventDefault();
+        sendMessage(input);
+    }
+
     function handleKeyDown(e) {
         if (e.key === "Enter" && !e.shiftKey) {
             handleSend(e);
         }
     }
 
-    return (
-        <>
+    if (!isOpen) {
+        return (
             <button
                 onClick={handleToggleChat}
-                aria-label={isOpen ? "Close chat" : "Open chat"}
-                aria-expanded={isOpen}
-                className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-[var(--color-text)] text-white border-2 border-[var(--color-text)] hover:bg-[var(--color-accent)] hover:border-[var(--color-accent)] transition-colors flex items-center justify-center"
+                aria-label="Open chat"
+                aria-expanded={false}
+                className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex w-[calc(100vw-2rem)] max-w-[560px] items-center gap-3 rounded-[var(--radius-xl)] border border-[var(--color-border-strong)] bg-[var(--color-raised)] px-4 py-3 shadow-[0_12px_40px_rgba(0,0,0,.5)] transition-colors hover:border-[var(--color-body)]"
             >
-                {isOpen ? <CloseIcon className="w-5 h-5" /> : <ChatIcon className="w-6 h-6" />}
+                <span className="chat-launcher__icon" aria-hidden="true">?</span>
+                <span className="flex-1 truncate text-left font-[family-name:var(--font-mono)] text-sm text-[var(--color-faint)]">
+                    Ask me about my work
+                </span>
+                <span className="kbd shrink-0">⌘K</span>
             </button>
+        );
+    }
 
-            {isOpen && (
-                <div
-                    role="dialog"
-                    aria-label="Portfolio assistant chat"
-                    className="fixed bottom-24 right-6 z-50 w-[360px] max-w-[calc(100vw-3rem)] h-[500px] max-h-[70vh] bg-[var(--color-bg)] border-2 border-[var(--color-text)] flex flex-col overflow-hidden"
-                >
-                    <div className="px-4 py-3.5 border-b-2 border-[var(--color-divider)] flex items-center justify-between shrink-0">
-                        <p className="font-[family-name:var(--font-display)] text-sm font-bold text-[var(--color-text)]">Ask me anything</p>
-                        <button
-                            onClick={() => setIsOpen(false)}
-                            aria-label="Close chat"
-                            className="text-[var(--color-neutral-600)] hover:text-[var(--color-text)] transition-colors"
-                        >
-                            <CloseIcon className="w-4 h-4" />
+    return (
+        <div
+            role="dialog"
+            aria-label="Portfolio assistant chat"
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex h-[560px] max-h-[75vh] w-[calc(100vw-2rem)] max-w-[680px] flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border-strong)] bg-[var(--color-surface)] shadow-[0_24px_80px_rgba(0,0,0,.6)]"
+        >
+            <div className="chat-panel__header">
+                <div className="chat-panel__identity">
+                    <span className="chat-panel__status" aria-hidden="true" />
+                    <div className="chat-panel__title-group">
+                        <span className="chat-panel__title">Portfolio guide</span>
+                        <span className="chat-panel__byline">Rondale Rae Bufete</span>
+                    </div>
+                </div>
+                <span className="chat-panel__actions">
+                    {messages.length > 0 && (
+                        <button onClick={() => setMessages([])} className="chat-panel__clear">
+                            Clear
                         </button>
-                    </div>
+                    )}
+                    <button onClick={() => setIsOpen(false)} aria-label="Close chat" className="chat-panel__close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </span>
+            </div>
 
-                    <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
-                        {messages.length === 0 && (
-                            <div className="max-w-[88%]">
-                                <div className="bg-[var(--color-neutral-100)] text-[var(--color-text)] border-2 border-[var(--color-divider)] px-4 py-3">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <span className="inline-flex h-2.5 w-2.5 rounded-full bg-[var(--color-accent)]" />
-                                        <span className="eyebrow text-[var(--color-neutral-600)]">
-                                            Portfolio assistant
-                                        </span>
-                                    </div>
-                                    <p className="text-sm leading-relaxed text-[var(--color-text)]">
-                                        {welcomeMessage || WELCOME_MESSAGES[0]}
-                                    </p>
-                                </div>
-                            </div>
-                        )}
-                        {messages.map((m, i) =>
-                            m.role === "user" ? (
-                                <div
-                                    key={i}
-                                    className="bg-[var(--color-text)] text-white px-4 py-2.5 max-w-[85%] ml-auto text-sm leading-relaxed whitespace-pre-wrap"
-                                >
-                                    {m.content}
-                                </div>
-                            ) : m.role === "error" ? (
-                                <div key={i} className="text-xs text-[var(--color-accent-700)] px-1">
-                                    {m.content}
-                                </div>
-                            ) : (
-                                <div
-                                    key={i}
-                                    className="bg-[var(--color-neutral-100)] text-[var(--color-text)] border-2 border-[var(--color-divider)] px-4 py-2.5 max-w-[85%] text-sm leading-relaxed"
-                                >
-                                    <div className="space-y-2">{renderMarkdownContent(m.content)}</div>
-                                </div>
-                            )
-                        )}
-                        {isLoading && (
-                            <div className="bg-[var(--color-neutral-100)] border-2 border-[var(--color-divider)] px-4 py-3 max-w-[85%] inline-block">
-                                <TypingDots />
-                            </div>
-                        )}
+            <div ref={scrollRef} className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+                {messages.length === 0 && (
+                    <p className="chat-welcome text-[15px] leading-relaxed text-[var(--color-body)]">
+                        {welcomeMessage || WELCOME_MESSAGES[0]}
+                    </p>
+                )}
+                {messages.map((m, i) =>
+                    m.role === "user" ? (
+                        <div key={i} className="chat-message chat-message--user">
+                            <span>You</span>{m.content}
+                        </div>
+                    ) : m.role === "error" ? (
+                        <div key={i} className="chat-message chat-message--error">
+                            {m.content}
+                        </div>
+                    ) : (
+                        <div key={i} className="chat-message chat-message--assistant">
+                            <div className="space-y-2">{renderMarkdownContent(m.content)}</div>
+                        </div>
+                    )
+                )}
+                {isLoading && (
+                    <div className="inline-block rounded-[var(--radius-md)] border border-[var(--color-border)] px-3 py-2">
+                        <TypingDots />
                     </div>
+                )}
+            </div>
 
-                    <form onSubmit={handleSend} className="border-t-2 border-[var(--color-divider)] p-3 flex items-end gap-2 shrink-0">
-                        <textarea
-                            value={input}
-                            onChange={(e) => setInput(e.target.value)}
-                            onKeyDown={handleKeyDown}
-                            placeholder="Type a question..."
-                            rows={1}
+            {messages.length === 0 && (
+                <div className="chat-panel__suggestions flex shrink-0 flex-wrap gap-2 px-5 pb-4 font-[family-name:var(--font-mono)] text-xs">
+                    {SUGGESTED_QUESTIONS.map((question) => (
+                        <button
+                            key={question}
+                            onClick={() => sendMessage(question)}
                             disabled={isLoading}
-                            className="flex-1 resize-none px-4 py-2.5 border-2 border-[var(--color-divider)] bg-[var(--color-bg)] text-sm focus:outline-none focus:border-[var(--color-accent)] transition-colors disabled:opacity-60 max-h-24"
-                        />
-                        <button
-                            type="submit"
-                            disabled={isLoading || !input.trim()}
-                            aria-label="Send message"
-                            className="w-10 h-10 shrink-0 bg-[var(--color-text)] text-white flex items-center justify-center hover:bg-[var(--color-accent)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="chat-panel__suggestion rounded-[var(--radius-md)] border border-[var(--color-border)] px-2.5 py-1.5 text-[var(--color-body)] transition-colors hover:border-[var(--color-border-strong)] hover:text-[var(--color-text)] disabled:opacity-50"
                         >
-                            <SendIcon className="w-4 h-4" />
+                            {question}
                         </button>
-                    </form>
+                    ))}
                 </div>
             )}
-        </>
+
+            <form onSubmit={handleSend} className="chat-panel__form flex shrink-0 items-center gap-3 border-t border-[var(--color-border)] bg-[var(--color-raised)] px-4 py-3.5">
+                <textarea
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Ask a follow-up question…"
+                    rows={1}
+                    disabled={isLoading}
+                    className="flex-1 resize-none bg-transparent font-[family-name:var(--font-mono)] text-sm text-[var(--color-text)] placeholder:text-[var(--color-faint)] focus:outline-none disabled:opacity-60 max-h-24"
+                />
+                {input.trim() ? (
+                    <button
+                        type="submit"
+                        disabled={isLoading}
+                        aria-label="Send message"
+                        className="shrink-0 text-[var(--color-accent)] transition-colors hover:text-[var(--color-accent-hover)] disabled:opacity-40"
+                    >
+                        <SendIcon className="w-4 h-4" />
+                    </button>
+                ) : (
+                    <span className="kbd shrink-0">↵</span>
+                )}
+            </form>
+        </div>
     );
 }

@@ -4,10 +4,10 @@ export default function InfoRow({ label, value, placeholder, href }) {
 
     const content = (
         <span
-            className={`font-bold text-xs text-right transition-colors ${
+            className={`font-[family-name:var(--font-mono)] text-[13px] text-right transition-colors ${
                 value
-                    ? "text-[var(--color-text)] group-hover:text-[var(--color-accent-700)]"
-                    : "text-[var(--color-neutral-400)]"
+                    ? "text-[var(--color-text)] group-hover:text-[var(--color-accent)]"
+                    : "text-[var(--color-subtle)]"
             }`}
         >
             {value || placeholder}
@@ -15,7 +15,7 @@ export default function InfoRow({ label, value, placeholder, href }) {
     );
 
     return (
-        <div className="flex items-baseline justify-between gap-3 px-6 py-3.5 border-b-2 border-[var(--color-divider)]">
+        <div className="flex items-baseline justify-between gap-3 px-6 py-3 border-b border-[var(--color-border)] last:border-b-0">
             <span className="field-label">{label}</span>
             {href && value ? (
                 <a href={href} target={href.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer" className="group">

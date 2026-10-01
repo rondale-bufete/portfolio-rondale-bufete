@@ -34,7 +34,7 @@ export default async function ExperienceAdminPage() {
                 description={
                     <>
                         Your work history. This section is hidden by default after setup — enable it from{" "}
-                        <a href="/admin/sections" className="text-[var(--color-accent-700)] hover:underline">Sections</a> once
+                        <a href="/admin/sections" className="text-[var(--color-accent)] hover:underline">Sections</a> once
                         you&rsquo;ve added your roles.
                     </>
                 }
@@ -59,6 +59,7 @@ export default async function ExperienceAdminPage() {
                         <ExperienceRow
                             key={exp.id}
                             exp={exp}
+                            index={index}
                             isFirst={index === 0}
                             isLast={index === (experience?.length || 0) - 1}
                         />
@@ -75,7 +76,7 @@ export default async function ExperienceAdminPage() {
     );
 }
 
-function ExperienceRow({ exp, isFirst, isLast }) {
+function ExperienceRow({ exp, index, isFirst, isLast }) {
     async function handleMoveUp() {
         "use server";
         await moveExperienceAction(exp.id, "up");
@@ -94,7 +95,7 @@ function ExperienceRow({ exp, isFirst, isLast }) {
     }
 
     return (
-        <ItemRow title={`${exp.role} · ${exp.company}`} meta={exp.period}>
+        <ItemRow index={index} title={`${exp.role} · ${exp.company}`} meta={exp.period}>
             <div className="mt-4 flex items-center gap-2">
                 <AdminActionForm action={handleMoveUp}>
                     <button type="submit" disabled={isFirst} className={buttonIcon} title="Move up" aria-label="Move up">

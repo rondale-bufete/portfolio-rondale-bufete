@@ -22,39 +22,38 @@ export default function FormStatusModal({ status, onClose, title, message, butto
 
     return (
         <div
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
             onClick={onClose}
         >
             <div
-                className="bg-[var(--color-bg)] border-2 border-[var(--color-text)] max-w-sm w-full p-8 text-center"
+                className="rounded-[var(--radius-xl)] bg-[var(--color-surface)] border border-[var(--color-border-strong)] max-w-sm w-full p-6 shadow-[0_24px_80px_rgba(0,0,0,.5)]"
                 onClick={(e) => e.stopPropagation()}
             >
-                <div
-                    className={`w-14 h-14 flex items-center justify-center mx-auto mb-5 border-2 ${isSuccess ? "border-[var(--color-accent)]" : "border-[var(--color-text)]"
-                        }`}
+                <p
+                    className={`font-[family-name:var(--font-mono)] text-xs mb-2.5 ${isSuccess ? "text-[var(--color-live)]" : "text-[var(--color-danger-text)]"}`}
                 >
-                    <span className={`text-2xl font-bold ${isSuccess ? "text-[var(--color-accent)]" : "text-[var(--color-text)]"}`}>
-                        {isSuccess ? "✓" : "✕"}
-                    </span>
-                </div>
+                    {isSuccess ? "SENT SUCCESSFULLY" : "NOT SENT"}
+                </p>
 
-                <h3 className="font-[family-name:var(--font-display)] text-xl font-extrabold text-[var(--color-text)] mb-2">
+                <h3 className="font-[family-name:var(--font-display)] text-lg font-medium text-[var(--color-text)] mb-1.5">
                     {title || (isSuccess ? "Message sent" : "Something went wrong")}
                 </h3>
 
-                <p className="text-[var(--color-neutral-700)] text-sm leading-relaxed mb-6">
+                <p className="text-[var(--color-body)] text-sm leading-relaxed mb-6">
                     {message || (isSuccess
                         ? "Thanks for reaching out — I'll get back to you soon."
                         : "Your message couldn't be sent. Please try again, or email me directly.")}
                 </p>
 
-                <button
-                    type="button"
-                    onClick={onClose}
-                    className="btn btn-primary btn-lg"
-                >
-                    {buttonLabel || "Close"}
-                </button>
+                <div className="flex justify-end">
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="btn btn-primary"
+                    >
+                        {buttonLabel || "done"}
+                    </button>
+                </div>
             </div>
         </div>
     );

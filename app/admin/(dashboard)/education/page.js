@@ -50,6 +50,7 @@ export default async function EducationAdminPage() {
                         <EduRow
                             key={edu.id}
                             edu={edu}
+                            index={index}
                             isFirst={index === 0}
                             isLast={index === (education?.length || 0) - 1}
                         />
@@ -63,7 +64,7 @@ export default async function EducationAdminPage() {
     );
 }
 
-function EduRow({ edu, isFirst, isLast }) {
+function EduRow({ edu, index, isFirst, isLast }) {
     async function handleMoveUp() {
         "use server";
         await moveEducationAction(edu.id, "up");
@@ -82,7 +83,7 @@ function EduRow({ edu, isFirst, isLast }) {
     }
 
     return (
-        <ItemRow title={edu.degree} meta={edu.period}>
+        <ItemRow index={index} title={edu.degree} meta={edu.period}>
             <div className="mt-4 flex items-center gap-2">
                 <AdminActionForm action={handleMoveUp}>
                     <button type="submit" disabled={isFirst} className={buttonIcon} title="Move up" aria-label="Move up">

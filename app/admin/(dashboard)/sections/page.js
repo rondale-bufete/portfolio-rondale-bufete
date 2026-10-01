@@ -88,6 +88,7 @@ export default async function SectionsAdminPage() {
                         <SectionRow
                             key={section.id}
                             section={section}
+                            index={i}
                             isFirst={i === 0}
                             isLast={i === (sections?.length || 0) - 1}
                         />
@@ -104,7 +105,7 @@ export default async function SectionsAdminPage() {
     );
 }
 
-function SectionRow({ section, isFirst, isLast }) {
+function SectionRow({ section, index, isFirst, isLast }) {
     async function handleMoveUp() {
         "use server";
         await moveSectionAction(section.id, "up");
@@ -137,7 +138,7 @@ function SectionRow({ section, isFirst, isLast }) {
     );
 
     return (
-        <ItemRow title={section.heading || "(untitled)"} badges={badges}>
+        <ItemRow index={index} title={section.heading || "(untitled)"} badges={badges}>
             {(canReorder || canToggle) && (
                 <div className="mt-4 flex items-center gap-2 flex-wrap">
                     {canReorder && (

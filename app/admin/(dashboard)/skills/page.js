@@ -98,7 +98,7 @@ function CategoryCard({ category }) {
                     <SkillItemTag key={item.id} item={item} />
                 ))}
                 {items.length === 0 && (
-                    <p className="text-sm text-[var(--color-neutral-700)]">No skills in this category yet.</p>
+                    <p className="text-sm text-[var(--color-body)]">No skills in this category yet.</p>
                 )}
             </div>
 
@@ -133,10 +133,10 @@ function SkillItemTag({ item }) {
                 type="submit"
                 title="Remove this skill"
                 aria-label={`Remove ${item.name}`}
-                className="group tag tag-neutral gap-1.5 pl-2.5 pr-2 py-1.5 border border-transparent hover:border-[#E5484D] hover:bg-[#E5484D]/5 transition-colors"
+                className="group tag tag-neutral gap-1.5 pl-2.5 pr-2 py-1.5 border border-transparent hover:border-[var(--color-danger)] hover:bg-[var(--color-danger-solid)]/5 transition-colors"
             >
                 {item.name}
-                <TrashIcon className="w-3 h-3 text-[var(--color-neutral-500)] group-hover:text-[#E5484D] transition-colors" />
+                <TrashIcon className="w-3 h-3 text-[var(--color-faint)] group-hover:text-[var(--color-danger-text)] transition-colors" />
             </button>
         </AdminActionForm>
     );

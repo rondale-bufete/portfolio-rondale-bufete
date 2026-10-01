@@ -126,7 +126,7 @@ describe("AdminActionForm", () => {
         );
 
         await user.click(screen.getByRole("button", { name: "Delete" }));
-        await user.click(screen.getByRole("button", { name: "Cancel" }));
+        await user.click(screen.getByRole("button", { name: "keep" }));
 
         expect(action).not.toHaveBeenCalled();
         expect(screen.queryByText("This will delete the thing.")).not.toBeInTheDocument();
@@ -142,8 +142,8 @@ describe("AdminActionForm", () => {
         );
 
         await user.click(screen.getByRole("button", { name: "Delete" }));
-        // The confirm dialog's own "Delete" button, not the form's trigger.
-        await user.click(screen.getAllByRole("button", { name: "Delete" })[1]);
+        // The confirm dialog's own "delete" button, not the form's trigger.
+        await user.click(screen.getByRole("button", { name: "delete" }));
 
         await waitFor(() => expect(action).toHaveBeenCalled());
     });

@@ -63,7 +63,7 @@ export default function AdminActionForm({
         <form action={formAction} onSubmit={confirmMessage ? handleSubmit : undefined} className={className}>
             {Children.map(children, (child) => disableButtonsWhilePending(child, isPending))}
             {state.error && (
-                <p role="alert" className="text-sm font-semibold text-[#E5484D]">
+                <p role="alert" className="text-sm font-semibold text-[var(--color-danger-text)]">
                     {state.error}
                 </p>
             )}
@@ -82,32 +82,32 @@ export default function AdminActionForm({
                         role="dialog"
                         aria-modal="true"
                         aria-labelledby="admin-confirm-title"
-                        className="bg-[var(--color-surface)] border-2 border-[var(--color-divider)] max-w-sm w-full p-8 text-center"
+                        className="rounded-[var(--radius-xl)] bg-[var(--color-surface)] border border-[var(--color-border-strong)] max-w-sm w-full p-8 text-center shadow-[0_24px_80px_rgba(0,0,0,.5)]"
                     >
-                        <div className="w-14 h-14 flex items-center justify-center mx-auto mb-5 bg-[#E5484D]/10">
-                            <span className="text-2xl text-[#E5484D]">!</span>
+                        <div className="w-14 h-14 rounded-[var(--radius-md)] flex items-center justify-center mx-auto mb-5 bg-[var(--color-danger-solid)]/10">
+                            <span className="text-2xl text-[var(--color-danger-text)]">!</span>
                         </div>
-                        <h3 id="admin-confirm-title" className="font-[family-name:var(--font-display)] text-xl font-extrabold mb-2 text-[var(--color-text)]">
+                        <h3 id="admin-confirm-title" className="font-[family-name:var(--font-display)] text-xl font-medium mb-2 text-[var(--color-text)]">
                             Confirm deletion
                         </h3>
-                        <p className="text-[var(--color-neutral-700)] text-sm leading-relaxed mb-6">{confirmMessage}</p>
-                        <div className="flex justify-center gap-3">
+                        <p className="text-[var(--color-body)] text-sm leading-relaxed mb-6">{confirmMessage}</p>
+                        <div className="flex justify-center gap-3 font-[family-name:var(--font-mono)]">
                             <button
                                 type="button"
                                 onClick={() => {
                                     setConfirmOpen(false);
                                     setPendingFormData(null);
                                 }}
-                                className="px-5 py-2.5 border-2 border-[var(--color-divider)] bg-[var(--color-bg)] text-[var(--color-text)] text-sm font-bold hover:border-[var(--color-text)] transition-colors"
+                                className="px-5 py-2.5 rounded-[var(--radius-md)] border border-[var(--color-border-strong)] bg-transparent text-[var(--color-text)] text-sm font-medium hover:bg-[var(--color-raised)] transition-colors"
                             >
-                                Cancel
+                                keep
                             </button>
                             <button
                                 type="button"
                                 onClick={confirmAction}
-                                className="px-5 py-2.5 border-2 border-[#E5484D] bg-[#E5484D] text-white text-sm font-bold hover:bg-[#c53339] hover:border-[#c53339] transition-colors"
+                                className="px-5 py-2.5 rounded-[var(--radius-md)] bg-[var(--color-danger-solid)] text-white text-sm font-medium hover:bg-[var(--color-danger-solid-hover)] transition-colors"
                             >
-                                Delete
+                                delete
                             </button>
                         </div>
                     </div>

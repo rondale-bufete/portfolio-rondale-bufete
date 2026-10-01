@@ -21,39 +21,46 @@ export default function LoginPage() {
         <div className="min-h-screen bg-[var(--color-bg)] flex items-center justify-center px-6">
             <form
                 action={formAction}
-                className="w-full max-w-sm bg-[var(--color-surface)] border-2 border-[var(--color-divider)] p-8"
+                className="w-full max-w-sm rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] overflow-hidden"
             >
-                <div className="flex items-center gap-2.5 mb-6">
-                    <span className="w-2.5 h-2.5 bg-[var(--color-accent)]" />
-                    <p className="font-[family-name:var(--font-display)] text-lg font-extrabold tracking-tight text-[var(--color-text)]">
-                        Admin
-                    </p>
+                <div className="flex items-center justify-between px-[18px] py-3 border-b border-[var(--color-border)] font-[family-name:var(--font-mono)] text-xs text-[var(--color-faint)]">
+                    <span><span className="text-[var(--color-accent)]">~/</span>admin/login</span>
+                    <span>🔒</span>
                 </div>
 
-                <h1 className="font-[family-name:var(--font-display)] text-2xl font-extrabold mb-1 text-[var(--color-text)]">
-                    Welcome back
-                </h1>
-                <p className="text-sm text-[var(--color-neutral-700)] mb-6">Enter your password to continue.</p>
+                <div className="p-6 flex flex-col gap-[18px]">
+                    <h1 className="font-[family-name:var(--font-display)] text-2xl font-medium text-[var(--color-text)]">
+                        Sign in
+                    </h1>
 
-                <label className={labelBase} htmlFor="password">
-                    Password
-                </label>
-                <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    required
-                    autoFocus
-                    className={`${inputBase} mb-2`}
-                />
+                    <div>
+                        <label className={labelBase} htmlFor="password">
+                            password
+                        </label>
+                        <input
+                            id="password"
+                            name="password"
+                            type="password"
+                            required
+                            autoFocus
+                            className={inputBase}
+                        />
+                    </div>
 
-                {state?.error && (
-                    <p className="text-sm font-semibold text-[#E5484D] mb-4">{state.error}</p>
-                )}
+                    {state?.error && (
+                        <p className="font-[family-name:var(--font-mono)] text-xs text-[var(--color-danger-text)]">
+                            error: {state.error}
+                        </p>
+                    )}
 
-                <button type="submit" disabled={isPending} className={`${buttonPrimary} w-full mt-4`}>
-                    {isPending ? "Checking..." : "Log in"}
-                </button>
+                    <button type="submit" disabled={isPending} className={`${buttonPrimary} w-full mt-2`}>
+                        {isPending ? "checking…" : "$ sign in ↵"}
+                    </button>
+                </div>
+
+                <div className="px-[18px] py-3 border-t border-[var(--color-border)] font-[family-name:var(--font-mono)] text-[11px] text-[var(--color-faint)]">
+                    changes publish to the public site in ~1 min
+                </div>
             </form>
         </div>
     );

@@ -18,7 +18,7 @@ describe("InfoRow", () => {
         render(<InfoRow label="Based" value="" placeholder="Add your location" />);
         const placeholder = screen.getByText("Add your location");
         expect(placeholder).toBeInTheDocument();
-        expect(placeholder.className).toContain("text-[var(--color-neutral-400)]");
+        expect(placeholder.className).toContain("text-[var(--color-subtle)]");
     });
 
     it("wraps the value in a link when href is provided and a value exists", () => {

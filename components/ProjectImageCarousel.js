@@ -8,7 +8,7 @@ export default function ProjectImageCarousel({ images = [], title }) {
 
     if (images.length === 0) {
         return (
-            <div className="eyebrow flex aspect-video w-full items-center justify-center border-2 border-[var(--color-text)] bg-[var(--color-text)] text-center text-[var(--color-neutral-400)]">
+            <div className="eyebrow flex aspect-video w-full items-center justify-center rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-raised)] text-center">
                 Preview unavailable
             </div>
         );
@@ -26,8 +26,8 @@ export default function ProjectImageCarousel({ images = [], title }) {
     }
 
     return (
-        <div className="w-full">
-            <div className="relative aspect-video w-full overflow-hidden border-2 border-[var(--color-text)] bg-[var(--color-text)]">
+        <div className="project-carousel w-full">
+            <div className="project-carousel__main relative aspect-video w-full overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-raised)]">
                 <Image
                     src={activeImage}
                     alt={`${title} showcase image ${activeIndex + 1} of ${images.length}`}
@@ -39,37 +39,39 @@ export default function ProjectImageCarousel({ images = [], title }) {
 
                 {hasMultipleImages && (
                     <>
-                        <button
-                            type="button"
-                            onClick={showPrevious}
-                            className="absolute left-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center border-2 border-white/40 bg-[var(--color-text)]/75 text-lg text-white backdrop-blur-sm transition-colors hover:bg-[var(--color-accent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
-                            aria-label="Show previous project image"
-                        >
-                            <span aria-hidden="true">&larr;</span>
-                        </button>
-                        <button
-                            type="button"
-                            onClick={showNext}
-                            className="absolute right-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center border-2 border-white/40 bg-[var(--color-text)]/75 text-lg text-white backdrop-blur-sm transition-colors hover:bg-[var(--color-accent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
-                            aria-label="Show next project image"
-                        >
-                            <span aria-hidden="true">&rarr;</span>
-                        </button>
-                        <div className="tag tag-neutral absolute bottom-3 left-1/2 -translate-x-1/2 !bg-[var(--color-text)]/75 !text-white backdrop-blur-sm">
-                            {activeIndex + 1} / {images.length}
+                        <div className="absolute bottom-3.5 left-3.5 rounded-[var(--radius-sm)] border border-[var(--color-border-strong)] bg-[var(--color-bg)]/85 px-2.5 py-1 font-[family-name:var(--font-mono)] text-xs text-[var(--color-text)]">
+                            {activeIndex + 1}/{images.length}
+                        </div>
+                        <div className="absolute bottom-3.5 right-3.5 flex gap-1.5">
+                            <button
+                                type="button"
+                                onClick={showPrevious}
+                                className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-border-strong)] bg-[var(--color-bg)]/85 text-[var(--color-text)] backdrop-blur-sm transition-colors hover:border-[var(--color-body)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
+                                aria-label="Show previous project image"
+                            >
+                                <span aria-hidden="true">&larr;</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={showNext}
+                                className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-accent)] text-[var(--color-bg)] transition-colors hover:bg-[var(--color-accent-hover)] focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                                aria-label="Show next project image"
+                            >
+                                <span aria-hidden="true">&rarr;</span>
+                            </button>
                         </div>
                     </>
                 )}
             </div>
 
             {hasMultipleImages && (
-                <div className="mt-3 flex gap-2 overflow-x-auto pb-1" aria-label="Project image thumbnails">
+                <div className="mt-2.5 grid grid-cols-6 gap-2.5" aria-label="Project image thumbnails">
                     {images.map((image, index) => (
                         <button
                             key={image}
                             type="button"
                             onClick={() => setActiveIndex(index)}
-                            className={`relative h-16 w-24 shrink-0 overflow-hidden border-2 bg-[var(--color-text)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] ${index === activeIndex ? "border-[var(--color-accent)]" : "border-[var(--color-divider)] hover:border-[var(--color-accent)]"}`}
+                            className={`relative aspect-video overflow-hidden rounded-[var(--radius-md)] border bg-[var(--color-raised)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] ${index === activeIndex ? "border-[var(--color-accent)]" : "border-[var(--color-border)] hover:border-[var(--color-border-strong)]"}`}
                             aria-label={`Show project image ${index + 1}`}
                             aria-current={index === activeIndex ? "true" : undefined}
                         >

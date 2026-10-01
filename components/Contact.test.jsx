@@ -66,7 +66,7 @@ describe("Contact", () => {
         await user.type(screen.getByLabelText("Name"), "Jane Doe");
         await user.type(screen.getByLabelText("Email"), "jane@example.com");
         await user.type(screen.getByLabelText("Message"), "Hello there");
-        await user.click(screen.getByRole("button", { name: /send message/i }));
+        await user.click(screen.getByRole("button", { name: /send/i }));
 
         await waitFor(() => expect(mockSend).toHaveBeenCalled());
         expect(mockSend.mock.calls[0][2]).toEqual({
@@ -86,7 +86,7 @@ describe("Contact", () => {
         await user.type(screen.getByLabelText("Name"), "Jane Doe");
         await user.type(screen.getByLabelText("Email"), "jane@example.com");
         await user.type(screen.getByLabelText("Message"), "Hello there");
-        await user.click(screen.getByRole("button", { name: /send message/i }));
+        await user.click(screen.getByRole("button", { name: /send/i }));
 
         await screen.findByText("Something went wrong");
     });
@@ -100,7 +100,7 @@ describe("Contact", () => {
         await user.type(screen.getByLabelText("Name"), "Jane Doe");
         await user.type(screen.getByLabelText("Email"), "jane@example.com");
         await user.type(screen.getByLabelText("Message"), "Hello there");
-        await user.click(screen.getByRole("button", { name: /send message/i }));
+        await user.click(screen.getByRole("button", { name: /send/i }));
 
         expect(screen.getByRole("button", { name: /sending/i })).toBeDisabled();
         resolveSend({ status: 200 });

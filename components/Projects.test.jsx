@@ -39,23 +39,25 @@ describe("Projects", () => {
         expect(screen.getByRole("button", { name: /ALL 3/i })).toHaveAttribute("aria-pressed", "false");
     });
 
-    it("shows an empty-state row when a filter matches nothing", async () => {
-        const user = userEvent.setup();
-        render(<Projects projects={[projects[0]]} />);
-
-        await user.click(screen.getByRole("button", { name: /Personal 0/i }));
+    it("shows an empty-state row when there are no projects", () => {
+        render(<Projects projects={[]} />);
 
         expect(screen.getByText("No projects match this filter yet.")).toBeInTheDocument();
     });
 
+    it("disables a filter pill whose count is zero", () => {
+        render(<Projects projects={[projects[0]]} />);
+        expect(screen.getByRole("button", { name: /personal 0/i })).toBeDisabled();
+    });
+
     it("does not render the GitHub callout when the profile has no github url", () => {
         render(<Projects projects={projects} profile={{}} />);
-        expect(screen.queryByText(/More projects and contributions/i)).not.toBeInTheDocument();
+        expect(screen.queryByText(/more on github/i)).not.toBeInTheDocument();
     });
 
     it("renders the GitHub callout when the profile has a github url", () => {
         render(<Projects projects={projects} profile={{ github: "https://github.com/example" }} />);
-        expect(screen.getByText(/More projects and contributions/i)).toBeInTheDocument();
+        expect(screen.getByText(/more on github/i)).toBeInTheDocument();
         expect(screen.getByRole("link", { name: /github.com\/example/i })).toHaveAttribute(
             "href",
             "https://github.com/example"

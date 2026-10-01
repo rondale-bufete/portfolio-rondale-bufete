@@ -29,30 +29,32 @@ export default function ResumeModal({ profile, onClose }) {
             onClick={onClose}
         >
             <div
-                className="bg-[var(--color-bg)] border-2 border-[var(--color-text)] w-full max-w-3xl h-[85vh] flex flex-col"
+                className="rounded-[var(--radius-xl)] bg-[var(--color-surface)] border border-[var(--color-border-strong)] w-full max-w-3xl h-[85vh] flex flex-col overflow-hidden shadow-[0_24px_80px_rgba(0,0,0,.5)]"
                 onClick={(e) => e.stopPropagation()}
             >
-                <div className="flex items-center justify-between px-5 py-3 border-b-2 border-[var(--color-divider)]">
-                    <h2 className="font-[family-name:var(--font-display)] text-lg font-extrabold text-[var(--color-text)]">Resume</h2>
-                    <div className="flex items-center gap-2">
+                <div className="flex items-center justify-between px-5 py-3.5 border-b border-[var(--color-border)]">
+                    <div className="font-[family-name:var(--font-mono)] text-sm text-[var(--color-text)]">
+                        Resume <span className="text-[var(--color-faint)]">· PDF preview</span>
+                    </div>
+                    <div className="flex items-center gap-2 font-[family-name:var(--font-mono)] text-sm">
                         <a
                             href={profile?.resumeUrl}
                             download={getResumeFilename(profile?.name)}
-                            className="text-sm font-bold px-3 py-1.5 bg-[var(--color-text)] text-white hover:bg-[var(--color-accent)] transition-colors"
+                            className="rounded-[var(--radius-md)] px-3.5 py-2 bg-[var(--color-accent)] text-[var(--color-bg)] font-medium hover:bg-[var(--color-accent-hover)] transition-colors"
                         >
-                            Download
+                            Download PDF ↓
                         </a>
                         <button
                             onClick={onClose}
-                            className="text-[var(--color-neutral-600)] hover:text-[var(--color-text)] text-xl leading-none px-2"
+                            className="w-9 h-9 rounded-[var(--radius-md)] border border-[var(--color-border-strong)] text-[var(--color-text)] hover:bg-[var(--color-raised)] transition-colors"
                             aria-label="Close"
                         >
-                            ×
+                            ✕
                         </button>
                     </div>
                 </div>
 
-                <div className="flex-1 overflow-hidden">
+                <div className="flex-1 overflow-hidden bg-[var(--color-bg)]">
                     <iframe
                         src={profile?.resumeUrl}
                         title="Resume preview"
@@ -61,9 +63,9 @@ export default function ResumeModal({ profile, onClose }) {
                 </div>
 
                 {/* Mobile fallback — some mobile browsers don't render PDFs inline */}
-                <p className="sm:hidden text-center text-xs text-[var(--color-neutral-600)] py-3 border-t-2 border-[var(--color-divider)]">
+                <p className="sm:hidden text-center text-xs text-[var(--color-faint)] py-3 border-t border-[var(--color-border)]">
                     Preview not showing?{" "}
-                    <a href={profile?.resumeUrl} download={getResumeFilename(profile?.name)} className="text-[var(--color-accent-700)] hover:underline">
+                    <a href={profile?.resumeUrl} download={getResumeFilename(profile?.name)} className="text-[var(--color-accent)] hover:underline">
                         Download instead
                     </a>
                 </p>

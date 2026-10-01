@@ -5,10 +5,16 @@ import emailjs from "@emailjs/browser";
 import FormStatusModal from "./FormStatusModal";
 import SectionHeader, { pageShell } from "./SectionHeader";
 import { stripProtocol } from "@/lib/format";
-import { MailIcon, LinkedInIcon, FacebookIcon, InstagramIcon } from "./SocialIcons";
+
+const CONTACT_METHODS = [
+    { key: "email", icon: "@" },
+    { key: "linkedin", icon: "in" },
+    { key: "facebook", icon: "fb" },
+    { key: "instagram", icon: "ig" },
+];
 
 // A single "Direct" contact method
-function ContactCard({ icon: Icon, label, value, href }) {
+function ContactCard({ icon, label, value, href }) {
     if (!value) return null;
 
     const Wrapper = href ? "a" : "div";
@@ -19,20 +25,20 @@ function ContactCard({ icon: Icon, label, value, href }) {
     return (
         <Wrapper
             {...linkProps}
-            className="group flex items-center gap-3 border-2 border-[var(--color-divider)] bg-[var(--color-neutral-100)] px-4 py-3 transition-colors hover:border-[var(--color-text)]"
+            className="flex items-center gap-3.5 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3.5 transition-colors hover:border-[var(--color-border-strong)]"
         >
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center bg-[var(--color-accent-100)] text-[var(--color-accent-700)] transition-colors group-hover:bg-[var(--color-text)] group-hover:text-white">
-                <Icon className="h-4 w-4" />
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-raised)] font-[family-name:var(--font-mono)] text-xs text-[var(--color-accent)]">
+                {icon}
             </span>
-            <span className="min-w-0">
-                <span className="field-label block">{label}</span>
-                <span className="block truncate text-xs font-bold text-[var(--color-text)]" title={value}>{value}</span>
+            <span className="min-w-0 flex flex-col gap-0.5">
+                <span className="font-[family-name:var(--font-mono)] text-[11px] text-[var(--color-faint)]">{label}</span>
+                <span className="block truncate text-sm text-[var(--color-text)]" title={value}>{value}</span>
             </span>
         </Wrapper>
     );
 }
 
-export default function Contact({ profile, label = "04 — Contact", heading ="Let\u2019s work together" }) {
+export default function Contact({ profile, label = "04 — Contact", heading ="Let’s talk" }) {
     const [form, setForm] = useState({ name: "", email: "", message: "" });
     const [status, setStatus] = useState("idle"); // idle | sending | success | error
 
@@ -67,98 +73,90 @@ export default function Contact({ profile, label = "04 — Contact", heading ="L
         setStatus("idle");
     }
 
+    const values = {
+        email: profile?.email,
+        linkedin: stripProtocol(profile?.linkedin),
+        facebook: stripProtocol(profile?.facebook),
+        instagram: stripProtocol(profile?.instagram),
+    };
+    const hrefs = {
+        email: profile?.email ? `mailto:${profile.email}` : undefined,
+        linkedin: profile?.linkedin,
+        facebook: profile?.facebook,
+        instagram: profile?.instagram,
+    };
+
     return (
-        <section className={pageShell}>
-            <SectionHeader label={label} heading={heading} />
-
-            <div className="grid md:grid-cols-[1fr_440px] items-start gap-8 max-w-5xl">
-                <form onSubmit={handleSubmit} className="space-y-3">
-                    <div>
-                        <label className="block text-xs font-medium text-[var(--color-neutral-700)] mb-1" htmlFor="name">
-                            Name
-                        </label>
-                        <input
-                            id="name"
-                            name="name"
-                            type="text"
-                            required
-                            value={form.name}
-                            onChange={handleChange}
-                            disabled={status === "sending"}
-                            className="w-full px-3.5 py-2 border-2 border-[var(--color-divider)] bg-[var(--color-bg)] text-sm focus:outline-none focus:border-[var(--color-accent)] transition-colors disabled:opacity-60"
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-xs font-medium text-[var(--color-neutral-700)] mb-1" htmlFor="email">
-                            Email
-                        </label>
-                        <input
-                            id="email"
-                            name="email"
-                            type="email"
-                            required
-                            value={form.email}
-                            onChange={handleChange}
-                            disabled={status === "sending"}
-                            className="w-full px-3.5 py-2 border-2 border-[var(--color-divider)] bg-[var(--color-bg)] text-sm focus:outline-none focus:border-[var(--color-accent)] transition-colors disabled:opacity-60"
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-xs font-medium text-[var(--color-neutral-700)] mb-1" htmlFor="message">
-                            Message
-                        </label>
-                        <textarea
-                            id="message"
-                            name="message"
-                            required
-                            rows={3}
-                            value={form.message}
-                            onChange={handleChange}
-                            disabled={status === "sending"}
-                            className="w-full px-3.5 py-2 border-2 border-[var(--color-divider)] bg-[var(--color-bg)] text-sm focus:outline-none focus:border-[var(--color-accent)] transition-colors resize-none disabled:opacity-60"
-                        />
-                    </div>
-
-                    <button
-                        type="submit"
-                        disabled={status === "sending"}
-                        className="btn btn-primary disabled:opacity-60 disabled:cursor-not-allowed"
-                    >
-                        {status === "sending" ? "Sending..." : "Send Message"}
-                    </button>
-                </form>
-
-                <div className="space-y-2.5">
-                    <p className="field-label text-[var(--color-accent-700)]">Direct</p>
-                    <div className="grid grid-cols-2 gap-2">
-                        <ContactCard
-                            icon={MailIcon}
-                            label="Email"
-                            value={profile?.email}
-                            href={profile?.email ? `mailto:${profile.email}` : undefined}
-                        />
-                        <ContactCard
-                            icon={LinkedInIcon}
-                            label="LinkedIn"
-                            value={stripProtocol(profile?.linkedin)}
-                            href={profile?.linkedin}
-                        />
-                        <ContactCard
-                            icon={FacebookIcon}
-                            label="Facebook"
-                            value={stripProtocol(profile?.facebook)}
-                            href={profile?.facebook}
-                        />
-                        <ContactCard
-                            icon={InstagramIcon}
-                            label="Instagram"
-                            value={stripProtocol(profile?.instagram)}
-                            href={profile?.instagram}
-                        />
+        <section id="contact" className={`${pageShell} contact-page`}>
+            <div className="contact-layout grid md:grid-cols-2 items-start gap-10">
+                <div className="contact-intro">
+                    <SectionHeader label={label} heading={heading} />
+                    <div className="contact-methods grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {CONTACT_METHODS.map(({ key, icon }) => (
+                            <ContactCard key={key} icon={icon} label={key} value={values[key]} href={hrefs[key]} />
+                        ))}
                     </div>
                 </div>
+
+                <form onSubmit={handleSubmit} className="contact-form rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] overflow-hidden">
+                    <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--color-border)] font-[family-name:var(--font-mono)] text-xs text-[var(--color-faint)]">
+                        <span>Send a message</span>
+                        <span>Usually replies within a day</span>
+                    </div>
+
+                    <div className="px-5 py-5 flex flex-col gap-5">
+                        <label className="flex flex-col gap-2">
+                            <span className="font-[family-name:var(--font-mono)] text-xs text-[var(--color-body)]">Name</span>
+                            <input
+                                name="name"
+                                type="text"
+                                required
+                                value={form.name}
+                                onChange={handleChange}
+                                disabled={status === "sending"}
+                                className="rounded-[var(--radius-md)] border border-[var(--color-border-strong)] bg-[var(--color-bg)] px-3.5 py-2.5 text-sm text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)] focus:ring-3 focus:ring-[var(--color-accent)]/20 transition-colors disabled:opacity-60"
+                            />
+                        </label>
+
+                        <label className="flex flex-col gap-2">
+                            <span className="font-[family-name:var(--font-mono)] text-xs text-[var(--color-body)]">Email</span>
+                            <input
+                                name="email"
+                                type="email"
+                                required
+                                value={form.email}
+                                onChange={handleChange}
+                                disabled={status === "sending"}
+                                className="rounded-[var(--radius-md)] border border-[var(--color-border-strong)] bg-[var(--color-bg)] px-3.5 py-2.5 text-sm text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)] focus:ring-3 focus:ring-[var(--color-accent)]/20 transition-colors disabled:opacity-60"
+                            />
+                        </label>
+
+                        <label className="flex flex-col gap-2">
+                            <span className="font-[family-name:var(--font-mono)] text-xs text-[var(--color-body)]">Message</span>
+                            <textarea
+                                name="message"
+                                required
+                                rows={4}
+                                placeholder="What would you like to talk about?"
+                                value={form.message}
+                                onChange={handleChange}
+                                disabled={status === "sending"}
+                                className="rounded-[var(--radius-md)] border border-[var(--color-border-strong)] bg-[var(--color-bg)] px-3.5 py-2.5 text-sm text-[var(--color-text)] placeholder:text-[var(--color-faint)] focus:outline-none focus:border-[var(--color-accent)] focus:ring-3 focus:ring-[var(--color-accent)]/20 transition-colors resize-none disabled:opacity-60"
+                            />
+                        </label>
+
+                        <div className="flex items-center justify-between pt-1">
+                            <span className="font-[family-name:var(--font-mono)] text-[11px] text-[var(--color-faint)]">All fields are required</span>
+                            <button
+                                type="submit"
+                                disabled={status === "sending"}
+                                className="btn btn-primary disabled:opacity-60 disabled:cursor-not-allowed"
+                            >
+                                {status === "sending" ? "Sending…" : "Send message ↗"}
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
 
             {(status === "success" || status === "error") && (

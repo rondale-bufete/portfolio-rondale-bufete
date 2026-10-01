@@ -54,14 +54,14 @@ export default async function ProfileAdminPage() {
                             id="available"
                             name="available"
                             defaultChecked={profile?.available ?? true}
-                            className="w-4 h-4 border-[var(--color-divider)] accent-[var(--color-accent)]"
+                            className="w-4 h-4 rounded-[var(--radius-sm)] border-[var(--color-border-strong)] accent-[var(--color-accent)]"
                         />
                         <label htmlFor="available" className="text-sm text-[var(--color-text)]">
-                            Show the status pill in the navbar
+                            Show the status badge on the homepage
                         </label>
                     </div>
                     <Field
-                        label="Status pill label"
+                        label="Status badge label"
                         name="status_label"
                         defaultValue={profile?.status_label || "OPEN TO WORK"}
                     />
@@ -73,18 +73,18 @@ export default async function ProfileAdminPage() {
                                 <img
                                     src={profile.photo_url}
                                     alt="Current photo"
-                                    className="w-16 h-16 object-cover border-2 border-[var(--color-divider)] shrink-0"
+                                    className="w-16 h-16 rounded-[var(--radius-md)] object-cover border border-[var(--color-border-strong)] shrink-0"
                                 />
                             )}
-                            <input type="file" name="photo" accept="image/*" className="text-sm text-[var(--color-neutral-700)]" />
+                            <input type="file" name="photo" accept="image/*" className="text-sm text-[var(--color-body)]" />
                         </div>
                     </div>
 
                     <div>
                         <label className={labelBase}>
-                            Resume (PDF) {profile?.resume_url && <span className="text-[var(--color-accent-700)] font-normal normal-case">— currently set</span>}
+                            Resume (PDF) {profile?.resume_url && <span className="text-[var(--color-accent)] font-normal normal-case">— currently set</span>}
                         </label>
-                        <input type="file" name="resume" accept="application/pdf" className="text-sm text-[var(--color-neutral-700)]" />
+                        <input type="file" name="resume" accept="application/pdf" className="text-sm text-[var(--color-body)]" />
                     </div>
 
                     <div className="pt-2">
