@@ -1,22 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
+import { useId } from "react";
+import { useModalBehavior } from "./useModalBehavior";
 
 export default function FormStatusModal({ status, onClose, title, message, buttonLabel }) {
-    useEffect(() => {
-        document.body.style.overflow = "hidden";
-        return () => {
-            document.body.style.overflow = "";
-        };
-    }, []);
-
-    useEffect(() => {
-        function handleKeyDown(e) {
-            if (e.key === "Escape") onClose();
-        }
-        window.addEventListener("keydown", handleKeyDown);
-        return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [onClose]);
+    const dialogRef = useModalBehavior(onClose);
+    const titleId = useId();
+    const messageId = useId();
 
     const isSuccess = status === "success";
 
@@ -26,6 +16,11 @@ export default function FormStatusModal({ status, onClose, title, message, butto
             onClick={onClose}
         >
             <div
+                ref={dialogRef}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby={titleId}
+                aria-describedby={messageId}
                 className="rounded-[var(--radius-xl)] bg-[var(--color-surface)] border border-[var(--color-border-strong)] max-w-sm w-full p-6 shadow-[0_24px_80px_rgba(0,0,0,.5)]"
                 onClick={(e) => e.stopPropagation()}
             >
@@ -35,11 +30,11 @@ export default function FormStatusModal({ status, onClose, title, message, butto
                     {isSuccess ? "SENT SUCCESSFULLY" : "NOT SENT"}
                 </p>
 
-                <h3 className="font-[family-name:var(--font-display)] text-lg font-medium text-[var(--color-text)] mb-1.5">
+                <h3 id={titleId} className="font-[family-name:var(--font-display)] text-lg font-medium text-[var(--color-text)] mb-1.5">
                     {title || (isSuccess ? "Message sent" : "Something went wrong")}
                 </h3>
 
-                <p className="text-[var(--color-body)] text-sm leading-relaxed mb-6">
+                <p id={messageId} className="text-[var(--color-body)] text-sm leading-relaxed mb-6">
                     {message || (isSuccess
                         ? "Thanks for reaching out — I'll get back to you soon."
                         : "Your message couldn't be sent. Please try again, or email me directly.")}

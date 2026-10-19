@@ -5,17 +5,35 @@ import Projects from "@/components/Projects";
 import Contact from "@/components/Contact";
 import PublicSite from "@/components/PublicSite";
 import { getPortfolioData } from "@/lib/data";
+import { buildPersonJsonLd, pageMetadata, serializeJsonLd } from "@/lib/seo";
+import { getSiteUrl } from "@/lib/site";
 
 // Revalidate this page at most once a minute so admin edits show up
 // quickly without needing a full redeploy.
 export const revalidate = 60;
 
+export async function generateMetadata() {
+    const { profile } = await getPortfolioData();
+    if (!profile) return {};
+
+    return pageMetadata({
+        siteName: profile.name,
+        title: [profile.name, profile.role].filter(Boolean).join(" — "),
+        description: profile.bio || profile.tagline,
+        path: "/",
+    });
+}
+
 export default async function Home() {
     const data = await getPortfolioData();
     const { profile, sections, projects, education, skills, experience, certifications } = data;
+    const personJsonLd = buildPersonJsonLd(data, getSiteUrl());
 
     return (
         <PublicSite profile={profile} sections={sections}>
+            {personJsonLd && (
+                <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(personJsonLd) }} />
+            )}
             <Hero profile={profile} projects={projects} education={education} skills={skills} />
             {sections.map((section) => {
                 if (section.kind === "about") {

@@ -1,9 +1,8 @@
 import { container } from "./SectionHeader";
+import { splitParagraphs } from "@/lib/format";
 
 export default function CustomSection({ id, label, heading, body }) {
-    // Blank-line-separated paragraphs — no markdown parsing, kept simple
-    // and predictable for a text field with no formatting toolbar.
-    const paragraphs = (body || "").split(/\n\s*\n/).filter((p) => p.trim());
+    const paragraphs = splitParagraphs(body);
 
     return (
         <section id={id} className={`${container} custom-section pb-14`}>

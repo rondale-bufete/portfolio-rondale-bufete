@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { pageShell } from "./SectionHeader";
 
 const JUMP_LINKS = [
@@ -43,7 +44,8 @@ export default function About({
                     {profile?.resumeUrl && (
                         <a
                             href={profile.resumeUrl}
-                            download
+                            target="_blank"
+                            rel="noopener noreferrer"
                             className="rounded-[var(--radius-md)] border border-[var(--color-border-strong)] py-3 text-center font-[family-name:var(--font-mono)] text-[13px] text-[var(--color-text)] hover:border-[var(--color-body)] transition-colors"
                         >
                             View Resume <span aria-hidden="true">↗</span>
@@ -164,12 +166,18 @@ export default function About({
                                             {...linkProps}
                                             className="flex flex-col gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4 transition-colors hover:border-[var(--color-border-strong)]"
                                         >
-                                            {cert.badge ? (
-                                                <div className="h-16 flex items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-text)]">
-                                                    <img src={cert.badge} alt={`${cert.issuer || cert.title} badge`} className="h-12 max-w-[120px] object-contain" />
+                                            {cert.image ? (
+                                                <div className="about-cert__thumb relative aspect-[3/2] overflow-hidden rounded-[var(--radius-md)] bg-[var(--color-raised)]">
+                                                    <Image
+                                                        src={cert.image}
+                                                        alt={`Certificate: ${cert.title}`}
+                                                        fill
+                                                        sizes="(min-width: 1024px) 300px, (min-width: 640px) 45vw, 90vw"
+                                                        className="object-contain"
+                                                    />
                                                 </div>
                                             ) : (
-                                                <div className="h-16 flex items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-raised)] font-[family-name:var(--font-mono)] text-xs text-[var(--color-faint)]">
+                                                <div className="about-cert__thumb flex aspect-[3/2] items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-raised)] font-[family-name:var(--font-mono)] text-xs text-[var(--color-faint)]">
                                                     {(cert.issuer || "cert").slice(0, 2).toUpperCase()}
                                                 </div>
                                             )}

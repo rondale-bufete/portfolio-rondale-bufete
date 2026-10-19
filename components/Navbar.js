@@ -109,9 +109,11 @@ export default function Navbar({ profile, sections = [] }) {
                     <div className="site-nav__actions">
                         {profile?.github && <a href={profile.github} target="_blank" rel="noopener noreferrer" className="site-nav__social">GitHub</a>}
                         {profile?.linkedin && <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" className="site-nav__social">LinkedIn</a>}
-                        <button onClick={() => setShowResume(true)} className="site-nav__resume">
-                            Resume <span aria-hidden="true">↗</span>
-                        </button>
+                        {profile?.resumeUrl && (
+                            <button onClick={() => setShowResume(true)} className="site-nav__resume">
+                                Resume <span aria-hidden="true">↗</span>
+                            </button>
+                        )}
                     </div>
 
                     <button
@@ -146,15 +148,17 @@ export default function Navbar({ profile, sections = [] }) {
                     </nav>
 
                     <div className="site-nav__mobile-actions">
-                        <button
-                            onClick={() => {
-                                setShowResume(true);
-                                setIsOpen(false);
-                            }}
-                            className="site-nav__resume"
-                        >
-                            Resume <span aria-hidden="true">↗</span>
-                        </button>
+                        {profile?.resumeUrl && (
+                            <button
+                                onClick={() => {
+                                    setShowResume(true);
+                                    setIsOpen(false);
+                                }}
+                                className="site-nav__resume"
+                            >
+                                Resume <span aria-hidden="true">↗</span>
+                            </button>
+                        )}
                         {socials.length > 0 && (
                             <div className="site-nav__mobile-socials">
                                 {socials.map((social) => (

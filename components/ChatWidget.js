@@ -289,7 +289,7 @@ export default function ChatWidget() {
                 </span>
             </div>
 
-            <div ref={scrollRef} className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+            <div ref={scrollRef} role="log" aria-label="Conversation" className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
                 {messages.length === 0 && (
                     <p className="chat-welcome text-[15px] leading-relaxed text-[var(--color-body)]">
                         {welcomeMessage || WELCOME_MESSAGES[0]}
@@ -313,6 +313,7 @@ export default function ChatWidget() {
                 {isLoading && (
                     <div className="inline-block rounded-[var(--radius-md)] border border-[var(--color-border)] px-3 py-2">
                         <TypingDots />
+                        <span className="sr-only">Assistant is typing</span>
                     </div>
                 )}
             </div>
@@ -338,6 +339,7 @@ export default function ChatWidget() {
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
                     placeholder="Ask me a question…"
+                    aria-label="Ask the portfolio assistant a question"
                     rows={1}
                     disabled={isLoading}
                     className="flex-1 resize-none bg-transparent font-[family-name:var(--font-mono)] text-sm text-[var(--color-text)] placeholder:text-[var(--color-faint)] focus:outline-none disabled:opacity-60 max-h-24"

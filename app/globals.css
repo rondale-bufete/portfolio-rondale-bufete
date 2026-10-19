@@ -141,8 +141,9 @@ body {
   --color-border-strong: #aab5c2;
   --color-text: #18222f;
   --color-body: #465364;
-  --color-muted: #657384;
-  --color-faint: #7e8997;
+  /* muted/faint sit at >= 4.5:1 on bg and raised surfaces (WCAG AA for the small labels that use them) */
+  --color-muted: #535f6f;
+  --color-faint: #5d6878;
   --color-subtle: #a7b0ba;
   --color-accent: #2563eb;
   --color-accent-hover: #1d4ed8;

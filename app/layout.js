@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono, Space_Grotesk, DM_Sans } from "next/font/google";
 import PublicAnalytics from "@/components/PublicAnalytics";
+import { getSiteUrl } from "@/lib/site";
 import "./globals.css";
 
 const geist = Geist({
@@ -26,7 +27,10 @@ const dmSans = DM_Sans({
   variable: "--font-body",
 });
 
+// Fallbacks only: public pages build their own title/description/Open Graph
+// from the CMS profile (lib/seo.js). metadataBase makes those URLs absolute.
 export const metadata = {
+  metadataBase: new URL(getSiteUrl()),
   title: "Rondale Rae Bufete — Full Stack Developer",
   description: "Portfolio of a full stack developer specializing in modern web technologies.",
 };

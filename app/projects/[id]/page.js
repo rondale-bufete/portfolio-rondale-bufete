@@ -4,17 +4,24 @@ import { getProjectById, getPortfolioData } from "@/lib/data";
 import ProjectImageCarousel from "@/components/ProjectImageCarousel";
 import PublicSite from "@/components/PublicSite";
 import { pageShell } from "@/components/SectionHeader";
+import { splitParagraphs } from "@/lib/format";
+import { pageMetadata } from "@/lib/seo";
 
 export const revalidate = 60;
 
 export async function generateMetadata({ params }) {
     const { id } = await params;
-    const project = await getProjectById(id);
+    const [project, { profile }] = await Promise.all([getProjectById(id), getPortfolioData()]);
+    if (!project) return { title: "Project not found", robots: { index: false } };
 
-    return {
-        title: project ? `${project.title} | Portfolio` : "Project Not Found | Portfolio",
-        description: project?.description || "Project details from the portfolio.",
-    };
+    const siteName = profile?.name;
+    return pageMetadata({
+        siteName,
+        title: siteName ? `${project.title} — ${siteName}` : project.title,
+        description: splitParagraphs(project.description)[0],
+        path: `/projects/${project.id}`,
+        type: "article",
+    });
 }
 
 export default async function ProjectDetailsPage({ params }) {
@@ -26,6 +33,15 @@ export default async function ProjectDetailsPage({ params }) {
     const index = data.projects.findIndex((p) => p.id === project.id);
     const prevProject = index > 0 ? data.projects[index - 1] : null;
     const nextProject = index >= 0 && index < data.projects.length - 1 ? data.projects[index + 1] : null;
+
+    // The first paragraph is the lead under the title; the rest becomes the
+    // Overview, so a one-paragraph description is never shown twice.
+    const [lead, ...overviewParagraphs] = splitParagraphs(project.description);
+    const detailSections = [
+        overviewParagraphs.length > 0 && "overview",
+        project.highlights.length > 0 && "highlights",
+    ].filter(Boolean);
+    const sectionNumber = (key) => String(detailSections.indexOf(key) + 1).padStart(2, "0");
 
     return (
         <PublicSite profile={data.profile} sections={data.sections}>
@@ -45,8 +61,8 @@ export default async function ProjectDetailsPage({ params }) {
                         <h1 className="font-[family-name:var(--font-display)] text-3xl font-medium leading-tight sm:text-5xl tracking-tight text-[var(--color-text)]">
                             {project.title}
                         </h1>
-                        {project.description && (
-                            <p className="mt-4 text-[17px] leading-relaxed text-[var(--color-body)]">{project.description}</p>
+                        {lead && (
+                            <p className="mt-4 whitespace-pre-line text-[17px] leading-relaxed text-[var(--color-body)]">{lead}</p>
                         )}
                     </div>
                     <div className="flex gap-2.5 font-[family-name:var(--font-mono)] text-sm shrink-0">
@@ -111,30 +127,38 @@ export default async function ProjectDetailsPage({ params }) {
                     </aside>
                 </section>
 
-                <div className="flex flex-col gap-14">
-                    <section>
-                        <h2 className="eyebrow mb-4">{"// 01 — Overview"}</h2>
-                        <p className="max-w-3xl whitespace-pre-line text-[16px] leading-7 text-[var(--color-body)]">
-                            {project.description || "No description available."}
-                        </p>
-                    </section>
+                {detailSections.length > 0 && (
+                    <div className="flex flex-col gap-14">
+                        {overviewParagraphs.length > 0 && (
+                            <section>
+                                <h2 className="eyebrow mb-4">{`// ${sectionNumber("overview")} — Overview`}</h2>
+                                <div className="max-w-3xl space-y-4">
+                                    {overviewParagraphs.map((paragraph, i) => (
+                                        <p key={i} className="whitespace-pre-line text-[16px] leading-7 text-[var(--color-body)]">
+                                            {paragraph}
+                                        </p>
+                                    ))}
+                                </div>
+                            </section>
+                        )}
 
-                    {project.highlights.length > 0 && (
-                        <section>
-                            <h2 className="eyebrow mb-4">{"// 02 — Key highlights"}</h2>
-                            <div className="grid gap-4 sm:grid-cols-3">
-                                {project.highlights.map((highlight, i) => (
-                                    <div key={i} className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-[18px]">
-                                        <div className="font-[family-name:var(--font-mono)] text-xs text-[var(--color-accent)] mb-2.5">
-                                            0x{String(i + 1).padStart(2, "0")}
+                        {project.highlights.length > 0 && (
+                            <section>
+                                <h2 className="eyebrow mb-4">{`// ${sectionNumber("highlights")} — Key highlights`}</h2>
+                                <div className="grid gap-4 sm:grid-cols-3">
+                                    {project.highlights.map((highlight, i) => (
+                                        <div key={i} className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-[18px]">
+                                            <div className="font-[family-name:var(--font-mono)] text-xs text-[var(--color-accent)] mb-2.5">
+                                                0x{String(i + 1).padStart(2, "0")}
+                                            </div>
+                                            <div className="text-[15px] leading-relaxed text-[var(--color-body)]">{highlight}</div>
                                         </div>
-                                        <div className="text-[15px] leading-relaxed text-[var(--color-body)]">{highlight}</div>
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
-                    )}
-                </div>
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+                    </div>
+                )}
 
                 {(prevProject || nextProject) && (
                     <div className="mt-16 grid gap-3.5 sm:grid-cols-2">

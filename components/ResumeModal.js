@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { useId } from "react";
+import { useModalBehavior } from "./useModalBehavior";
 
 function getResumeFilename(name) {
     const cleaned = (name || "resume").trim().replace(/\s+/g, "-");
@@ -8,20 +9,8 @@ function getResumeFilename(name) {
 }
 
 export default function ResumeModal({ profile, onClose }) {
-    useEffect(() => {
-        document.body.style.overflow = "hidden";
-        return () => {
-            document.body.style.overflow = "";
-        };
-    }, []);
-
-    useEffect(() => {
-        function handleKeyDown(e) {
-            if (e.key === "Escape") onClose();
-        }
-        window.addEventListener("keydown", handleKeyDown);
-        return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [onClose]);
+    const dialogRef = useModalBehavior(onClose);
+    const titleId = useId();
 
     return (
         <div
@@ -29,11 +18,15 @@ export default function ResumeModal({ profile, onClose }) {
             onClick={onClose}
         >
             <div
+                ref={dialogRef}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby={titleId}
                 className="rounded-[var(--radius-xl)] bg-[var(--color-surface)] border border-[var(--color-border-strong)] w-full max-w-3xl h-[85vh] flex flex-col overflow-hidden shadow-[0_24px_80px_rgba(0,0,0,.5)]"
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="flex items-center justify-between px-5 py-3.5 border-b border-[var(--color-border)]">
-                    <div className="font-[family-name:var(--font-mono)] text-sm text-[var(--color-text)]">
+                    <div id={titleId} className="font-[family-name:var(--font-mono)] text-sm text-[var(--color-text)]">
                         Resume <span className="text-[var(--color-faint)]">· PDF preview</span>
                     </div>
                     <div className="flex items-center gap-2 font-[family-name:var(--font-mono)] text-sm">
@@ -47,7 +40,7 @@ export default function ResumeModal({ profile, onClose }) {
                         <button
                             onClick={onClose}
                             className="w-9 h-9 rounded-[var(--radius-md)] border border-[var(--color-border-strong)] text-[var(--color-text)] hover:bg-[var(--color-raised)] transition-colors"
-                            aria-label="Close"
+                            aria-label="Close resume preview"
                         >
                             ✕
                         </button>

@@ -66,13 +66,20 @@ describe("Navbar", () => {
         expect(screen.getByRole("button", { name: /open menu/i })).toHaveAttribute("aria-expanded", "false");
     });
 
-    it("opens the resume modal when the résumé button is clicked", async () => {
+    it("opens the resume modal as a dialog and closes it with Escape", async () => {
         const user = userEvent.setup();
-        render(<Navbar profile={profile} sections={sections} />);
+        render(<Navbar profile={{ ...profile, resumeUrl: "https://example.test/cv.pdf" }} sections={sections} />);
 
         await user.click(screen.getAllByRole("button", { name: /resume/i })[0]);
+        expect(screen.getByRole("dialog", { name: /resume/i })).toBeInTheDocument();
 
-        expect(screen.getAllByText(/resume/i).length).toBeGreaterThan(0);
+        await user.keyboard("{Escape}");
+        expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
+
+    it("hides the resume button when no resume is uploaded", () => {
+        render(<Navbar profile={profile} sections={sections} />);
+        expect(screen.queryByRole("button", { name: /resume/i })).not.toBeInTheDocument();
     });
 
     it("does not render an About tab when there is no about section", () => {

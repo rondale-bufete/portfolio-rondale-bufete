@@ -94,12 +94,15 @@ lib/
 └── supabase/
     ├── public.js               # Anon-key client (read-only, used by the public site)
     └── admin.js                 # Service-role client (server-only, used by admin + chat)
-middleware.js                  # Protects /admin/* routes
+proxy.js                       # Protects /admin/* routes
 supabase/
 ├── schema.sql                  # Core tables (profile, education, skills, certifications, projects)
 ├── sections_migration.sql      # Adds the sections table (order/visibility/titles)
+├── project_images_migration.sql # Adds the multi-image gallery column to projects
 ├── experience_migration.sql    # Adds Experience + bullets/highlights/credential fields
-└── chat_migration.sql          # Adds the chat rate-limit table
+├── chat_migration.sql          # Adds the chat rate-limit table
+├── migration_modernist_v2.sql  # Adds project origin/year/role/timeline/outcome + profile status fields
+└── social_links_migration.sql  # Adds Facebook and Instagram links to the profile
 ```
 
 ---
@@ -114,7 +117,7 @@ npm install
 
 1. Create a [Supabase](https://supabase.com) project.
 2. In the Supabase SQL Editor, run the migrations **in order**:
-   `schema.sql` → `sections_migration.sql` → `experience_migration.sql` → `chat_migration.sql`.
+   `schema.sql` → `sections_migration.sql` → `project_images_migration.sql` → `experience_migration.sql` → `chat_migration.sql` → `migration_modernist_v2.sql` → `social_links_migration.sql`.
 3. Copy `.env.local.example` to `.env.local` and fill in the values (see below).
 4. Get a [Gemini API key](https://aistudio.google.com/app/apikey) if you want the chat assistant enabled.
 5. Run the dev server:
