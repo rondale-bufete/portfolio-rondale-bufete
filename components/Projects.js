@@ -6,7 +6,7 @@ import { useMemo, useState } from "react";
 import SectionHeader, { pageShell } from "./SectionHeader";
 import { stripProtocol } from "@/lib/format";
 
-const PROVENANCE_ORDER = ["Client", "Capstone", "Personal"];
+const PROVENANCE_ORDER = ["Client", "Personal"];
 
 function ProjectCard({ project, index }) {
     return (
