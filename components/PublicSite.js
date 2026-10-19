@@ -8,7 +8,7 @@ export default function PublicSite({ profile, sections = [], children }) {
             <Navbar profile={profile} sections={sections} />
             <main>{children}</main>
             <Footer profile={profile} />
-            <ChatWidget />
+            {profile?.chatVisible !== false && <ChatWidget />}
         </div>
     );
 }

@@ -19,7 +19,8 @@ vi.mock("@/lib/supabase/admin", () => ({
     deleteAsset: (...args) => mockDeleteAsset(...args),
 }));
 
-const { updateProfileAction } = await import("./profile.js");
+const { updateProfileAction, setChatWidgetVisibilityAction } = await import("./profile.js");
+const { revalidatePath } = await import("next/cache");
 
 function formDataOf(fields) {
     const fd = new FormData();
@@ -133,5 +134,39 @@ describe("updateProfileAction asset replacement", () => {
         );
 
         expect(mockDeleteAsset).not.toHaveBeenCalled();
+    });
+});
+
+describe("setChatWidgetVisibilityAction", () => {
+    beforeEach(() => {
+        mockIsAuthed.mockResolvedValue(true);
+        revalidatePath.mockClear();
+    });
+
+    it("rejects when not authenticated", async () => {
+        mockIsAuthed.mockResolvedValue(false);
+        supabaseFrom = vi.fn(() => createQueryBuilder());
+
+        await expect(setChatWidgetVisibilityAction(false)).rejects.toThrow("Unauthorized.");
+        expect(supabaseFrom).not.toHaveBeenCalled();
+    });
+
+    it("stores the requested state on the profile row and refreshes every public page", async () => {
+        const builder = createQueryBuilder({ data: null, error: null });
+        supabaseFrom = vi.fn(() => builder);
+
+        await setChatWidgetVisibilityAction(false);
+
+        expect(supabaseFrom).toHaveBeenCalledWith("profile");
+        expect(builder.update).toHaveBeenCalledWith({ chat_visible: false });
+        expect(builder.eq).toHaveBeenCalledWith("id", 1);
+        expect(revalidatePath).toHaveBeenCalledWith("/", "layout");
+    });
+
+    it("surfaces a database error, e.g. when the migration hasn't been run", async () => {
+        supabaseFrom = vi.fn(() => createQueryBuilder({ data: null, error: { message: "column profile.chat_visible does not exist" } }));
+
+        await expect(setChatWidgetVisibilityAction(true)).rejects.toThrow("chat_visible does not exist");
+        expect(revalidatePath).not.toHaveBeenCalled();
     });
 });

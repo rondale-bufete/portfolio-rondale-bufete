@@ -6,7 +6,9 @@ import {
     createCustomSectionAction,
     deleteSectionAction,
 } from "../../actions/sections";
+import { setChatWidgetVisibilityAction } from "../../actions/profile";
 import PageHeader from "../../ui/PageHeader";
+import Card from "../../ui/Card";
 import Field from "../../ui/Field";
 import Badge from "../../ui/Badge";
 import EmptyState from "../../ui/EmptyState";
@@ -36,10 +38,12 @@ const REORDERABLE_KINDS = new Set(["custom"]);
 const TOGGLEABLE_KINDS = new Set(["about", "projects", "contact", "custom"]);
 
 export default async function SectionsAdminPage() {
-    const { data: sections, error } = await supabaseAdmin
-        .from("sections")
-        .select("*")
-        .order("sort_order");
+    const [{ data: sections, error }, { data: profile, error: profileError }] = await Promise.all([
+        supabaseAdmin.from("sections").select("*").order("sort_order"),
+        // select("*") rather than the column itself, so the page still loads
+        // before the chat_widget_toggle migration has been run.
+        supabaseAdmin.from("profile").select("*").eq("id", 1).maybeSingle(),
+    ]);
 
     async function handleCreate(formData) {
         "use server";
@@ -60,6 +64,8 @@ export default async function SectionsAdminPage() {
                     </>
                 }
             />
+
+            <ChatWidgetCard profile={profile} error={profileError} />
 
             <div className="mb-6">
                 <AddNewRow label="Add a custom section">
@@ -102,6 +108,61 @@ export default async function SectionsAdminPage() {
                 </div>
             )}
         </div>
+    );
+}
+
+function ChatWidgetCard({ profile, error }) {
+    if (error) {
+        return <ErrorState title="Chat widget setting couldn't load" message={error.message} />;
+    }
+
+    const hasSetting = Boolean(profile) && "chat_visible" in profile;
+    const isVisible = profile?.chat_visible ?? true;
+
+    async function handleToggle() {
+        "use server";
+        await setChatWidgetVisibilityAction(!isVisible);
+    }
+
+    return (
+        <Card className="mb-6">
+            <div className="flex items-start justify-between gap-4">
+                <div>
+                    <h2 className="font-medium text-[var(--color-text)] font-[family-name:var(--font-display)]">Chat widget</h2>
+                    <p className="mt-1 text-sm leading-relaxed text-[var(--color-body)]">
+                        The &ldquo;Ask me about my work&rdquo; assistant on every public page. Hiding it only removes it
+                        from the site; the assistant itself isn&apos;t changed.
+                    </p>
+                </div>
+                <Badge tone={isVisible ? "accent" : "neutral"}>{isVisible ? "Visible" : "Hidden"}</Badge>
+            </div>
+
+            {hasSetting ? (
+                <AdminActionForm
+                    action={handleToggle}
+                    className="mt-4"
+                    successMessage={isVisible ? "The chat widget is now hidden from your site." : "The chat widget is back on your site."}
+                >
+                    <button type="submit" className={buttonSecondary}>
+                        {isVisible ? (
+                            <>
+                                <EyeOffIcon className="w-4 h-4" />
+                                Hide from site
+                            </>
+                        ) : (
+                            <>
+                                <EyeIcon className="w-4 h-4" />
+                                Show on site
+                            </>
+                        )}
+                    </button>
+                </AdminActionForm>
+            ) : (
+                <p className="mt-4 field-label">
+                    Run supabase/chat_widget_toggle_migration.sql in the Supabase SQL Editor to turn on this toggle.
+                </p>
+            )}
+        </Card>
     );
 }
 
