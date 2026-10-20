@@ -1,7 +1,4 @@
--- =============================================================
--- Sections migration — run this AFTER the original schema.sql
--- (safe to run once; re-running won't duplicate the seed rows)
--- =============================================================
+-- Add section configuration after schema.sql; safe to rerun.
 
 create table if not exists sections (
   id uuid primary key default gen_random_uuid(),
@@ -14,7 +11,7 @@ create table if not exists sections (
   created_at timestamptz not null default now()
 );
 
--- Only one of each structural section allowed; unlimited custom ones.
+-- Allow one of each structural section and unlimited custom sections.
 create unique index if not exists sections_unique_structural
   on sections (kind)
   where kind <> 'custom';
@@ -23,8 +20,7 @@ alter table sections enable row level security;
 
 create policy "public read sections" on sections for select using (true);
 
--- Seed with your current section order/labels — only runs if the table
--- is empty, so it's safe to re-run this whole file.
+-- Seed the default section order only when the table is empty.
 insert into sections (kind, label, heading, sort_order)
 select * from (
   values

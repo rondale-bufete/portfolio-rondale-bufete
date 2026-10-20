@@ -55,7 +55,7 @@ export default function ResumeModal({ profile, onClose }) {
                     />
                 </div>
 
-                {/* Mobile fallback — some mobile browsers don't render PDFs inline */}
+                {/* Offer a download when mobile browsers cannot preview PDFs. */}
                 <p className="sm:hidden text-center text-xs text-[var(--color-faint)] py-3 border-t border-[var(--color-border)]">
                     Preview not showing?{" "}
                     <a href={profile?.resumeUrl} download={getResumeFilename(profile?.name)} className="text-[var(--color-accent)] hover:underline">

@@ -32,7 +32,7 @@ export async function updateSectionMetaAction(id, formData) {
         label: formData.get("label")?.toString() || "",
         heading: formData.get("heading")?.toString() || "",
     };
-    // Only structural sections' forms omit body; custom sections include it.
+    // Only custom section forms include a body field.
     if (formData.has("body")) {
         patch.body = formData.get("body")?.toString() || "";
     }
@@ -60,9 +60,7 @@ export async function createCustomSectionAction(formData) {
 export async function deleteSectionAction(id) {
     await requireAdmin();
 
-    // Guard against deleting structural sections — they should only ever
-    // be hidden, since deleting one would leave its data (projects, etc.)
-    // with no home on the page.
+    // Structural sections can be hidden but not deleted because they own page data.
     const { data: section } = await supabaseAdmin
         .from("sections")
         .select("kind")

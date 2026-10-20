@@ -5,10 +5,7 @@ import FormStatusModal from "../../../components/FormStatusModal";
 
 const initialState = { error: null, success: false };
 
-// Walks the form's children and disables any <button> it finds while the
-// action is in flight, so a slow save/delete can't be double-submitted by
-// an impatient click. Preserves each button's own `disabled` (e.g. the
-// move-up/move-down buttons at the first/last position).
+// Disable form buttons while saving, while preserving buttons already disabled.
 function disableButtonsWhilePending(node, pending) {
     if (!isValidElement(node)) return node;
 

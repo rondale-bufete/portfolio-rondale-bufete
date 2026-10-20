@@ -27,21 +27,16 @@ const KIND_LABELS = {
     custom: "Custom",
 };
 
-// About/Projects/Contact are separate routes now — their visibility toggle
-// still turns the whole page on/off, but reordering them has no effect, so
-// the move buttons are hidden for anything that isn't a custom section.
+// Only custom sections can be reordered; the other sections are separate pages.
 const REORDERABLE_KINDS = new Set(["custom"]);
 
-// Experience/Skills render inside About whenever they have data — the
-// sections table row for them is a leftover from before that migration and
-// has no effect on the public site, so their toggle is hidden too.
+// Experience and Skills render within About, so their legacy toggles are hidden.
 const TOGGLEABLE_KINDS = new Set(["about", "projects", "contact", "custom"]);
 
 export default async function SectionsAdminPage() {
     const [{ data: sections, error }, { data: profile, error: profileError }] = await Promise.all([
         supabaseAdmin.from("sections").select("*").order("sort_order"),
-        // select("*") rather than the column itself, so the page still loads
-        // before the chat_widget_toggle migration has been run.
+        // Select all columns so this page loads before the chat toggle migration.
         supabaseAdmin.from("profile").select("*").eq("id", 1).maybeSingle(),
     ]);
 

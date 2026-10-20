@@ -4,9 +4,7 @@ import userEvent from "@testing-library/user-event";
 import AdminActionForm from "./AdminActionForm";
 
 beforeEach(() => {
-    // FormStatusModal's onClose calls window.location.reload() on success,
-    // which jsdom doesn't implement — stub it so success-path tests don't
-    // throw.
+    // Stub reload because jsdom does not implement it.
     Object.defineProperty(window, "location", {
         value: { ...window.location, reload: vi.fn() },
         writable: true,
@@ -30,13 +28,7 @@ describe("AdminActionForm", () => {
     });
 
     it("regression: clicking the success modal's Okay button does not re-submit the form", async () => {
-        // FormStatusModal renders inside the same <form> as the real submit
-        // button. Its "Okay" button must be type="button" — without that,
-        // a plain <button> defaults to type="submit" inside a <form>, so
-        // clicking Okay both closes the modal AND silently re-submits the
-        // form with whatever stale values are still in the DOM, clobbering
-        // the save that just succeeded (see the Origin-field bug this was
-        // written to catch).
+        // Keep the modal's Okay button from resubmitting the form after a save.
         const action = vi.fn().mockResolvedValue(undefined);
         const user = userEvent.setup();
         render(
@@ -142,7 +134,7 @@ describe("AdminActionForm", () => {
         );
 
         await user.click(screen.getByRole("button", { name: "Delete" }));
-        // The confirm dialog's own "delete" button, not the form's trigger.
+        // Click the confirmation dialog's delete button, not the form trigger.
         await user.click(screen.getByRole("button", { name: "delete" }));
 
         await waitFor(() => expect(action).toHaveBeenCalled());

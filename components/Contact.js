@@ -13,7 +13,7 @@ const CONTACT_METHODS = [
     { key: "instagram", icon: "ig" },
 ];
 
-// A single "Direct" contact method
+// Direct contact card.
 function ContactCard({ icon, label, value, href }) {
     if (!value) return null;
 
@@ -40,7 +40,7 @@ function ContactCard({ icon, label, value, href }) {
 
 export default function Contact({ profile, label = "04 — Contact", heading ="Let’s talk" }) {
     const [form, setForm] = useState({ name: "", email: "", message: "" });
-    const [status, setStatus] = useState("idle"); // idle | sending | success | error
+    const [status, setStatus] = useState("idle"); // Status: idle, sending, success, or error.
 
     function handleChange(e) {
         setForm({ ...form, [e.target.name]: e.target.value });

@@ -1,7 +1,6 @@
 import { initials } from "@/lib/format";
 
-// Rendered by next/og (Satori), not the browser: inline styles only, and
-// every element with more than one child needs display: flex.
+// next/og uses Satori, which requires inline styles and flex for multi-child elements.
 export const OG_SIZE = { width: 1200, height: 630 };
 
 const COLORS = { bg: "#f4f6f8", text: "#18222f", body: "#465364", accent: "#2563eb" };

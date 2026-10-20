@@ -1,5 +1,4 @@
--- Add ordered showcase images to projects.
--- Existing image_url values remain supported by the application as a fallback.
+-- Add ordered project images while retaining image_url as a fallback.
 alter table projects
 add column if not exists image_urls text[] not null default '{}';
 

@@ -1,9 +1,6 @@
--- =============================================================
--- Portfolio DB schema for Supabase
--- Run this in: Supabase Dashboard -> SQL Editor -> New query
--- =============================================================
+-- Portfolio schema; run in the Supabase SQL Editor.
 
--- ---------- PROFILE (single row) ----------
+-- Profile.
 create table if not exists profile (
   id int primary key default 1,
   name text not null default '',
@@ -19,7 +16,7 @@ create table if not exists profile (
   constraint profile_singleton check (id = 1)
 );
 
--- ---------- EDUCATION ----------
+-- Education.
 create table if not exists education (
   id uuid primary key default gen_random_uuid(),
   degree text not null,
@@ -30,7 +27,7 @@ create table if not exists education (
   created_at timestamptz not null default now()
 );
 
--- ---------- SKILLS (category -> items) ----------
+-- Skills and categories.
 create table if not exists skill_categories (
   id uuid primary key default gen_random_uuid(),
   category text not null,
@@ -46,7 +43,7 @@ create table if not exists skill_items (
   created_at timestamptz not null default now()
 );
 
--- ---------- CERTIFICATIONS ----------
+-- Certifications.
 create table if not exists certifications (
   id uuid primary key default gen_random_uuid(),
   title text not null,
@@ -60,7 +57,7 @@ create table if not exists certifications (
   created_at timestamptz not null default now()
 );
 
--- ---------- PROJECTS ----------
+-- Projects.
 create table if not exists projects (
   id uuid primary key default gen_random_uuid(),
   title text not null,
@@ -75,12 +72,7 @@ create table if not exists projects (
   created_at timestamptz not null default now()
 );
 
--- =============================================================
--- Row Level Security
--- Public (anon key) can only READ. All writes happen server-side
--- via the service role key inside Server Actions, which bypasses
--- RLS entirely — so we never need public insert/update/delete policies.
--- =============================================================
+-- Public access is read-only; server actions write with the service role.
 
 alter table profile enable row level security;
 alter table education enable row level security;
@@ -96,11 +88,7 @@ create policy "public read skill_items" on skill_items for select using (true);
 create policy "public read certifications" on certifications for select using (true);
 create policy "public read projects" on projects for select using (true);
 
--- =============================================================
--- Storage bucket for images / resume / cert PDFs
--- (Run this part too — creates a public-read bucket named
--- "portfolio-assets". Writes are done via service role key only.)
--- =============================================================
+-- Create a public-read portfolio-assets bucket; writes use the service role.
 insert into storage.buckets (id, name, public)
 values ('portfolio-assets', 'portfolio-assets', true)
 on conflict (id) do nothing;
@@ -109,11 +97,7 @@ create policy "public read portfolio-assets"
 on storage.objects for select
 using (bucket_id = 'portfolio-assets');
 
--- =============================================================
--- Seed data — pulled straight from your existing data/portfolio.js
--- Image paths keep pointing at /public for now; re-upload them via
--- the admin panel whenever you want them served from Storage instead.
--- =============================================================
+-- Seed portfolio data; image paths remain in /public until uploaded to storage.
 
 insert into profile (id, name, role, tagline, bio, email, github, linkedin, resume_url, photo_url)
 values (

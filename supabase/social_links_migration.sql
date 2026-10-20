@@ -1,5 +1,4 @@
--- Add Facebook and Instagram profile links, alongside the existing
--- github/linkedin columns.
+-- Add Facebook and Instagram profile links.
 alter table profile
 add column if not exists facebook text not null default '';
 

@@ -1,9 +1,4 @@
-// Design tokens for the admin panel — sourced from the same CSS custom
-// properties as the public site (app/globals.css, loaded globally by the
-// root layout) so admin and public share one visual language instead of
-// two unrelated systems. Every admin component pulls its classNames from
-// here rather than inlining its own — that's what keeps buttons, fields,
-// and cards consistent across every page instead of drifting page by page.
+// Share public-site design tokens across admin components.
 
 export const colors = {
     accent: "var(--color-accent)",

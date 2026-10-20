@@ -7,10 +7,7 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
     plugins: [react({ include: /\.(js|jsx|mjs)$/ })],
-    // This project writes JSX in plain .js files (Next.js convention).
-    // Vite's oxc transform picks its parser mode from the file extension
-    // (.js -> no JSX allowed) unless `lang` is forced — this makes every
-    // matched file parse as JSX so component .js files aren't rejected.
+    // Parse .js files as JSX to match the project's Next.js conventions.
     oxc: {
         lang: "jsx",
         include: /\.[jt]sx?$/,

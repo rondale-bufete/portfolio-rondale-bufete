@@ -10,8 +10,7 @@ export default function LoginPage() {
     const [state, formAction, isPending] = useActionState(
         async (_prevState, formData) => {
             const result = await loginAction(formData);
-            // On success loginAction redirects and never returns; we only
-            // get here on failure.
+            // Successful login redirects; returning here means it failed.
             return result ?? initialState;
         },
         initialState

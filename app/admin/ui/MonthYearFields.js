@@ -1,8 +1,6 @@
 import { inputBase, labelBase } from "./tokens";
 
-// A single native month picker ("YYYY-MM"). Replaces the old paired
-// Month/Year <select> — one field means no month-without-a-year state to
-// fall into, and no flex-width fight between two adjacent elements.
+// Use one native month picker to avoid incomplete month/year values.
 export function MonthField({ label, name, defaultValue }) {
     return (
         <div>

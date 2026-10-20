@@ -160,7 +160,7 @@ function renderMarkdownContent(content) {
 
 export default function ChatWidget() {
     const [isOpen, setIsOpen] = useState(false);
-    // { role: "user" | "assistant" | "error", content: string }
+    // Messages use user, assistant, or error roles.
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
     const [isLoading, setIsLoading] = useState(false);
@@ -185,9 +185,7 @@ export default function ChatWidget() {
         });
     }
 
-    // ⌘K / Ctrl+K toggles the palette from anywhere on the page; Esc closes
-    // it while open (the textarea's own Enter-to-send is handled separately
-    // below, since Escape here needs to fire even when the input isn't focused).
+    // The global shortcut toggles chat; Escape closes it when input is unfocused.
     useEffect(() => {
         function handleGlobalKeyDown(e) {
             if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
@@ -258,7 +256,7 @@ export default function ChatWidget() {
                 <span className="flex-1 truncate text-left font-[family-name:var(--font-mono)] text-sm text-[var(--color-faint)]">
                     Ask me about my work
                 </span>
-                {/* <span className="kbd shrink-0">⌘K</span> */}
+                {/* Keyboard shortcut hint. */}
             </button>
         );
     }

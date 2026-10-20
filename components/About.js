@@ -19,7 +19,7 @@ export default function About({
     return (
         <section id="about" className={`${pageShell} about-page`}>
             <div className="about-layout grid md:grid-cols-[280px_1fr] gap-10">
-                {/* Sidebar */}
+                {/* Sidebar content. */}
                 <div className="about-sidebar md:sticky md:top-24 md:self-start flex flex-col gap-7">
                     {(profile?.email || profile?.location) && (
                         <div className="about-contact">
@@ -53,7 +53,7 @@ export default function About({
                     )}
                 </div>
 
-                {/* Main column */}
+                {/* Main content column. */}
                 <div className="about-content flex flex-col gap-16 min-w-0">
                     <div id="about-summary" className="about-summary scroll-mt-24">
                         <p className="eyebrow mb-4">{"// summary"}</p>

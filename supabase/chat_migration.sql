@@ -1,7 +1,4 @@
--- =============================================================
--- Chatbot rate limiting
--- Run this in Supabase -> SQL Editor
--- =============================================================
+-- Create chatbot rate limiting in the Supabase SQL Editor.
 
 create table if not exists chat_rate_limits (
   session_id text not null,
@@ -10,9 +7,5 @@ create table if not exists chat_rate_limits (
   primary key (session_id, day)
 );
 
--- RLS enabled with NO policies at all — this locks the table to the
--- service role key only (used server-side in app/api/chat/route.js).
--- The public anon key used by the rest of the site has zero access,
--- which is exactly right: visitors should never be able to read or
--- reset their own rate-limit row directly.
+-- No RLS policies restrict this table to the server-side service role.
 alter table chat_rate_limits enable row level security;

@@ -3,9 +3,9 @@ import nextVitals from "eslint-config-next/core-web-vitals";
 
 const eslintConfig = defineConfig([
   ...nextVitals,
-  // Override default ignores of eslint-config-next.
+  // Add project-specific generated-file ignores.
   globalIgnores([
-    // Default ignores of eslint-config-next:
+    // Ignore generated Next.js build output.
     ".next/**",
     "out/**",
     "build/**",

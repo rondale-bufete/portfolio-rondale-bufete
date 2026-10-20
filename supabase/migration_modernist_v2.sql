@@ -1,8 +1,4 @@
--- =============================================================
--- Modernist redesign wave 2 — new optional metadata columns.
--- Run this in: Supabase Dashboard -> SQL Editor -> New query
--- Safe to re-run: every statement is idempotent.
--- =============================================================
+-- Add optional metadata columns; safe to rerun in the Supabase SQL Editor.
 
 alter table projects add column if not exists provenance text not null default 'Personal';
 alter table projects add column if not exists year text not null default '';

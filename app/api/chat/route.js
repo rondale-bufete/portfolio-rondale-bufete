@@ -82,11 +82,7 @@ export async function POST(request) {
         );
     }
 
-    // Identify the visitor for rate limiting via an opaque, unsigned
-    // cookie. It only gates a soft daily quota — nothing sensitive — so
-    // there's no need to sign it; clearing cookies resets your own quota,
-    // which is an acceptable ceiling for a portfolio chatbot, not a
-    // security boundary.
+    // An unsigned cookie tracks the soft quota; clearing it resets the limit.
     const cookieStore = await cookies();
     let sessionId = cookieStore.get(SESSION_COOKIE)?.value;
     const isNewSession = !sessionId;

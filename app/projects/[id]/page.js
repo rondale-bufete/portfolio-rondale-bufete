@@ -34,8 +34,7 @@ export default async function ProjectDetailsPage({ params }) {
     const prevProject = index > 0 ? data.projects[index - 1] : null;
     const nextProject = index >= 0 && index < data.projects.length - 1 ? data.projects[index + 1] : null;
 
-    // The first paragraph is the lead under the title; the rest becomes the
-    // Overview, so a one-paragraph description is never shown twice.
+    // Use the first paragraph as the lead and the rest as the overview.
     const [lead, ...overviewParagraphs] = splitParagraphs(project.description);
     const detailSections = [
         overviewParagraphs.length > 0 && "overview",

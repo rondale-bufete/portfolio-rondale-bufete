@@ -27,8 +27,7 @@ const dmSans = DM_Sans({
   variable: "--font-body",
 });
 
-// Fallbacks only: public pages build their own title/description/Open Graph
-// from the CMS profile (lib/seo.js). metadataBase makes those URLs absolute.
+// Public pages build CMS metadata; metadataBase makes their URLs absolute.
 export const metadata = {
   metadataBase: new URL(getSiteUrl()),
   title: "Rondale Rae Bufete — Full Stack Developer",

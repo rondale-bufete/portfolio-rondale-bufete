@@ -1,8 +1,7 @@
 import { ChevronIcon, PlusIcon } from "./icons";
 import { cardBase } from "./tokens";
 
-// A single item row in a list (project, cert, education entry, etc).
-// Click the summary to expand its edit form.
+// Render an expandable item row for admin lists.
 export function ItemRow({ index, title, meta, badges, children, defaultOpen = false }) {
     return (
         <details className={`group ${cardBase} overflow-hidden`} open={defaultOpen || undefined}>
@@ -28,9 +27,7 @@ export function ItemRow({ index, title, meta, badges, children, defaultOpen = fa
     );
 }
 
-// The "+ Add new X" affordance — visually distinct (dashed border, accent
-// text) so it never gets mistaken for an existing item, and placed above
-// the list so it doesn't require scrolling past every entry to find it.
+// Keep the add-new action distinct and above the list.
 export function AddNewRow({ label, children }) {
     return (
         <details className="group rounded-[var(--radius-lg)] border border-dashed border-[var(--color-border-strong)] bg-[var(--color-bg)] transition-colors open:border-[var(--color-accent)]/50">

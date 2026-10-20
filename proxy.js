@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import { expectedSessionToken, timingSafeEqualStrings } from "./lib/session-token";
 
-// Proxy always runs on Node.js in Next 16, so Node's crypto (HMAC) is
-// available here; a `runtime` option would throw.
+// Next.js 16 runs this proxy on Node.js; setting a runtime option would throw.
 export const config = {
     matcher: ["/admin/:path*"],
 };
@@ -12,7 +11,7 @@ const COOKIE_NAME = "admin_session";
 export function proxy(request) {
     const { pathname } = request.nextUrl;
 
-    // Let the login page itself through, always.
+    // Always allow access to the login page.
     if (pathname === "/admin/login") {
         return NextResponse.next();
     }

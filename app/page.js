@@ -8,8 +8,7 @@ import { getPortfolioData } from "@/lib/data";
 import { buildPersonJsonLd, pageMetadata, serializeJsonLd } from "@/lib/seo";
 import { getSiteUrl } from "@/lib/site";
 
-// Revalidate this page at most once a minute so admin edits show up
-// quickly without needing a full redeploy.
+// Revalidate every minute so admin edits appear without a redeploy.
 export const revalidate = 60;
 
 export async function generateMetadata() {

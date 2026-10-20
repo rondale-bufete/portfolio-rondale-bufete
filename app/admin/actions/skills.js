@@ -27,7 +27,7 @@ export async function createSkillCategoryAction(formData) {
 export async function deleteSkillCategoryAction(id) {
     await requireAdmin();
 
-    // skill_items rows cascade-delete via the FK constraint.
+    // The foreign key cascade deletes related skill_items rows.
     const { error } = await supabaseAdmin.from("skill_categories").delete().eq("id", id);
     if (error) throw new Error(error.message);
 

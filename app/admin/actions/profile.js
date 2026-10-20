@@ -65,8 +65,7 @@ export async function updateProfileAction(formData) {
     revalidatePath("/admin/profile");
 }
 
-// Takes the desired state rather than flipping the stored one, so a
-// double-submitted click can't toggle it back.
+// Set the desired state so duplicate submissions cannot reverse it.
 export async function setChatWidgetVisibilityAction(visible) {
     await requireAdmin();
 
@@ -76,7 +75,6 @@ export async function setChatWidgetVisibilityAction(visible) {
         .eq("id", 1);
     if (error) throw new Error(error.message);
 
-    // "layout" refreshes every public page (home and each project page),
-    // since the widget is on all of them.
+    // Refresh every public page because the widget appears across the site.
     revalidatePath("/", "layout");
 }

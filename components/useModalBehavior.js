@@ -4,9 +4,7 @@ import { useEffect, useEffectEvent, useRef } from "react";
 
 const FOCUSABLE = 'a[href], button:not([disabled]), input, textarea, select, iframe, [tabindex]:not([tabindex="-1"])';
 
-// Shared dialog behavior: locks page scroll, closes on Escape, moves focus
-// into the dialog, keeps Tab inside it, and gives focus back on close so
-// keyboard users land where they were.
+// Share dialog scroll locking, keyboard focus handling, and focus restoration.
 export function useModalBehavior(onClose) {
     const dialogRef = useRef(null);
     const handleClose = useEffectEvent(() => onClose());

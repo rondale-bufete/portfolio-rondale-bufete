@@ -10,7 +10,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        // Matches https://<project-ref>.supabase.co/storage/v1/object/public/...
+        // Allow public Supabase Storage assets.
         hostname: "*.supabase.co",
         pathname: "/storage/v1/object/public/**",
       },
