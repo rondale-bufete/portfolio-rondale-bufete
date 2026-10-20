@@ -178,37 +178,95 @@ describe("createProjectAction", () => {
 describe("updateProjectAction image cleanup", () => {
     beforeEach(() => mockIsAuthed.mockResolvedValue(true));
 
-    it("deletes the previous images when new ones are uploaded", async () => {
+    it("keeps selected images, adds uploads, and deletes only removed images", async () => {
         mockUploadAsset.mockResolvedValue("https://cdn.test/projects/new.png");
+        const update = vi.fn(() => createQueryBuilder({ data: null, error: null }));
 
         supabaseFrom = vi.fn((table) => {
             const builder = createQueryBuilder({
                 data: { image_urls: ["https://cdn.test/projects/old1.png", "https://cdn.test/projects/old2.png"] },
                 error: null,
             });
-            builder.update = vi.fn(() => createQueryBuilder({ data: null, error: null }));
+            builder.update = update;
             return builder;
         });
 
         const fd = formDataOf(baseFields);
+        fd.append("existing_images", "https://cdn.test/projects/old2.png");
         fd.append("images", new File(["x"], "new.png", { type: "image/png" }));
 
         await updateProjectAction("id-1", fd);
 
         expect(mockDeleteAsset).toHaveBeenCalledWith("https://cdn.test/projects/old1.png");
-        expect(mockDeleteAsset).toHaveBeenCalledWith("https://cdn.test/projects/old2.png");
+        expect(mockDeleteAsset).not.toHaveBeenCalledWith("https://cdn.test/projects/old2.png");
+        expect(update).toHaveBeenCalledWith(
+            expect.objectContaining({
+                image_url: "https://cdn.test/projects/old2.png",
+                image_urls: ["https://cdn.test/projects/old2.png", "https://cdn.test/projects/new.png"],
+            })
+        );
     });
 
-    it("keeps existing images and deletes nothing when no new images are uploaded", async () => {
+    it("saves existing images in the submitted order and updates the thumbnail", async () => {
+        const imageUrls = ["https://cdn.test/projects/first.png", "https://cdn.test/projects/second.png"];
+        const update = vi.fn(() => createQueryBuilder({ data: null, error: null }));
         supabaseFrom = vi.fn(() => {
-            const builder = createQueryBuilder({ data: null, error: null });
-            builder.update = vi.fn(() => createQueryBuilder({ data: null, error: null }));
+            const builder = createQueryBuilder({ data: { image_urls: imageUrls }, error: null });
+            builder.update = update;
+            return builder;
+        });
+
+        const fd = formDataOf(baseFields);
+        fd.append("existing_images", imageUrls[1]);
+        fd.append("existing_images", imageUrls[0]);
+
+        await updateProjectAction("id-1", fd);
+
+        expect(update).toHaveBeenCalledWith(
+            expect.objectContaining({
+                image_url: imageUrls[1],
+                image_urls: [imageUrls[1], imageUrls[0]],
+            })
+        );
+        expect(mockDeleteAsset).not.toHaveBeenCalled();
+    });
+
+    it("keeps selected images and deletes nothing when no new images are uploaded", async () => {
+        const update = vi.fn(() => createQueryBuilder({ data: null, error: null }));
+        supabaseFrom = vi.fn(() => {
+            const builder = createQueryBuilder({
+                data: { image_urls: ["https://cdn.test/projects/old.png"] },
+                error: null,
+            });
+            builder.update = update;
+            return builder;
+        });
+
+        const fd = formDataOf(baseFields);
+        fd.append("existing_images", "https://cdn.test/projects/old.png");
+        await updateProjectAction("id-1", fd);
+
+        expect(mockDeleteAsset).not.toHaveBeenCalled();
+        expect(update).toHaveBeenCalledWith(
+            expect.objectContaining({ image_urls: ["https://cdn.test/projects/old.png"] })
+        );
+    });
+
+    it("removes a legacy single image when it is not retained", async () => {
+        const update = vi.fn(() => createQueryBuilder({ data: null, error: null }));
+        supabaseFrom = vi.fn(() => {
+            const builder = createQueryBuilder({
+                data: { image_urls: [], image_url: "https://cdn.test/projects/legacy.png" },
+                error: null,
+            });
+            builder.update = update;
             return builder;
         });
 
         await updateProjectAction("id-1", formDataOf(baseFields));
 
-        expect(mockDeleteAsset).not.toHaveBeenCalled();
+        expect(mockDeleteAsset).toHaveBeenCalledWith("https://cdn.test/projects/legacy.png");
+        expect(update).toHaveBeenCalledWith(expect.objectContaining({ image_url: "", image_urls: [] }));
     });
 });
 

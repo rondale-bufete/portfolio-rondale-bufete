@@ -13,6 +13,7 @@ import { ItemRow, AddNewRow } from "../../ui/CollapsibleRow";
 import { labelBase, inputBase, buttonPrimary, buttonIcon, linkDanger } from "../../ui/tokens";
 import { ArrowUpIcon, ArrowDownIcon, TrashIcon } from "../../ui/icons";
 import AdminActionForm from "../../ui/AdminActionForm";
+import ProjectImagesField from "./ProjectImagesField";
 
 export default async function ProjectsAdminPage() {
     const { data: projects, error } = await supabaseAdmin
@@ -176,21 +177,15 @@ function ProjectFields({ project }) {
             />
             <Field label="Live demo URL" name="live_url" defaultValue={project?.live_url} />
             <Field label="Repo URL" name="repo_url" defaultValue={project?.repo_url} />
-            <div>
-                <label className={labelBase}>Showcase images</label>
-                <div className="flex items-center gap-4">
-                    {(project?.image_urls?.length ? project.image_urls : project?.image_url ? [project.image_url] : []).map((imageUrl) => (
-                        <img
-                            key={imageUrl}
-                            src={imageUrl}
-                            alt=""
-                            className="w-28 aspect-video rounded-[var(--radius-md)] object-cover border border-[var(--color-border-strong)] shrink-0"
-                        />
-                    ))}
-                    <input type="file" name="images" accept="image/*" multiple className="text-sm text-[var(--color-body)]" />
-                </div>
-                <p className="mt-1 text-xs text-[var(--color-faint)]">Select multiple images to replace the current showcase gallery.</p>
-            </div>
+            <ProjectImagesField
+                imageUrls={
+                    project?.image_urls?.length
+                        ? project.image_urls
+                        : project?.image_url
+                          ? [project.image_url]
+                          : []
+                }
+            />
         </>
     );
 }

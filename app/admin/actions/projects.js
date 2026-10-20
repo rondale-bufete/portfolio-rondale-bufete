@@ -79,8 +79,30 @@ export async function updateProjectAction(id, formData) {
     const repoUrl = formData.get("repo_url")?.toString() || "";
     validateUrls({ liveUrl, repoUrl });
 
+    const { data: existing, error: existingError } = await supabaseAdmin
+        .from("projects")
+        .select("image_urls, image_url")
+        .eq("id", id)
+        .maybeSingle();
+    if (existingError) throw new Error(existingError.message);
+    if (!existing) throw new Error("Project not found.");
+
+    const previousImageUrls = existing.image_urls?.length
+        ? existing.image_urls
+        : existing.image_url
+          ? [existing.image_url]
+          : [];
+    const submittedImageUrls = formData
+        .getAll("existing_images")
+        .filter((url) => typeof url === "string" && previousImageUrls.includes(url));
+    const retainedImageUrls = [...new Set(submittedImageUrls)];
+    const retainedImageUrlSet = new Set(retainedImageUrls);
+    const removedImageUrls = previousImageUrls.filter((url) => !retainedImageUrlSet.has(url));
     const imageFiles = formData.getAll("images");
-    const imageUrls = (await Promise.all(imageFiles.map((file) => uploadAsset(file, "projects")))).filter(Boolean);
+    const uploadedImageUrls = (
+        await Promise.all(imageFiles.map((file) => uploadAsset(file, "projects")))
+    ).filter(Boolean);
+    const imageUrls = [...retainedImageUrls, ...uploadedImageUrls];
 
     const patch = {
         title: formData.get("title")?.toString() || "",
@@ -90,25 +112,15 @@ export async function updateProjectAction(id, formData) {
         highlights: parseBullets(formData.get("highlights")?.toString()),
         live_url: liveUrl,
         repo_url: repoUrl,
+        image_url: imageUrls[0] || "",
+        image_urls: imageUrls,
         ...projectMetaPatch(formData),
     };
-
-    let previousImageUrls = [];
-    if (imageUrls.length > 0) {
-        const { data: existing } = await supabaseAdmin
-            .from("projects")
-            .select("image_urls")
-            .eq("id", id)
-            .maybeSingle();
-        previousImageUrls = existing?.image_urls || [];
-        patch.image_url = imageUrls[0];
-        patch.image_urls = imageUrls;
-    }
 
     const { error } = await supabaseAdmin.from("projects").update(patch).eq("id", id);
     if (error) throw new Error(error.message);
 
-    await Promise.all(previousImageUrls.map((url) => deleteAsset(url)));
+    await Promise.all(removedImageUrls.map((url) => deleteAsset(url)));
 
     refresh(id);
 }
@@ -118,14 +130,19 @@ export async function deleteProjectAction(id) {
 
     const { data: existing } = await supabaseAdmin
         .from("projects")
-        .select("image_urls")
+        .select("image_urls, image_url")
         .eq("id", id)
         .maybeSingle();
 
     const { error } = await supabaseAdmin.from("projects").delete().eq("id", id);
     if (error) throw new Error(error.message);
 
-    await Promise.all((existing?.image_urls || []).map((url) => deleteAsset(url)));
+    const imageUrls = existing?.image_urls?.length
+        ? existing.image_urls
+        : existing?.image_url
+          ? [existing.image_url]
+          : [];
+    await Promise.all(imageUrls.map((url) => deleteAsset(url)));
 
     refresh(id);
 }
