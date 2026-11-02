@@ -14,3 +14,19 @@ describe("ChatWidget accessibility", () => {
         expect(screen.getByRole("log", { name: "Conversation" })).toBeInTheDocument();
     });
 });
+
+describe("ChatWidget with a modal open", () => {
+    it("closes on Escape normally but ignores Escape meant for an open modal", async () => {
+        const user = userEvent.setup();
+        render(<ChatWidget />);
+        await user.click(screen.getByRole("button", { name: "Open chat" }));
+
+        document.body.dataset.modalOpen = "true";
+        await user.keyboard("{Escape}");
+        expect(screen.getByRole("dialog", { name: "Portfolio assistant chat" })).toBeInTheDocument();
+
+        delete document.body.dataset.modalOpen;
+        await user.keyboard("{Escape}");
+        expect(screen.queryByRole("dialog", { name: "Portfolio assistant chat" })).not.toBeInTheDocument();
+    });
+});

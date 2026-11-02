@@ -326,6 +326,8 @@ body { overflow-x: clip; scroll-behavior: smooth; }
 .site-footer__links { gap: 20px; }
 .site-footer a:hover { color: var(--color-accent) !important; }
 
+/* Any open modal (resume, form result, screenshot viewer) hides the chat so it can't cover the modal's controls; the chat keeps its conversation. */
+body[data-modal-open] .chat-widget { display: none; }
 .portfolio-site [aria-label="Open chat"] { right: 26px; bottom: 24px; left: auto; width: auto; max-width: calc(100vw - 32px); border: 1px solid var(--color-text); border-radius: 0; background: var(--color-text); box-shadow: 0 8px 28px rgba(23, 36, 30, 0.18); color: white; transform: none; }
 .portfolio-site [aria-label="Open chat"] > span:nth-child(1) { color: var(--color-live); }
 .portfolio-site [aria-label="Open chat"] > span:nth-child(2) { color: white; }

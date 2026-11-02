@@ -4,6 +4,25 @@ import { useEffect, useEffectEvent, useRef } from "react";
 
 const FOCUSABLE = 'a[href], button:not([disabled]), input, textarea, select, iframe, [tabindex]:not([tabindex="-1"])';
 
+// Counted rather than a flag so a modal opened over another one (e.g. a
+// result pop-up over a form) doesn't unlock the page when it closes first.
+let openModalCount = 0;
+
+// While any modal is open, <body data-modal-open> lets page-level overlays
+// such as the chat widget step out of the way (see globals.css).
+function lockPage() {
+    openModalCount += 1;
+    document.body.style.overflow = "hidden";
+    document.body.dataset.modalOpen = "true";
+}
+
+function unlockPage() {
+    openModalCount = Math.max(0, openModalCount - 1);
+    if (openModalCount > 0) return;
+    document.body.style.overflow = "";
+    delete document.body.dataset.modalOpen;
+}
+
 // Share dialog scroll locking, keyboard focus handling, and focus restoration.
 export function useModalBehavior(onClose) {
     const dialogRef = useRef(null);
@@ -12,7 +31,7 @@ export function useModalBehavior(onClose) {
     useEffect(() => {
         const dialog = dialogRef.current;
         const previouslyFocused = document.activeElement;
-        document.body.style.overflow = "hidden";
+        lockPage();
         dialog?.querySelector(FOCUSABLE)?.focus();
 
         function handleKeyDown(event) {
@@ -39,7 +58,7 @@ export function useModalBehavior(onClose) {
         window.addEventListener("keydown", handleKeyDown);
         return () => {
             window.removeEventListener("keydown", handleKeyDown);
-            document.body.style.overflow = "";
+            unlockPage();
             previouslyFocused?.focus?.();
         };
     }, []);

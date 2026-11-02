@@ -192,7 +192,8 @@ export default function ChatWidget() {
                 e.preventDefault();
                 setWelcomeMessage(WELCOME_MESSAGES[Math.floor(Math.random() * WELCOME_MESSAGES.length)]);
                 setIsOpen((current) => !current);
-            } else if (e.key === "Escape") {
+            } else if (e.key === "Escape" && !document.body.dataset.modalOpen) {
+                // A modal on top owns Escape; the hidden chat stays as it was.
                 setIsOpen(false);
             }
         }
@@ -250,7 +251,7 @@ export default function ChatWidget() {
                 onClick={handleToggleChat}
                 aria-label="Open chat"
                 aria-expanded={false}
-                className="fixed bottom-6 left-1/2 z-50 flex w-[calc(100vw-2rem)] max-w-[560px] items-center gap-3 rounded-[var(--radius-xl)] border border-[var(--color-border-strong)] bg-[var(--color-raised)] px-4 py-3 shadow-[0_12px_40px_rgba(0,0,0,.5)] transition-colors hover:border-[var(--color-body)]"
+                className="chat-widget fixed bottom-6 left-1/2 z-50 flex w-[calc(100vw-2rem)] max-w-[560px] items-center gap-3 rounded-[var(--radius-xl)] border border-[var(--color-border-strong)] bg-[var(--color-raised)] px-4 py-3 shadow-[0_12px_40px_rgba(0,0,0,.5)] transition-colors hover:border-[var(--color-body)]"
             >
                 <span className="chat-launcher__icon" aria-hidden="true">?</span>
                 <span className="flex-1 truncate text-left font-[family-name:var(--font-mono)] text-sm text-[var(--color-faint)]">
@@ -265,7 +266,7 @@ export default function ChatWidget() {
         <div
             role="dialog"
             aria-label="Portfolio assistant chat"
-            className="fixed bottom-6 left-1/2  z-50 flex h-[560px] max-h-[75vh] w-[calc(100vw-2rem)] max-w-[680px] flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border-strong)] bg-[var(--color-surface)] shadow-[0_24px_80px_rgba(0,0,0,.6)]"
+            className="chat-widget fixed bottom-6 left-1/2 z-50 flex h-[560px] max-h-[75vh] w-[calc(100vw-2rem)] max-w-[680px] flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border-strong)] bg-[var(--color-surface)] shadow-[0_24px_80px_rgba(0,0,0,.6)]"
         >
             <div className="chat-panel__header">
                 <div className="chat-panel__identity">
