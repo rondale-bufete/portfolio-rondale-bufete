@@ -119,6 +119,12 @@ function ProjectRow({ project, index, isFirst, isLast }) {
 }
 
 function ProjectFields({ project }) {
+    const savedImageUrls = project?.image_urls?.length
+        ? project.image_urls
+        : project?.image_url
+          ? [project.image_url]
+          : [];
+
     return (
         <>
             <Field label="Title" name="title" defaultValue={project?.title} required />
@@ -177,15 +183,7 @@ function ProjectFields({ project }) {
             />
             <Field label="Live demo URL" name="live_url" defaultValue={project?.live_url} />
             <Field label="Repo URL" name="repo_url" defaultValue={project?.repo_url} />
-            <ProjectImagesField
-                imageUrls={
-                    project?.image_urls?.length
-                        ? project.image_urls
-                        : project?.image_url
-                          ? [project.image_url]
-                          : []
-                }
-            />
+            <ProjectImagesField imageUrls={savedImageUrls} />
         </>
     );
 }
