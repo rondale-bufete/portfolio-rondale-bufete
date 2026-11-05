@@ -1,22 +1,19 @@
+import { stripOrdinal } from "@/lib/format";
 
-export default function SectionHeader({ label, heading, className = "" }) {
+// Every homepage section opens the same way: a rule draws across and the
+// heading rises into place (globals.css, "section header"). `children` sits
+// opposite the heading, e.g. the project filter.
+export default function SectionHeader({ label, heading, children }) {
+    const title = heading || stripOrdinal(label);
+
     return (
-        <div className={`section-heading mb-8 ${className}`}>
-            {label && (
-                <p className="eyebrow mb-3">
-                    {label}
-                </p>
-            )}
-            {heading && (
-                <h2 className="font-[family-name:var(--font-display)] text-3xl md:text-4xl font-medium tracking-tight text-[var(--color-text)] max-w-xl">
-                    {heading}
+        <div className="section-header" data-reveal>
+            {title && (
+                <h2 className="section-header__title">
+                    <span>{title}</span>
                 </h2>
             )}
+            {children && <div className="section-header__aside">{children}</div>}
         </div>
     );
 }
-
-
-export const container = "max-w-7xl mx-auto px-6";
-
-export const pageShell = `${container} pb-14`;

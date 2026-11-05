@@ -1,168 +1,202 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ResumeModal from "./ResumeModal";
+import { CloseIcon, FacebookIcon, GitHubIcon, InstagramIcon, LinkedInIcon, MenuIcon } from "./icons";
+import { initials, stripOrdinal } from "@/lib/format";
+import { prefersReducedMotion } from "@/lib/motion";
 
-function tabLabel(label) {
-    return (label || "").replace(/^\d+\s*[—-]\s*/, "");
+const FALLBACK_LABELS = { about: "About", projects: "Projects", contact: "Contact", custom: "More" };
+
+// Tabs follow the section order set in the admin, so reordering sections
+// there reorders the nav too. The intro has no tab: the name goes home.
+export function buildTabs(sections = []) {
+    return sections
+        .filter((section) => FALLBACK_LABELS[section.kind])
+        .map((section) => ({
+            anchor: section.kind === "custom" ? `section-${section.id}` : section.kind,
+            label: stripOrdinal(section.label) || FALLBACK_LABELS[section.kind],
+        }));
 }
 
-function handleSlug(name) {
-    return (name || "").trim().split(/\s+/).join(".").toLowerCase() || "rondale.bufete";
+function scrollBehavior() {
+    return prefersReducedMotion() ? "auto" : "smooth";
 }
 
 export default function Navbar({ profile, sections = [] }) {
     const [isOpen, setIsOpen] = useState(false);
     const [showResume, setShowResume] = useState(false);
-    const [activeHash, setActiveHash] = useState("work");
+    const [activeAnchor, setActiveAnchor] = useState("");
     const pathname = usePathname();
+    const isHome = pathname === "/";
+    const tabs = buildTabs(sections);
+    const linksRef = useRef(null);
+    const tabRefs = useRef({});
 
     useEffect(() => {
-        function updateActiveHash() {
-            setActiveHash(window.location.hash.slice(1) || "work");
+        if (!isHome) return;
+        function syncFromHash() {
+            setActiveAnchor(window.location.hash.slice(1));
         }
+        syncFromHash();
+        window.addEventListener("hashchange", syncFromHash);
+        if (!("IntersectionObserver" in window)) return () => window.removeEventListener("hashchange", syncFromHash);
 
-        updateActiveHash();
-        window.addEventListener("hashchange", updateActiveHash);
-        const observer = "IntersectionObserver" in window
-            ? new IntersectionObserver((entries) => {
+        const observer = new IntersectionObserver(
+            (entries) => {
                 const visible = entries
                     .filter((entry) => entry.isIntersecting)
                     .sort((first, second) => first.boundingClientRect.top - second.boundingClientRect.top)[0];
-                if (visible) setActiveHash(visible.target.id);
-            }, { rootMargin: "-20% 0px -65% 0px" })
-            : null;
-        document.querySelectorAll(".portfolio-site main > section[id]").forEach((section) => observer?.observe(section));
-
+                if (visible) setActiveAnchor(visible.target.id === "work" ? "" : visible.target.id);
+            },
+            { rootMargin: "-20% 0px -65% 0px" }
+        );
+        document.querySelectorAll(".portfolio-site main > section[id]").forEach((section) => observer.observe(section));
         return () => {
-            window.removeEventListener("hashchange", updateActiveHash);
-            observer?.disconnect();
+            window.removeEventListener("hashchange", syncFromHash);
+            observer.disconnect();
         };
-    }, []);
+    }, [isHome]);
 
-    const aboutSection = sections.find((s) => s.kind === "about");
-    const projectsSection = sections.find((s) => s.kind === "projects");
-    const contactSection = sections.find((s) => s.kind === "contact");
-    const customSections = sections.filter((s) => s.kind === "custom");
+    // Slide the underline to the active tab; measured from the DOM so it fits any label length.
+    useLayoutEffect(() => {
+        const container = linksRef.current;
+        if (!container) return;
 
-    const sectionHref = (id) => `${pathname === "/" ? "" : "/"}#${id}`;
+        function placeIndicator() {
+            const activeTab = tabRefs.current[activeAnchor];
+            if (!activeTab) {
+                container.style.setProperty("--indicator-opacity", "0");
+                return;
+            }
+            container.style.setProperty("--indicator-x", `${activeTab.offsetLeft}px`);
+            container.style.setProperty("--indicator-width", `${activeTab.offsetWidth}px`);
+            container.style.setProperty("--indicator-opacity", "1");
+        }
 
-    const tabs = [
-        { href: sectionHref("work"), label: "Work" },
-        ...(aboutSection ? [{ href: sectionHref("about"), label: tabLabel(aboutSection.label) || "About" }] : []),
-        ...(projectsSection ? [{ href: sectionHref("projects"), label: tabLabel(projectsSection.label) || "Projects" }] : []),
-        ...customSections.map((section) => ({ href: sectionHref(`section-${section.id}`), label: tabLabel(section.label) || "More" })),
-        ...(contactSection ? [{ href: sectionHref("contact"), label: tabLabel(contactSection.label) || "Contact" }] : []),
-    ];
+        placeIndicator();
+        window.addEventListener("resize", placeIndicator);
+        return () => window.removeEventListener("resize", placeIndicator);
+    }, [activeAnchor, tabs.length]);
 
-    function isActive(href) {
-        return pathname === "/" && activeHash === href.split("#")[1];
+    function hrefFor(anchor) {
+        return `${isHome ? "" : "/"}#${anchor}`;
     }
 
-    function handleLinkClick(event, href) {
+    function handleTabClick(event, anchor) {
         setIsOpen(false);
-        const sectionId = href.split("#")[1] || "work";
-        setActiveHash(sectionId);
+        setActiveAnchor(anchor);
+        if (!isHome) return;
+        event.preventDefault();
+        window.history.pushState(null, "", `#${anchor}`);
+        document.getElementById(anchor)?.scrollIntoView({ behavior: scrollBehavior(), block: "start" });
+    }
 
-        if (href.startsWith("#")) {
-            event.preventDefault();
-            window.history.pushState(null, "", href);
-            document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
+    function handleBrandClick(event) {
+        setIsOpen(false);
+        if (!isHome) return;
+        event.preventDefault();
+        setActiveAnchor("");
+        window.history.replaceState(null, "", "/");
+        window.scrollTo({ top: 0, behavior: scrollBehavior() });
     }
 
     const socials = [
-        profile?.github && { label: "github", href: profile.github },
-        profile?.linkedin && { label: "linkedin", href: profile.linkedin },
-        profile?.facebook && { label: "facebook", href: profile.facebook },
-        profile?.instagram && { label: "instagram", href: profile.instagram },
+        profile?.github && { label: "GitHub", href: profile.github, Icon: GitHubIcon },
+        profile?.linkedin && { label: "LinkedIn", href: profile.linkedin, Icon: LinkedInIcon },
+        profile?.facebook && { label: "Facebook", href: profile.facebook, Icon: FacebookIcon },
+        profile?.instagram && { label: "Instagram", href: profile.instagram, Icon: InstagramIcon },
     ].filter(Boolean);
 
     return (
         <>
             <header className="site-nav">
-                <nav className="site-nav__inner">
-                    <Link href="/" className="site-nav__brand">
-                        <span className="site-nav__monogram" aria-hidden="true">RB</span>
-                        <span className="site-nav__name">{profile?.name || handleSlug(profile?.name)}</span>
+                <nav className="site-nav__inner" aria-label="Main">
+                    <Link href="/" className="site-nav__brand" onClick={handleBrandClick}>
+                        <span className="site-nav__monogram" aria-hidden="true">{initials(profile?.name) || "RB"}</span>
+                        <span className="site-nav__name">{profile?.name}</span>
                     </Link>
 
-                    <div className="site-nav__links">
-                        {tabs.map((tab) => {
-                            const active = isActive(tab.href);
-                            const TabLink = tab.href.startsWith("#") ? "a" : Link;
-                            return (
-                                <TabLink
-                                    key={tab.href}
-                                    href={tab.href}
-                                    onClick={(event) => handleLinkClick(event, tab.href)}
-                                    className={`site-nav__link ${active ? "is-active" : ""}`}
-                                >
-                                    {tab.label.toLowerCase()}
-                                </TabLink>
-                            );
-                        })}
+                    <div ref={linksRef} className="site-nav__links">
+                        {tabs.map((tab) => (
+                            <a
+                                key={tab.anchor}
+                                ref={(node) => {
+                                    tabRefs.current[tab.anchor] = node;
+                                }}
+                                href={hrefFor(tab.anchor)}
+                                onClick={(event) => handleTabClick(event, tab.anchor)}
+                                aria-current={isHome && activeAnchor === tab.anchor ? "location" : undefined}
+                                className={`site-nav__link ${isHome && activeAnchor === tab.anchor ? "is-active" : ""}`}
+                            >
+                                {tab.label}
+                            </a>
+                        ))}
+                        <span className="site-nav__indicator" aria-hidden="true" />
                     </div>
 
                     <div className="site-nav__actions">
-                        {profile?.github && <a href={profile.github} target="_blank" rel="noopener noreferrer" className="site-nav__social">GitHub</a>}
-                        {profile?.linkedin && <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" className="site-nav__social">LinkedIn</a>}
+                        {socials.slice(0, 2).map(({ label, href }) => (
+                            <a key={label} href={href} target="_blank" rel="noopener noreferrer" className="site-nav__social">
+                                {label}
+                            </a>
+                        ))}
                         {profile?.resumeUrl && (
-                            <button onClick={() => setShowResume(true)} className="site-nav__resume">
-                                Resume <span aria-hidden="true">↗</span>
+                            <button type="button" onClick={() => setShowResume(true)} className="site-nav__resume">
+                                Resume
                             </button>
                         )}
                     </div>
 
                     <button
+                        type="button"
                         onClick={() => setIsOpen((open) => !open)}
                         className="site-nav__menu-toggle"
                         aria-label={isOpen ? "Close menu" : "Open menu"}
                         aria-expanded={isOpen}
                     >
-                        <span aria-hidden="true">{isOpen ? "×" : "☰"}</span>
+                        {isOpen ? <CloseIcon size={20} /> : <MenuIcon size={20} />}
                     </button>
                 </nav>
             </header>
 
             {isOpen && (
-                <div className="site-nav__mobile-panel">
-                    <nav className="site-nav__mobile-links">
-                        {tabs.map((tab, index) => {
-                            const active = isActive(tab.href);
-                            const TabLink = tab.href.startsWith("#") ? "a" : Link;
-                            return (
-                                <TabLink
-                                    key={tab.href}
-                                    href={tab.href}
-                                    onClick={(event) => handleLinkClick(event, tab.href)}
-                                    className={`site-nav__mobile-link ${active ? "is-active" : ""}`}
-                                >
-                                    <span>{tab.label.toLowerCase()}</span>
-                                    <span>{String(index + 1).padStart(2, "0")}</span>
-                                </TabLink>
-                            );
-                        })}
+                <div className="site-nav__panel">
+                    <nav className="site-nav__panel-links" aria-label="Main">
+                        {tabs.map((tab, index) => (
+                            <a
+                                key={tab.anchor}
+                                href={hrefFor(tab.anchor)}
+                                onClick={(event) => handleTabClick(event, tab.anchor)}
+                                style={{ "--i": index }}
+                                className={`site-nav__panel-link ${isHome && activeAnchor === tab.anchor ? "is-active" : ""}`}
+                            >
+                                {tab.label}
+                            </a>
+                        ))}
                     </nav>
 
-                    <div className="site-nav__mobile-actions">
+                    <div className="site-nav__panel-actions">
                         {profile?.resumeUrl && (
                             <button
+                                type="button"
                                 onClick={() => {
                                     setShowResume(true);
                                     setIsOpen(false);
                                 }}
                                 className="site-nav__resume"
                             >
-                                Resume <span aria-hidden="true">↗</span>
+                                Resume
                             </button>
                         )}
                         {socials.length > 0 && (
-                            <div className="site-nav__mobile-socials">
-                                {socials.map((social) => (
-                                    <a key={social.label} href={social.href} target="_blank" rel="noopener noreferrer">{social.label}</a>
+                            <div className="site-nav__panel-socials">
+                                {socials.map(({ label, href, Icon }) => (
+                                    <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label}>
+                                        <Icon size={20} />
+                                    </a>
                                 ))}
                             </div>
                         )}

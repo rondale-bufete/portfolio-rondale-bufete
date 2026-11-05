@@ -135,8 +135,8 @@ describe("moveSectionAction", () => {
         supabaseFrom = vi.fn(() => {
             const builder = createQueryBuilder({
                 data: [
-                    { id: "a", sort_order: 0 },
-                    { id: "b", sort_order: 1 },
+                    { id: "a", kind: "about", sort_order: 0 },
+                    { id: "b", kind: "contact", sort_order: 1 },
                 ],
                 error: null,
             });
@@ -146,5 +146,39 @@ describe("moveSectionAction", () => {
 
         await moveSectionAction("b", "down");
         expect(update).not.toHaveBeenCalled();
+    });
+
+    it("swaps with the nearest homepage section, skipping legacy rows", async () => {
+        const updates = [];
+        supabaseFrom = vi.fn(() => {
+            const builder = createQueryBuilder({
+                data: [
+                    { id: "about", kind: "about", sort_order: 0 },
+                    { id: "exp", kind: "experience", sort_order: 1 },
+                    { id: "skills", kind: "skills", sort_order: 2 },
+                    { id: "projects", kind: "projects", sort_order: 3 },
+                    { id: "contact", kind: "contact", sort_order: 4 },
+                ],
+                error: null,
+            });
+            builder.update = vi.fn((values) => {
+                const update = createQueryBuilder();
+                update.eq = vi.fn((column, id) => {
+                    updates.push({ id, ...values });
+                    return update;
+                });
+                return update;
+            });
+            return builder;
+        });
+
+        await moveSectionAction("projects", "up");
+        expect(updates).toEqual(
+            expect.arrayContaining([
+                { id: "projects", sort_order: 0 },
+                { id: "about", sort_order: 3 },
+            ])
+        );
+        expect(updates).toHaveLength(2);
     });
 });

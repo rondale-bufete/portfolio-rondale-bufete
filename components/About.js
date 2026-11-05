@@ -1,196 +1,165 @@
 import Image from "next/image";
-import { pageShell } from "./SectionHeader";
+import { ExternalLinkIcon } from "./icons";
 
-const JUMP_LINKS = [
-    { href: "#about-summary", label: "summary" },
-    { href: "#about-experience", label: "experience" },
-    { href: "#about-skills", label: "skills" },
-    { href: "#about-education", label: "education" },
-    { href: "#about-certifications", label: "certifications" },
-];
+// The intro (tagline and bio) lives in the hero, so About starts at Experience.
+// Jump links only list the parts that have content.
+function jumpLinksFor({ experience, skills, education, certifications }) {
+    return [
+        experience.length > 0 && { href: "#about-experience", label: "Experience" },
+        skills.length > 0 && { href: "#about-skills", label: "Skills" },
+        education.length > 0 && { href: "#about-education", label: "Education" },
+        certifications.length > 0 && { href: "#about-certifications", label: "Certifications" },
+    ].filter(Boolean);
+}
 
-export default function About({
-    profile,
-    experience = [],
-    skills = [],
-    education = [],
-    certifications = [],
-}) {
+function Subsection({ id, title, children }) {
     return (
-        <section id="about" className={`${pageShell} about-page`}>
-            <div className="about-layout grid md:grid-cols-[280px_1fr] gap-10">
-                {/* Sidebar content. */}
-                <div className="about-sidebar md:sticky md:top-24 md:self-start flex flex-col gap-7">
+        <div id={id} className="about__block">
+            <h2 className="about__heading" data-reveal>
+                <span>{title}</span>
+            </h2>
+            {children}
+        </div>
+    );
+}
+
+function CertificationCard({ cert }) {
+    const link = cert.url || cert.pdf;
+    const Wrapper = link ? "a" : "div";
+    const linkProps = link ? { href: link, target: "_blank", rel: "noopener noreferrer" } : {};
+
+    return (
+        <Wrapper {...linkProps} className="cert-card">
+            <span className="cert-card__thumb">
+                {cert.image ? (
+                    <Image src={cert.image} alt={`Certificate: ${cert.title}`} fill sizes="120px" className="cert-card__image" />
+                ) : (
+                    <span className="cert-card__initials" aria-hidden="true">
+                        {(cert.issuer || "cert").slice(0, 2).toUpperCase()}
+                    </span>
+                )}
+            </span>
+            <span className="cert-card__text">
+                <span className="cert-card__title">{cert.title}</span>
+                <span className="cert-card__issuer">{[cert.issuer, cert.date].filter(Boolean).join(", ")}</span>
+                {link && (
+                    <span className="cert-card__action">
+                        {cert.url ? "Verify" : "View PDF"}
+                        <ExternalLinkIcon size={14} />
+                        <span className="sr-only"> (opens in a new tab)</span>
+                    </span>
+                )}
+            </span>
+        </Wrapper>
+    );
+}
+
+export default function About({ profile, experience = [], skills = [], education = [], certifications = [] }) {
+    const jumpLinks = jumpLinksFor({ experience, skills, education, certifications });
+
+    return (
+        <section id="about" className="section about">
+            <div className="container about__layout">
+                <aside className="about__sidebar">
                     {(profile?.email || profile?.location) && (
-                        <div className="about-contact">
-                            {profile.email && <div>{profile.email}</div>}
-                            {profile.location && <div>{profile.location}</div>}
+                        <div className="about__contact">
+                            {profile.email && <a href={`mailto:${profile.email}`}>{profile.email}</a>}
+                            {profile.location && <span>{profile.location}</span>}
                         </div>
                     )}
 
-                    <nav className="about-jump-links flex flex-col gap-0.5 font-[family-name:var(--font-mono)] text-[13px]">
-                        {JUMP_LINKS.map((link, i) => (
-                            <a
-                                key={link.href}
-                                href={link.href}
-                                className="flex items-center justify-between rounded-[var(--radius-md)] px-3 py-2 text-[var(--color-body)] hover:bg-[var(--color-raised)] hover:text-[var(--color-text)] transition-colors"
-                            >
-                                <span>{link.label}</span>
-                                <span className="text-[var(--color-faint)]">{String(i).padStart(2, "0")}</span>
-                            </a>
-                        ))}
-                    </nav>
+                    {jumpLinks.length > 0 && (
+                        <nav className="about__jump" aria-label="About sections">
+                            {jumpLinks.map((link) => (
+                                <a key={link.href} href={link.href}>
+                                    {link.label}
+                                </a>
+                            ))}
+                        </nav>
+                    )}
 
                     {profile?.resumeUrl && (
-                        <a
-                            href={profile.resumeUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="rounded-[var(--radius-md)] border border-[var(--color-border-strong)] py-3 text-center font-[family-name:var(--font-mono)] text-[13px] text-[var(--color-text)] hover:border-[var(--color-body)] transition-colors"
-                        >
-                            View Resume <span aria-hidden="true">↗</span>
+                        <a href={profile.resumeUrl} target="_blank" rel="noopener noreferrer" className="button button--outline about__resume">
+                            View resume
+                            <ExternalLinkIcon size={14} />
                         </a>
                     )}
-                </div>
+                </aside>
 
-                {/* Main content column. */}
-                <div className="about-content flex flex-col gap-16 min-w-0">
-                    <div id="about-summary" className="about-summary scroll-mt-24">
-                        <p className="eyebrow mb-4">{"// summary"}</p>
-                        <h2 className="font-[family-name:var(--font-display)] text-3xl md:text-4xl font-medium tracking-tight text-[var(--color-text)] max-w-xl">
-                            {profile?.tagline}
-                        </h2>
-                        <p className="mt-5 text-[15px] leading-relaxed text-[var(--color-body)] max-w-2xl">
-                            {profile?.bio}
-                        </p>
-                    </div>
-
+                <div className="about__content">
                     {experience.length > 0 && (
-                        <div id="about-experience" className="about-experience scroll-mt-24">
-                            <p className="eyebrow mb-2">{"// 01"}</p>
-                            <h2 className="font-[family-name:var(--font-display)] text-2xl font-medium tracking-tight text-[var(--color-text)] mb-6">
-                                Experience
-                            </h2>
-                            <div className="flex flex-col border-l border-[var(--color-border-strong)] ml-[5px]">
-                                {experience.map((exp, i) => (
-                                    <div key={i} className="relative pl-7 pb-9 last:pb-0">
-                                        <span className="absolute -left-[6px] top-1.5 w-[11px] h-[11px] rounded-full bg-[var(--color-bg)] border-2 border-[var(--color-accent)]" />
-                                        <div className="font-[family-name:var(--font-mono)] text-xs text-[var(--color-accent)] mb-1.5">
-                                            {exp.period}
-                                        </div>
-                                        <div className="font-[family-name:var(--font-display)] text-lg font-medium text-[var(--color-text)]">
-                                            {exp.role}
-                                        </div>
-                                        <div className="mt-1 mb-3.5 text-sm text-[var(--color-muted)]">
-                                            {exp.company}
-                                            {exp.location ? ` · ${exp.location}` : ""}
-                                        </div>
+                        <Subsection id="about-experience" title="Experience">
+                            <ol className="timeline">
+                                {experience.map((exp, index) => (
+                                    <li key={`${exp.company}-${exp.period}-${index}`} className="timeline__item" data-reveal>
+                                        <p className="timeline__period">{exp.period}</p>
+                                        <h3 className="timeline__role">{exp.role}</h3>
+                                        <p className="timeline__company">
+                                            {exp.companyUrl ? (
+                                                <a href={exp.companyUrl} target="_blank" rel="noopener noreferrer">
+                                                    {exp.company}
+                                                </a>
+                                            ) : (
+                                                exp.company
+                                            )}
+                                            {exp.location && <span>{exp.location}</span>}
+                                        </p>
                                         {exp.bullets?.length > 0 && (
-                                            <ul className="space-y-2">
-                                                {exp.bullets.map((bullet, bi) => (
-                                                    <li key={bi} className="grid grid-cols-[16px_1fr] text-[14px] leading-relaxed text-[var(--color-body)]">
-                                                        <span className="font-[family-name:var(--font-mono)] text-[var(--color-faint)]">+</span>
-                                                        <span>{bullet}</span>
-                                                    </li>
+                                            <ul className="timeline__bullets">
+                                                {exp.bullets.map((bullet, bulletIndex) => (
+                                                    <li key={bulletIndex}>{bullet}</li>
                                                 ))}
                                             </ul>
                                         )}
-                                    </div>
+                                    </li>
                                 ))}
-                            </div>
-                        </div>
+                            </ol>
+                        </Subsection>
                     )}
 
                     {skills.length > 0 && (
-                        <div id="about-skills" className="about-skills scroll-mt-24">
-                            <p className="eyebrow mb-2">{"// 02"}</p>
-                            <h2 className="font-[family-name:var(--font-display)] text-2xl font-medium tracking-tight text-[var(--color-text)] mb-6">
-                                Skills
-                            </h2>
-                            <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] overflow-hidden font-[family-name:var(--font-mono)] text-[13px]">
+                        <Subsection id="about-skills" title="Skills">
+                            <dl className="skills" data-reveal>
                                 {skills.map((group) => (
-                                    <div
-                                        key={group.category}
-                                        className="grid sm:grid-cols-[220px_minmax(0,1fr)] gap-3 sm:gap-4 px-4 sm:px-5 py-3.5 border-b border-[var(--color-border)] last:border-b-0 items-baseline"
-                                    >
-                                        <span className="text-[var(--color-muted)]">{group.category}:</span>
-                                        <div className="flex flex-wrap gap-1.5">
-                                            {group.items.map((item) => (
-                                                <span key={item} className="tag tag-neutral">{item}</span>
-                                            ))}
-                                        </div>
+                                    <div key={group.category} className="skills__row">
+                                        <dt>{group.category}</dt>
+                                        <dd>
+                                            <ul className="skills__tags">
+                                                {group.items.map((item) => (
+                                                    <li key={item} className="tech-tag">{item}</li>
+                                                ))}
+                                            </ul>
+                                        </dd>
                                     </div>
                                 ))}
-                            </div>
-                        </div>
+                            </dl>
+                        </Subsection>
                     )}
 
                     {education.length > 0 && (
-                        <div id="about-education" className="about-education scroll-mt-24">
-                            <p className="eyebrow mb-2">{"// 03"}</p>
-                            <h2 className="font-[family-name:var(--font-display)] text-2xl font-medium tracking-tight text-[var(--color-text)] mb-6">
-                                Education
-                            </h2>
-                            <div className="grid sm:grid-cols-2 gap-4">
-                                {education.map((edu, i) => (
-                                    <div key={i} className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-[18px]">
-                                        <div className="font-[family-name:var(--font-mono)] text-[11px] text-[var(--color-faint)] mb-2.5">
-                                            {edu.period}
-                                        </div>
-                                        <div className="font-[family-name:var(--font-display)] text-base font-medium text-[var(--color-text)] leading-snug">
-                                            {edu.degree}
-                                        </div>
-                                        <div className="mt-1.5 text-[13px] text-[var(--color-muted)]">
-                                            {edu.school}
-                                        </div>
-                                    </div>
+                        <Subsection id="about-education" title="Education">
+                            <ul className="education" data-reveal>
+                                {education.map((edu, index) => (
+                                    <li key={`${edu.school}-${index}`} className="education__item">
+                                        <span className="education__degree">{edu.degree}</span>
+                                        <span className="education__school">{edu.school}</span>
+                                        <span className="education__period">{edu.period}</span>
+                                    </li>
                                 ))}
-                            </div>
-                        </div>
+                            </ul>
+                        </Subsection>
                     )}
 
                     {certifications.length > 0 && (
-                        <div id="about-certifications" className="about-certifications scroll-mt-24">
-                            <p className="eyebrow mb-2">{"// 04"}</p>
-                            <h2 className="font-[family-name:var(--font-display)] text-2xl font-medium tracking-tight text-[var(--color-text)] mb-6">
-                                Certifications
-                            </h2>
-                            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                {certifications.map((cert, i) => {
-                                    const link = cert.url || cert.pdf;
-                                    const Wrapper = link ? "a" : "div";
-                                    const linkProps = link ? { href: link, target: "_blank", rel: "noopener noreferrer" } : {};
-                                    return (
-                                        <Wrapper
-                                            key={i}
-                                            {...linkProps}
-                                            className="flex flex-col gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4 transition-colors hover:border-[var(--color-border-strong)]"
-                                        >
-                                            {cert.image ? (
-                                                <div className="about-cert__thumb relative aspect-[3/2] overflow-hidden rounded-[var(--radius-md)] bg-[var(--color-raised)]">
-                                                    <Image
-                                                        src={cert.image}
-                                                        alt={`Certificate: ${cert.title}`}
-                                                        fill
-                                                        sizes="(min-width: 1024px) 300px, (min-width: 640px) 45vw, 90vw"
-                                                        className="object-contain"
-                                                    />
-                                                </div>
-                                            ) : (
-                                                <div className="about-cert__thumb flex aspect-[3/2] items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-raised)] font-[family-name:var(--font-mono)] text-xs text-[var(--color-faint)]">
-                                                    {(cert.issuer || "cert").slice(0, 2).toUpperCase()}
-                                                </div>
-                                            )}
-                                            <div className="text-sm font-medium leading-snug text-[var(--color-text)]">{cert.title}</div>
-                                            <div className="mt-auto flex items-center justify-between font-[family-name:var(--font-mono)] text-[11px] text-[var(--color-muted)]">
-                                                <span>{cert.issuer}</span>
-                                                {link && <span className="text-[var(--color-accent)]">{cert.url ? "verify ↗" : "view pdf"}</span>}
-                                            </div>
-                                        </Wrapper>
-                                    );
-                                })}
-                            </div>
-                        </div>
+                        <Subsection id="about-certifications" title="Certifications">
+                            <ul className="certs" data-reveal>
+                                {certifications.map((cert, index) => (
+                                    <li key={`${cert.title}-${index}`} style={{ "--i": index }}>
+                                        <CertificationCard cert={cert} />
+                                    </li>
+                                ))}
+                            </ul>
+                        </Subsection>
                     )}
                 </div>
             </div>

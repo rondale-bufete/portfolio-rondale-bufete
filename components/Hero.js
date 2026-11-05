@@ -1,75 +1,138 @@
-import Link from "next/link";
+import { Fragment } from "react";
 import Image from "next/image";
-import { pageShell } from "./SectionHeader";
+import PointerSpotlight from "./motion/PointerSpotlight";
+import { ArrowDownIcon } from "./icons";
+import { initials } from "@/lib/format";
 
-function statusSlug(label) {
-    return (label || "").trim().toLowerCase().replace(/\s+/g, "_") || "open_to_work";
+// Numbers like "300+", "+60%" or "200+" count up on load; anything else
+// (a comma, a decimal, plain text) is shown as written.
+const COUNTABLE_STAT = /^(\D*?)(\d{1,6})(\D*)$/;
+
+function sentenceCase(text) {
+    const value = (text || "").trim().toLowerCase();
+    return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
-export default function Hero({ profile, projects = [], education = [], skills = [] }) {
+// Each word rises from behind its own clipping line, one after another.
+function RevealWords({ text, startDelay = 0, step = 90 }) {
+    return (text || "")
+        .split(/\s+/)
+        .filter(Boolean)
+        .map((word, index) => (
+            <Fragment key={`${word}-${index}`}>
+                {index > 0 && " "}
+                <span className="word-reveal">
+                    <span style={{ "--delay": `${startDelay + index * step}ms` }}>{word}</span>
+                </span>
+            </Fragment>
+        ));
+}
+
+// The count is drawn by CSS (a registered custom property animated from 0),
+// so it needs no JavaScript and can't flash the wrong number; screen readers
+// get the plain value.
+function StatValue({ value, index }) {
+    const match = value.match(COUNTABLE_STAT);
+    if (!match) return <strong className="hero-stats__value">{value}</strong>;
+
+    const [, prefix, digits, suffix] = match;
+    return (
+        <strong className="hero-stats__value">
+            <span className="sr-only">{value}</span>
+            <span aria-hidden="true">
+                {prefix}
+                <span className="count-up" style={{ "--count-to": Number(digits), "--delay": `${650 + index * 120}ms` }} />
+                {suffix}
+            </span>
+        </strong>
+    );
+}
+
+export default function Hero({ profile, projects = [], skills = [] }) {
     if (!profile) return null;
 
     const coreStack = skills.flatMap((group) => group.items).slice(0, 6);
-    const topProjects = projects.slice(0, 3);
-    const heroImage = profile.photo || topProjects[0]?.imageUrl;
+    const stats = profile.stats ?? [];
+    const heroImage = profile.photo || projects[0]?.imageUrl;
 
     return (
-        <section id="work" className={`${pageShell} home-page`}>
-            <div className="home-hero">
-                <div className="home-hero__copy">
-                    <div className="home-hero__eyebrow">
-                        <span className={`home-hero__availability ${profile.available ? "is-available" : ""}`} />
-                        {profile.role || "Full-stack developer"}
-                        {profile.available && <span className="home-hero__status">{statusSlug(profile.statusLabel).replaceAll("_", " ")}</span>}
+        <section id="work" className="hero" aria-labelledby="hero-title">
+            <PointerSpotlight />
+            <div className="container hero__inner">
+                <div className="hero__copy">
+                    <div className="hero__meta">
+                        {profile.role && <p className="hero__role">{profile.role}</p>}
+                        {profile.available && (
+                            <p className="hero__status">
+                                <span className="hero__status-dot" aria-hidden="true" />
+                                {sentenceCase(profile.statusLabel) || "Open to work"}
+                            </p>
+                        )}
                     </div>
-                    <h1 className="home-hero__title">{profile.name}</h1>
-                    <p className="home-hero__tagline">{profile.tagline}</p>
-                    <p className="home-hero__bio">{profile.bio}</p>
-                    <div className="home-hero__actions">
-                        <Link href="/#projects" className="home-button home-button--primary">
-                            Explore selected work <span aria-hidden="true">↗</span>
-                        </Link>
-                        <Link href="/#about" className="home-button home-button--text">
-                            More about me <span aria-hidden="true">→</span>
-                        </Link>
+
+                    <h1 id="hero-title" className="hero__title">
+                        <RevealWords text={profile.name} startDelay={120} />
+                    </h1>
+                    {profile.tagline && <p className="hero__tagline">{profile.tagline}</p>}
+                    {profile.bio && <p className="hero__bio">{profile.bio}</p>}
+
+                    <div className="hero__actions">
+                        <a href="#projects" className="button button--primary">
+                            View my projects
+                            <ArrowDownIcon size={16} />
+                        </a>
+                        <a href="#about" className="button button--ghost">
+                            About me
+                        </a>
                     </div>
+
                     {coreStack.length > 0 && (
-                        <div className="home-hero__stack" aria-label="Core technologies">
-                            {coreStack.map((item) => <span key={item}>{item}</span>)}
-                        </div>
+                        <ul className="hero__stack" aria-label="Core technologies">
+                            {coreStack.map((item, index) => (
+                                <li key={item} className="tech-tag" style={{ "--i": index }}>
+                                    {item}
+                                </li>
+                            ))}
+                        </ul>
                     )}
                 </div>
 
-                <div className="home-hero__visual">
-                    <div className={`home-hero__image-wrap ${profile.photo ? "is-portrait" : "is-project-preview"}`}>
+                <figure className="hero__portrait">
+                    <div className="hero__frame">
                         {heroImage ? (
                             <Image
                                 src={heroImage}
-                                alt={profile.photo ? `${profile.name} portrait` : `${topProjects[0]?.title} project preview`}
+                                alt={profile.photo ? `${profile.name} portrait` : `${projects[0]?.title} project preview`}
                                 fill
-                                priority
-                                sizes="(max-width: 760px) 90vw, 44vw"
-                                className="home-hero__image"
+                                preload
+                                sizes="(max-width: 700px) 90vw, 40vw"
+                                className="hero__image"
                             />
                         ) : (
-                            <div className="home-hero__initials" aria-hidden="true">
-                                {profile.name.split(/\s+/).slice(0, 2).map((part) => part[0]).join("")}
+                            <div className="hero__initials" aria-hidden="true">
+                                {initials(profile.name)}
                             </div>
                         )}
                     </div>
-                    <div className="home-hero__caption">
-                        <span>Currently based</span>
-                        <span>{profile.location || "Available worldwide"}</span>
-                    </div>
-                </div>
+                    {profile.location && (
+                        <figcaption className="hero__location">
+                            <span>Based in</span> {profile.location}
+                        </figcaption>
+                    )}
+                </figure>
             </div>
 
-            <div className="home-stats" aria-label="Portfolio overview">
-                <div><strong>{String(projects.length).padStart(2, "0")}</strong><span>Selected projects</span></div>
-                <div><strong>{String(education.length).padStart(2, "0")}</strong><span>Qualifications</span></div>
-                <div><strong>{String(coreStack.length).padStart(2, "0")}</strong><span>Core technologies</span></div>
-                <p>Thoughtful work, built with care.</p>
-            </div>
+            {stats.length > 0 && (
+                <div className="container">
+                    <ul className="hero-stats" aria-label="Highlights">
+                        {stats.map((stat, index) => (
+                            <li key={`${stat.value}-${stat.label}`}>
+                                <StatValue value={stat.value} index={index} /> <span>{stat.label}</span>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
         </section>
     );
 }

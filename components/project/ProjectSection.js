@@ -4,7 +4,7 @@ export default function ProjectSection({ id, title, children }) {
     const headingId = `${id}-heading`;
 
     return (
-        <section id={id} className="project-section" aria-labelledby={headingId}>
+        <section id={id} className="project-section" aria-labelledby={headingId} data-reveal>
             <h2 id={headingId} className="project-section__title">{title}</h2>
             <div className="project-section__body">{children}</div>
         </section>

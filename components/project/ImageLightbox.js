@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useEffectEvent } from "react";
 import { useModalBehavior } from "../useModalBehavior";
-import { ArrowLeftIcon, ArrowRightIcon, CloseIcon } from "./icons";
+import { ArrowLeftIcon, ArrowRightIcon, CloseIcon } from "../icons";
 
 export default function ImageLightbox({ images, title, index, onIndexChange, onClose }) {
     const dialogRef = useModalBehavior(onClose);

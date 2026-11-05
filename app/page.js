@@ -33,7 +33,7 @@ export default async function Home() {
             {personJsonLd && (
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(personJsonLd) }} />
             )}
-            <Hero profile={profile} projects={projects} education={education} skills={skills} />
+            <Hero profile={profile} projects={projects} skills={skills} />
             {sections.map((section) => {
                 if (section.kind === "about") {
                     return (

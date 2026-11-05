@@ -23,3 +23,12 @@ describe("About certifications", () => {
         expect(link).not.toHaveAttribute("download");
     });
 });
+
+describe("About intro", () => {
+    it("doesn't repeat the tagline and bio already shown in the hero", () => {
+        render(<About profile={{ tagline: "I build systems.", bio: "Long bio text." }} experience={[{ role: "Developer", company: "Acme", period: "2025", bullets: [] }]} />);
+        expect(screen.queryByText("I build systems.")).not.toBeInTheDocument();
+        expect(screen.queryByText("Long bio text.")).not.toBeInTheDocument();
+        expect(screen.getByRole("link", { name: /experience/i })).toHaveAttribute("href", "#about-experience");
+    });
+});

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { supabaseAdmin, uploadAsset, deleteAsset } from "@/lib/supabase/admin";
 import { requireAdmin } from "@/lib/auth";
 import { isValidEmail, isValidUrl } from "@/lib/validation";
+import { parseStatsForm } from "@/lib/profileStats";
 
 export async function updateProfileAction(formData) {
     await requireAdmin();
@@ -19,6 +20,9 @@ export async function updateProfileAction(formData) {
     if (!isValidUrl(linkedin)) throw new Error("LinkedIn URL must be a valid http(s) link.");
     if (!isValidUrl(facebook)) throw new Error("Facebook URL must be a valid http(s) link.");
     if (!isValidUrl(instagram)) throw new Error("Instagram URL must be a valid http(s) link.");
+    // Only present once the profile_stats migration has run (the form hides the
+    // inputs until then), so older databases keep saving without the column.
+    const stats = formData.has("stat_value_1") ? parseStatsForm(formData) : undefined;
 
     const photoFile = formData.get("photo");
     const resumeFile = formData.get("resume");
@@ -48,6 +52,7 @@ export async function updateProfileAction(formData) {
         open_to: formData.get("open_to")?.toString() || "",
         status_label: formData.get("status_label")?.toString() || "OPEN TO WORK",
         available: formData.get("available") === "on",
+        ...(stats && { stats }),
         updated_at: new Date().toISOString(),
     };
 

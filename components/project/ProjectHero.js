@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { provenanceLabel } from "@/lib/projectDetail";
-import { ArrowLeftIcon, ExternalLinkIcon } from "./icons";
+import Morph from "../motion/Morph";
+import { ArrowLeftIcon, ExternalLinkIcon } from "../icons";
 
 // Past this length the lead drops to body size, so a description written
 // as one long paragraph doesn't turn into a wall of large text.
@@ -39,7 +40,9 @@ export default function ProjectHero({ project, lead }) {
 
             <div className="project-hero__body">
                 <div className="project-hero__intro">
-                    <h1 className="project-hero__title">{project.title}</h1>
+                    <Morph name={`project-title-${project.id}`}>
+                        <h1 className="project-hero__title">{project.title}</h1>
+                    </Morph>
 
                     {lead && (
                         <p className={`project-hero__lead ${lead.length > LONG_LEAD_LENGTH ? "is-long" : ""}`}>{lead}</p>
@@ -77,7 +80,7 @@ export default function ProjectHero({ project, lead }) {
                             <dd>
                                 <ul className="project-facts__tags">
                                     {project.tags.map((tag) => (
-                                        <li key={tag} className="tag">{tag}</li>
+                                        <li key={tag} className="tech-tag">{tag}</li>
                                     ))}
                                 </ul>
                             </dd>

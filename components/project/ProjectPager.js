@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { ArrowLeftIcon, ArrowRightIcon } from "./icons";
+import { ArrowLeftIcon, ArrowRightIcon } from "../icons";
 
 export default function ProjectPager({ previous, next }) {
     if (!previous && !next) return null;
 
     return (
-        <nav className="project-pager" aria-label="More projects">
+        <nav className="project-pager" aria-label="More projects" data-reveal>
             {previous ? (
                 <Link href={`/projects/${previous.id}`} className="project-pager__link">
                     <span className="project-pager__label">

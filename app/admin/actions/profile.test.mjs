@@ -170,3 +170,38 @@ describe("setChatWidgetVisibilityAction", () => {
         expect(revalidatePath).not.toHaveBeenCalled();
     });
 });
+
+describe("updateProfileAction headline numbers", () => {
+    let upsert;
+    beforeEach(() => {
+        mockIsAuthed.mockResolvedValue(true);
+        mockUploadAsset.mockReset();
+        mockUploadAsset.mockResolvedValue(null);
+        upsert = vi.fn(() => Promise.resolve({ data: null, error: null }));
+        supabaseFrom = vi.fn(() => {
+            const builder = createQueryBuilder({ data: null, error: null });
+            builder.upsert = upsert;
+            return builder;
+        });
+    });
+
+    it("saves the filled-in numbers when the form has the fields", async () => {
+        await updateProfileAction(
+            formDataOf({ ...baseFields, stat_value_1: "300+", stat_label_1: "subscriber accounts", stat_value_2: "", stat_label_2: "", stat_value_3: "", stat_label_3: "" })
+        );
+        expect(upsert.mock.calls[0][0].stats).toEqual([{ value: "300+", label: "subscriber accounts" }]);
+    });
+
+    it("leaves stats out of the save when the form has no stat fields (migration not run yet)", async () => {
+        await updateProfileAction(formDataOf(baseFields));
+        expect(upsert.mock.calls[0][0]).not.toHaveProperty("stats");
+    });
+
+    it("rejects a half-filled row before uploading or saving anything", async () => {
+        await expect(updateProfileAction(formDataOf({ ...baseFields, stat_value_1: "60%", stat_label_1: "" }))).rejects.toThrow(
+            "needs both a number and a label"
+        );
+        expect(mockUploadAsset).not.toHaveBeenCalled();
+        expect(upsert).not.toHaveBeenCalled();
+    });
+});

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import ImageLightbox from "./ImageLightbox";
-import { ArrowLeftIcon, ArrowRightIcon } from "./icons";
+import { ArrowLeftIcon, ArrowRightIcon } from "../icons";
 
 // Every screenshot is drawn at the same height and keeps its own width, so
 // tall phone captures sit side by side while wide web captures fill the

@@ -6,6 +6,33 @@ import Field from "../../ui/Field";
 import ErrorState from "../../ui/ErrorState";
 import AdminActionForm from "../../ui/AdminActionForm";
 import { labelBase, buttonPrimary } from "../../ui/tokens";
+import { MAX_STATS, normalizeStats } from "@/lib/profileStats";
+
+function HeadlineNumbersFields({ profile }) {
+    // select("*") omits the column until the profile_stats migration runs.
+    if (!profile || !("stats" in profile)) {
+        return (
+            <p className="text-xs text-[var(--color-faint)]">
+                Run supabase/profile_stats_migration.sql in the Supabase SQL Editor to add headline numbers under your intro.
+            </p>
+        );
+    }
+
+    const stats = normalizeStats(profile.stats);
+    const rows = Array.from({ length: MAX_STATS }, (_, index) => index + 1);
+
+    return (
+        <fieldset className="space-y-3">
+            <legend className={labelBase}>Headline numbers (shown under your intro; leave a row empty to skip it)</legend>
+            {rows.map((row) => (
+                <div key={row} className="grid grid-cols-[120px_minmax(0,1fr)] gap-3">
+                    <Field label={`Number ${row}`} name={`stat_value_${row}`} defaultValue={stats[row - 1]?.value} placeholder="300+" />
+                    <Field label={`Label ${row}`} name={`stat_label_${row}`} defaultValue={stats[row - 1]?.label} placeholder="subscriber accounts managed" />
+                </div>
+            ))}
+        </fieldset>
+    );
+}
 
 export default async function ProfileAdminPage() {
     const { data: profile, error } = await supabaseAdmin.from("profile").select("*").eq("id", 1).maybeSingle();
@@ -65,6 +92,8 @@ export default async function ProfileAdminPage() {
                         name="status_label"
                         defaultValue={profile?.status_label || "OPEN TO WORK"}
                     />
+
+                    <HeadlineNumbersFields profile={profile} />
 
                     <div>
                         <label className={labelBase}>Photo</label>

@@ -2,107 +2,212 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
-import SectionHeader, { pageShell } from "./SectionHeader";
-import { stripProtocol } from "@/lib/format";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import SectionHeader from "./SectionHeader";
+import Morph from "./motion/Morph";
+import { ArrowRightIcon, GitHubIcon } from "./icons";
+import { splitParagraphs, stripProtocol, truncate } from "@/lib/format";
+import { hasFinePointer, prefersReducedMotion } from "@/lib/motion";
+import { provenanceLabel } from "@/lib/projectDetail";
 
 const PROVENANCE_ORDER = ["Client", "Personal"];
+// The first projects in admin order get the large treatment under "All".
+const FEATURED_COUNT = 2;
 
-function ProjectCard({ project, index }) {
+function summaryOf(project, maxLength) {
+    return truncate(splitParagraphs(project.description)[0], maxLength);
+}
+
+function TagList({ tags, limit }) {
+    const shown = tags.slice(0, limit);
+    const hidden = tags.length - shown.length;
+    if (shown.length === 0) return null;
+
+    return (
+        <ul className="project-tags" aria-label="Built with">
+            {shown.map((tag) => (
+                <li key={tag} className="tech-tag">{tag}</li>
+            ))}
+            {hidden > 0 && <li className="tech-tag tech-tag--more">+{hidden}</li>}
+        </ul>
+    );
+}
+
+function ProjectMeta({ project }) {
+    return (
+        <p className="project-meta">
+            <span>{provenanceLabel(project.provenance)}</span>
+            {project.year && <span>{project.year}</span>}
+        </p>
+    );
+}
+
+function ProjectCover({ project, sizes, className }) {
+    return (
+        <div className={className}>
+            {project.imageUrl ? (
+                <Image src={project.imageUrl} alt="" fill sizes={sizes} className="project-cover" />
+            ) : (
+                <div className="project-cover project-cover--empty" aria-hidden="true" />
+            )}
+        </div>
+    );
+}
+
+function FeaturedProject({ project, index }) {
     return (
         <Link
             href={`/projects/${project.id}`}
-            className="project-card flex flex-col rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] overflow-hidden transition-colors hover:border-[var(--color-border-strong)]"
+            className={`featured-project ${index % 2 === 1 ? "featured-project--flip" : ""}`}
+            data-reveal
         >
-            <div className="project-card__image relative aspect-video bg-[var(--color-raised)]">
-                {project.imageUrl ? (
-                    <Image src={project.imageUrl} alt={project.title} fill className="object-cover object-top" sizes="(min-width: 1024px) 33vw, 100vw" />
-                ) : (
-                    <div className="absolute inset-0 flex items-center justify-center font-[family-name:var(--font-mono)] text-[11px] text-[var(--color-faint)]">
-                        [ preview unavailable ]
-                    </div>
-                )}
-            </div>
-            <div className="project-card__content p-5 flex flex-col gap-2">
-                <div className="flex items-center justify-between font-[family-name:var(--font-mono)] text-[11px] text-[var(--color-muted)]">
-                    <span>
-                        {String(index + 1).padStart(2, "0")} · <span className="text-[var(--color-accent)]">{project.provenance.toLowerCase()}</span>
-                    </span>
-                    <span>{project.year || ""}</span>
-                </div>
-                <div className="font-[family-name:var(--font-display)] text-lg font-medium tracking-tight text-[var(--color-text)]">
-                    {project.title}
-                </div>
-                <div className="text-sm text-[var(--color-body)] leading-relaxed line-clamp-2">{project.description}</div>
-                <div className="font-[family-name:var(--font-mono)] text-[11px] text-[var(--color-faint)] truncate">
-                    {project.tags.join(" · ")}
-                </div>
+            <ProjectCover project={project} sizes="(min-width: 900px) 58vw, 100vw" className="featured-project__media" />
+            <div className="featured-project__body">
+                <ProjectMeta project={project} />
+                <Morph name={`project-title-${project.id}`}>
+                    <h3 className="featured-project__title">{project.title}</h3>
+                </Morph>
+                <p className="featured-project__summary">{summaryOf(project, 220)}</p>
+                {project.outcome && <p className="featured-project__outcome">{project.outcome}</p>}
+                <TagList tags={project.tags} limit={4} />
+                <span className="featured-project__cta">
+                    Read the case study
+                    <ArrowRightIcon size={16} />
+                </span>
             </div>
         </Link>
     );
 }
 
-export default function Projects({ projects = [], profile, label = "03 — Projects", heading = "Things I’ve built" }) {
+// Tilts the card toward the pointer and moves a soft glare with it, by
+// writing CSS variables directly (no React state, no re-render per move).
+function tiltToward(event) {
+    if (event.pointerType !== "mouse" || prefersReducedMotion() || !hasFinePointer()) return;
+    const card = event.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const x = (event.clientX - rect.left) / rect.width;
+    const y = (event.clientY - rect.top) / rect.height;
+    card.style.setProperty("--tilt-x", `${((0.5 - y) * 6).toFixed(2)}deg`);
+    card.style.setProperty("--tilt-y", `${((x - 0.5) * 8).toFixed(2)}deg`);
+    card.style.setProperty("--glare-x", `${(x * 100).toFixed(1)}%`);
+    card.style.setProperty("--glare-y", `${(y * 100).toFixed(1)}%`);
+}
+
+function resetTilt(event) {
+    const card = event.currentTarget;
+    ["--tilt-x", "--tilt-y", "--glare-x", "--glare-y"].forEach((property) => card.style.removeProperty(property));
+}
+
+function ProjectCard({ project, index }) {
+    return (
+        <li className="project-grid__item" style={{ "--i": index }}>
+            <Link href={`/projects/${project.id}`} className="project-card" onPointerMove={tiltToward} onPointerLeave={resetTilt}>
+                <ProjectCover project={project} sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 100vw" className="project-card__media" />
+                <div className="project-card__body">
+                    <ProjectMeta project={project} />
+                    <Morph name={`project-title-${project.id}`}>
+                        <h3 className="project-card__title">{project.title}</h3>
+                    </Morph>
+                    <p className="project-card__summary">{summaryOf(project, 130)}</p>
+                    <TagList tags={project.tags} limit={3} />
+                </div>
+            </Link>
+        </li>
+    );
+}
+
+// Segmented filter with a pill that slides to the selected option.
+function ProjectFilter({ options, counts, value, onChange }) {
+    const groupRef = useRef(null);
+
+    useLayoutEffect(() => {
+        const group = groupRef.current;
+        if (!group) return;
+
+        function placePill() {
+            const selected = group.querySelector('[aria-pressed="true"]');
+            if (!selected) return;
+            group.style.setProperty("--pill-x", `${selected.offsetLeft}px`);
+            group.style.setProperty("--pill-width", `${selected.offsetWidth}px`);
+        }
+
+        placePill();
+        const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(placePill);
+        observer?.observe(group);
+        return () => observer?.disconnect();
+    }, [value]);
+
+    return (
+        <div ref={groupRef} className="project-filter" role="group" aria-label="Filter projects">
+            <span className="project-filter__pill" aria-hidden="true" />
+            {options.map((option) => {
+                const count = counts[option] || 0;
+                return (
+                    <button
+                        key={option}
+                        type="button"
+                        onClick={() => onChange(option)}
+                        aria-label={`${option} ${count}`}
+                        aria-pressed={value === option}
+                        disabled={count === 0}
+                        className="project-filter__option"
+                    >
+                        {option} <span className="project-filter__count">{count}</span>
+                    </button>
+                );
+            })}
+        </div>
+    );
+}
+
+export default function Projects({ projects = [], profile, label = "Projects", heading = "Things I’ve built" }) {
     const [filter, setFilter] = useState("All");
 
     const counts = useMemo(() => {
         const byProvenance = { All: projects.length };
-        for (const p of PROVENANCE_ORDER) byProvenance[p] = 0;
         for (const project of projects) {
             byProvenance[project.provenance] = (byProvenance[project.provenance] || 0) + 1;
         }
         return byProvenance;
     }, [projects]);
 
-    const filtered = filter === "All" ? projects : projects.filter((p) => p.provenance === filter);
+    const filtered = filter === "All" ? projects : projects.filter((project) => project.provenance === filter);
+    const featured = filter === "All" ? filtered.slice(0, FEATURED_COUNT) : [];
+    const rest = filter === "All" ? filtered.slice(FEATURED_COUNT) : filtered;
 
     return (
-        <section id="projects" className={`${pageShell} projects-page`}>
-            <div className="projects-heading flex flex-col lg:flex-row lg:items-end justify-between gap-4 mb-10">
-                <SectionHeader label={label} heading={heading} className="mb-0" />
-                <div className="projects-filter flex flex-wrap gap-1 rounded-[var(--radius-md)] border border-[var(--color-border)] p-1 font-[family-name:var(--font-mono)] text-[13px]">
-                    {["All", ...PROVENANCE_ORDER].map((p) => {
-                        const count = p === "All" ? counts.All : counts[p] || 0;
-                        const active = filter === p;
-                        return (
-                            <button
-                                key={p}
-                                onClick={() => setFilter(p)}
-                                aria-label={`${p} ${count}`}
-                                aria-pressed={active}
-                                disabled={count === 0}
-                                className={`projects-filter__button rounded-[4px] px-3.5 py-1.5 whitespace-nowrap transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
-                                    active ? "bg-[var(--color-accent)] text-[var(--color-bg)]" : "text-[var(--color-body)] hover:text-[var(--color-text)]"
-                                }`}
-                            >
-                                {p} <span className="projects-filter__count">{count}</span>
-                            </button>
-                        );
-                    })}
-                </div>
-            </div>
+        <section id="projects" className="section projects">
+            <div className="container">
+                <SectionHeader label={label} heading={heading}>
+                    <ProjectFilter options={["All", ...PROVENANCE_ORDER]} counts={counts} value={filter} onChange={setFilter} />
+                </SectionHeader>
 
-            <div className="project-grid grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {filtered.map((project, i) => (
-                    <ProjectCard key={project.id} project={project} index={i} />
-                ))}
-
-                {filtered.length === 0 && (
-                    <p className="col-span-full py-8 text-center text-sm text-[var(--color-faint)]">
-                        No projects match this filter yet.
-                    </p>
+                {featured.length > 0 && (
+                    <div className="featured-projects">
+                        {featured.map((project, index) => (
+                            <FeaturedProject key={project.id} project={project} index={index} />
+                        ))}
+                    </div>
                 )}
 
-                {profile?.github && (
-                    <a
-                        href={profile.github}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="project-card project-card--github flex flex-col justify-center gap-2.5 rounded-[var(--radius-lg)] border border-dashed border-[var(--color-border-strong)] p-6 font-[family-name:var(--font-mono)] text-[13px] text-[var(--color-body)] transition-colors hover:border-[var(--color-body)]"
-                    >
-                        <span>More on GitHub</span>
-                        <span className="text-[var(--color-text)]">{stripProtocol(profile.github)} ↗</span>
-                    </a>
+                {filtered.length === 0 && <p className="projects__empty">No projects match this filter yet.</p>}
+
+                {(rest.length > 0 || profile?.github) && (
+                    // Keyed by filter so a new selection remounts the grid and its cards re-enter in sequence.
+                    <ul key={filter} className="project-grid" data-reveal>
+                        {rest.map((project, index) => (
+                            <ProjectCard key={project.id} project={project} index={index} />
+                        ))}
+                        {profile?.github && (
+                            <li className="project-grid__item" style={{ "--i": rest.length }}>
+                                <a href={profile.github} target="_blank" rel="noopener noreferrer" className="project-card project-card--github">
+                                    <GitHubIcon size={28} />
+                                    <span className="project-card--github__title">More on GitHub</span>
+                                    <span className="project-card--github__handle">{stripProtocol(profile.github)}</span>
+                                </a>
+                            </li>
+                        )}
+                    </ul>
                 )}
             </div>
         </section>

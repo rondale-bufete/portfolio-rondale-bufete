@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Projects from "./Projects";
 
@@ -53,6 +53,25 @@ describe("Projects", () => {
     it("does not render the GitHub callout when the profile has no github url", () => {
         render(<Projects projects={projects} profile={{}} />);
         expect(screen.queryByText(/more on github/i)).not.toBeInTheDocument();
+    });
+
+    it("gives the first two projects the large case-study layout, with the outcome", () => {
+        render(<Projects projects={[{ ...projects[0], outcome: "Cut billing time in half" }, projects[1], projects[2]]} />);
+
+        const featured = screen.getAllByRole("link", { name: /read the case study/i });
+        expect(featured).toHaveLength(2);
+        expect(featured[0]).toHaveAttribute("href", "/projects/1");
+        expect(within(featured[0]).getByText("Cut billing time in half")).toBeInTheDocument();
+        expect(screen.getByRole("link", { name: /Side Project/ })).not.toHaveTextContent(/read the case study/i);
+    });
+
+    it("shows at most three tags on a card and counts the rest", () => {
+        const tagged = { id: "4", title: "Tagged", description: "Lots of tools", tags: ["A", "B", "C", "D", "E"], provenance: "Personal", year: "2022", outcome: "" };
+        render(<Projects projects={[...projects, tagged]} />);
+
+        const card = screen.getByRole("link", { name: /Tagged/ });
+        expect(within(card).getByText("+2")).toBeInTheDocument();
+        expect(within(card).queryByText("D")).not.toBeInTheDocument();
     });
 
     it("renders the GitHub callout when the profile has a github url", () => {

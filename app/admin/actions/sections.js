@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { moveItem, nextSortOrder } from "@/lib/supabase/reorder";
+import { HOMEPAGE_SECTION_KINDS } from "@/lib/sectionKinds";
 import { requireAdmin } from "@/lib/auth";
 
 function refresh() {
@@ -12,7 +13,8 @@ function refresh() {
 
 export async function moveSectionAction(id, direction) {
     await requireAdmin();
-    await moveItem("sections", id, direction);
+    // Only homepage sections take part, so one click always moves a section past a visible neighbour.
+    await moveItem("sections", id, direction, (row) => HOMEPAGE_SECTION_KINDS.has(row.kind));
     refresh();
 }
 

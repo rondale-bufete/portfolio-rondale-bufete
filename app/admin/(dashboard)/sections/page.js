@@ -17,6 +17,7 @@ import { ItemRow, AddNewRow } from "../../ui/CollapsibleRow";
 import { buttonPrimary, buttonSecondary, buttonIcon, linkDanger } from "../../ui/tokens";
 import { ArrowUpIcon, ArrowDownIcon, EyeIcon, EyeOffIcon, TrashIcon } from "../../ui/icons";
 import AdminActionForm from "../../ui/AdminActionForm";
+import { HOMEPAGE_SECTION_KINDS } from "@/lib/sectionKinds";
 
 const KIND_LABELS = {
     about: "About",
@@ -27,11 +28,9 @@ const KIND_LABELS = {
     custom: "Custom",
 };
 
-// Only custom sections can be reordered; the other sections are separate pages.
-const REORDERABLE_KINDS = new Set(["custom"]);
-
-// Experience and Skills render within About, so their legacy toggles are hidden.
-const TOGGLEABLE_KINDS = new Set(["about", "projects", "contact", "custom"]);
+// About, Projects, Contact and custom sections make up the homepage below the
+// hero, in this order. Experience and Skills are legacy rows that render inside
+// About, so they can't be moved or hidden on their own.
 
 export default async function SectionsAdminPage() {
     const [{ data: sections, error }, { data: profile, error: profileError }] = await Promise.all([
@@ -45,17 +44,18 @@ export default async function SectionsAdminPage() {
         await createCustomSectionAction(formData);
     }
 
+    const homepageIds = (sections || []).filter((section) => HOMEPAGE_SECTION_KINDS.has(section.kind)).map((section) => section.id);
+
     return (
         <div>
             <PageHeader
                 title="Sections"
                 description={
                     <>
-                        About, Projects, and Contact are separate pages now — their visibility toggle here turns
-                        the whole page on or off (hiding one removes its navbar tab and makes the page 404).
-                        Experience and Skills are managed from their own pages and always render inside About
-                        when they have content. Only Custom sections are reorderable and appear on the homepage,
-                        below the hero.
+                        The homepage shows these sections below the hero, top to bottom in this order, and the
+                        navbar tabs follow the same order. Use the arrows to reorder About, Projects, Contact and
+                        custom sections, and hide any of them (hiding one also removes its navbar tab). Experience
+                        and Skills always render inside About when they have content.
                     </>
                 }
             />
@@ -65,7 +65,7 @@ export default async function SectionsAdminPage() {
             <div className="mb-6">
                 <AddNewRow label="Add a custom section">
                     <AdminActionForm action={handleCreate} className="mt-4 space-y-4 max-w-xl">
-                        <Field label="Label" name="label" placeholder="05 — Testimonials" required />
+                        <Field label="Label" name="label" placeholder="Testimonials" required />
                         <Field label="Heading" name="heading" placeholder="What people say" required />
                         <Field
                             label="Body"
@@ -90,8 +90,8 @@ export default async function SectionsAdminPage() {
                             key={section.id}
                             section={section}
                             index={i}
-                            isFirst={i === 0}
-                            isLast={i === (sections?.length || 0) - 1}
+                            isFirst={section.id === homepageIds[0]}
+                            isLast={section.id === homepageIds.at(-1)}
                         />
                     ))}
                     {(!sections || sections.length === 0) && (
@@ -183,8 +183,8 @@ function SectionRow({ section, index, isFirst, isLast }) {
         await deleteSectionAction(section.id);
     }
 
-    const canReorder = REORDERABLE_KINDS.has(section.kind);
-    const canToggle = TOGGLEABLE_KINDS.has(section.kind);
+    const canReorder = HOMEPAGE_SECTION_KINDS.has(section.kind);
+    const canToggle = canReorder;
 
     const badges = (
         <div className="flex items-center gap-1.5 shrink-0">
