@@ -1,3 +1,4 @@
+import Logo from "./Logo";
 import { ArrowUpIcon, FacebookIcon, GitHubIcon, InstagramIcon, LinkedInIcon, MailIcon } from "./icons";
 
 export default function Footer({ profile }) {
@@ -12,9 +13,12 @@ export default function Footer({ profile }) {
     return (
         <footer className="site-footer">
             <div className="container site-footer__inner">
-                <p className="site-footer__copy">
-                    © {new Date().getFullYear()} {profile?.name}
-                </p>
+                <div className="site-footer__brand">
+                    <Logo size={28} />
+                    <p className="site-footer__copy">
+                        © {new Date().getFullYear()} {profile?.name}
+                    </p>
+                </div>
                 {links.length > 0 && (
                     <ul className="site-footer__links">
                         {links.map(({ label, href, Icon }) => (

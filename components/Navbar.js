@@ -5,7 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ResumeModal from "./ResumeModal";
 import { CloseIcon, FacebookIcon, GitHubIcon, InstagramIcon, LinkedInIcon, MenuIcon } from "./icons";
-import { initials, stripOrdinal } from "@/lib/format";
+import Logo from "./Logo";
+import { stripOrdinal } from "@/lib/format";
 import { prefersReducedMotion } from "@/lib/motion";
 
 const FALLBACK_LABELS = { about: "About", projects: "Projects", contact: "Contact", custom: "More" };
@@ -115,7 +116,7 @@ export default function Navbar({ profile, sections = [] }) {
             <header className="site-nav">
                 <nav className="site-nav__inner" aria-label="Main">
                     <Link href="/" className="site-nav__brand" onClick={handleBrandClick}>
-                        <span className="site-nav__monogram" aria-hidden="true">{initials(profile?.name) || "RB"}</span>
+                        <Logo size={38} />
                         <span className="site-nav__name">{profile?.name}</span>
                     </Link>
 

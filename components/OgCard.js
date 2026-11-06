@@ -1,4 +1,4 @@
-import { initials } from "@/lib/format";
+import { LOGO_LETTERS } from "./Logo";
 
 // next/og uses Satori, which requires inline styles and flex for multi-child elements.
 export const OG_SIZE = { width: 1200, height: 630 };
@@ -33,21 +33,11 @@ export default function OgCard({ eyebrow, title, subtitle, name, host }) {
             </div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 26, color: COLORS.body }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-                    <div
-                        style={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            width: 64,
-                            height: 64,
-                            background: COLORS.accent,
-                            color: "white",
-                            fontSize: 26,
-                            fontWeight: 700,
-                        }}
-                    >
-                        {initials(name) || "•"}
-                    </div>
+                    <svg width="72" height="72" viewBox="0 0 72 72">
+                        <rect x="9.5" y="9.5" width="61" height="61" fill="none" stroke={COLORS.text} strokeWidth="3" />
+                        <rect width="64" height="64" fill={COLORS.accent} />
+                        <path d={LOGO_LETTERS} fill="#ffffff" />
+                    </svg>
                     <div style={{ color: COLORS.text, fontWeight: 600 }}>{name}</div>
                 </div>
                 <div>{host}</div>

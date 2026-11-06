@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { loginAction } from "../auth-actions";
 import { AlertIcon } from "@/components/icons";
+import Logo from "@/components/Logo";
 
 const initialState = { error: null };
 
@@ -20,9 +21,7 @@ export default function LoginPage() {
         <main className="admin-login">
             <form action={formAction} className="admin-login__card">
                 <div className="admin-login__brand">
-                    <span className="admin-monogram" aria-hidden="true">
-                        RB
-                    </span>
+                    <Logo size={36} />
                     <span className="admin-sidebar__name">
                         <strong>Portfolio admin</strong>
                         <span>Rondale Rae Bufete</span>

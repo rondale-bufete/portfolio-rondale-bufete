@@ -141,8 +141,11 @@ body[data-modal-open] .chat-widget { display: none; }
 .site-nav::after { position: absolute; right: 0; bottom: -1px; left: 0; height: 2px; content: ""; background: var(--color-accent); transform: scaleX(0); transform-origin: left; }
 .site-nav__inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; width: min(100% - 2 * var(--gutter), 1320px); min-height: var(--nav-height); margin-inline: auto; animation: fade-down 700ms var(--ease-out) backwards; }
 .site-nav__brand { display: flex; flex: 1 1 0; align-items: center; gap: 12px; min-width: 0; }
-.site-nav__monogram { display: grid; flex: none; place-items: center; width: 38px; aspect-ratio: 1; background: var(--color-accent); color: #fff; font-family: var(--font-display), sans-serif; font-size: 14px; font-weight: 700; transition: transform 320ms var(--ease-spring), box-shadow 320ms var(--ease-out); }
-.site-nav__brand:hover .site-nav__monogram { box-shadow: 4px 4px 0 var(--color-text); transform: translate(-2px, -2px); }
+/* logo (components/Logo.js): the square lifts off its plate on hover */
+.logo { display: block; flex: none; overflow: visible; color: var(--color-text); }
+.logo__mark { transition: transform 320ms var(--ease-spring); }
+.site-nav__brand:hover .logo__mark,
+.admin-sidebar__brand:hover .logo__mark { transform: translate(-3px, -3px); }
 .site-nav__name { overflow: hidden; color: var(--color-text); font-size: 15px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
 .site-nav__links { position: relative; display: flex; align-items: center; gap: 4px; }
 .portfolio-site .site-nav__link { padding: 10px 14px; color: var(--color-muted); font-size: 14px; font-weight: 500; transition: color 200ms ease, background-color 200ms ease; }
@@ -382,6 +385,7 @@ a.cert-card:hover .cert-card__image { transform: scale(1.08); }
 /* footer */
 .site-footer { border-top: 1px solid var(--color-border); background: rgb(255 255 255 / 55%); }
 .site-footer__inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 24px; padding: 28px 0; }
+.site-footer__brand { display: flex; align-items: center; gap: 12px; }
 .site-footer__copy { margin: 0; color: var(--color-muted); font-size: 14px; }
 .site-footer__links { display: flex; gap: 4px; margin: 0; padding: 0; list-style: none; }
 .portfolio-site .site-footer__links a { display: grid; place-items: center; width: 44px; height: 44px; color: var(--color-muted); transition: color 200ms ease, background-color 200ms ease, transform 260ms var(--ease-out); }
@@ -722,7 +726,6 @@ a.cert-card:hover .cert-card__image { transform: scale(1.08); }
 .admin-app { display: grid; grid-template-columns: 248px minmax(0, 1fr); min-height: 100vh; }
 .admin-sidebar { position: sticky; top: 0; display: grid; grid-template-areas: "brand" "nav" "footer"; grid-template-rows: auto 1fr auto; height: 100vh; border-right: 1px solid var(--color-border); background: rgb(255 255 255 / 78%); backdrop-filter: blur(12px); }
 .admin-sidebar__brand { grid-area: brand; display: flex; align-items: center; gap: 12px; min-width: 0; padding: 20px; border-bottom: 1px solid var(--color-border); }
-.admin-monogram { display: grid; flex: none; place-items: center; width: 36px; aspect-ratio: 1; background: var(--color-accent); color: #fff; font-family: var(--font-display), sans-serif; font-size: 14px; font-weight: 700; }
 .admin-sidebar__name { display: flex; min-width: 0; flex-direction: column; line-height: 1.25; }
 .admin-sidebar__name strong { overflow: hidden; color: var(--color-text); font-size: 14px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
 .admin-sidebar__name span { color: var(--color-muted); font-size: 13px; }

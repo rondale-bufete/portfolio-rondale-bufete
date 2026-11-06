@@ -14,7 +14,7 @@ import {
     LogOutIcon,
     UserIcon,
 } from "@/components/icons";
-import { initials } from "@/lib/format";
+import Logo from "@/components/Logo";
 
 const NAV = [
     { group: "Dashboard", items: [{ href: "/admin", label: "Overview", Icon: ChartIcon }] },
@@ -42,9 +42,7 @@ export default function AdminNav({ logoutAction, counts = {}, name }) {
     return (
         <aside className="admin-sidebar">
             <Link href="/admin" className="admin-sidebar__brand">
-                <span className="admin-monogram" aria-hidden="true">
-                    {initials(name) || "RB"}
-                </span>
+                <Logo size={36} />
                 <span className="admin-sidebar__name">
                     <strong>{name || "Portfolio"}</strong>
                     <span>Portfolio admin</span>
