@@ -267,6 +267,10 @@ body[data-modal-open] .chat-widget { display: none; }
 .project-card__media::after { position: absolute; inset: 0; content: ""; background: radial-gradient(circle at var(--glare-x, 50%) var(--glare-y, 0%), rgb(255 255 255 / 38%), transparent 55%); opacity: 0; pointer-events: none; transition: opacity 300ms ease; }
 .project-card:hover .project-card__media { border-color: var(--color-accent); box-shadow: 10px 10px 0 var(--color-accent-border); }
 .project-card:hover .project-card__media::after { opacity: 1; }
+/* Grid cards show the whole screenshot: phone and web captures come in
+   different shapes, so each sits centred on the paper instead of being cropped. */
+.project-card__media { background-color: var(--color-bg); background-image: var(--paper); background-size: 16px 16px; }
+.project-card__media img.project-cover { box-sizing: border-box; padding: 14px; object-fit: contain; filter: drop-shadow(0 8px 16px rgb(24 34 47 / 18%)); }
 .project-card__body { display: flex; flex: 1; flex-direction: column; gap: 10px; padding-top: 18px; }
 .project-card__title { margin: 0; color: var(--color-text); font-family: var(--font-display), sans-serif; font-size: 1.375rem; font-weight: 600; line-height: 1.2; transition: color 200ms ease; }
 .project-card:hover .project-card__title { color: var(--color-accent); }
