@@ -5,14 +5,14 @@ import Card from "../../ui/Card";
 import Field from "../../ui/Field";
 import ErrorState from "../../ui/ErrorState";
 import AdminActionForm from "../../ui/AdminActionForm";
-import { labelBase, buttonPrimary } from "../../ui/tokens";
+import { buttonPrimary } from "../../ui/tokens";
 import { MAX_STATS, normalizeStats } from "@/lib/profileStats";
 
 function HeadlineNumbersFields({ profile }) {
     // select("*") omits the column until the profile_stats migration runs.
     if (!profile || !("stats" in profile)) {
         return (
-            <p className="text-xs text-[var(--color-faint)]">
+            <p className="admin-note">
                 Run supabase/profile_stats_migration.sql in the Supabase SQL Editor to add headline numbers under your intro.
             </p>
         );
@@ -21,17 +21,12 @@ function HeadlineNumbersFields({ profile }) {
     const stats = normalizeStats(profile.stats);
     const rows = Array.from({ length: MAX_STATS }, (_, index) => index + 1);
 
-    return (
-        <fieldset className="space-y-3">
-            <legend className={labelBase}>Headline numbers (shown under your intro; leave a row empty to skip it)</legend>
-            {rows.map((row) => (
-                <div key={row} className="grid grid-cols-[120px_minmax(0,1fr)] gap-3">
-                    <Field label={`Number ${row}`} name={`stat_value_${row}`} defaultValue={stats[row - 1]?.value} placeholder="300+" />
-                    <Field label={`Label ${row}`} name={`stat_label_${row}`} defaultValue={stats[row - 1]?.label} placeholder="subscriber accounts managed" />
-                </div>
-            ))}
-        </fieldset>
-    );
+    return rows.map((row) => (
+        <div key={row} className="admin-stat-row">
+            <Field label={`Number ${row}`} name={`stat_value_${row}`} defaultValue={stats[row - 1]?.value} placeholder="300+" />
+            <Field label={`Label ${row}`} name={`stat_label_${row}`} defaultValue={stats[row - 1]?.label} placeholder="subscriber accounts managed" />
+        </div>
+    ));
 }
 
 export default async function ProfileAdminPage() {
@@ -44,85 +39,92 @@ export default async function ProfileAdminPage() {
 
     return (
         <div>
-            <PageHeader
-                title="Profile"
-                description="Powers the navbar, hero section, footer, and resume modal on your site."
-            />
+            <PageHeader title="Profile" description="Your name, intro, links, photo and resume: the hero, navbar, footer and contact section all read from here." />
 
             {error && <ErrorState message={error.message} />}
 
             {!error && (
-            <Card className="max-w-xl">
-                <AdminActionForm action={handleSubmit} className="space-y-5">
-                    <input type="hidden" name="existing_photo_url" value={profile?.photo_url || ""} />
-                    <input type="hidden" name="existing_resume_url" value={profile?.resume_url || ""} />
+                <Card className="admin-card--form">
+                    <AdminActionForm action={handleSubmit} className="admin-form">
+                        <input type="hidden" name="existing_photo_url" value={profile?.photo_url || ""} />
+                        <input type="hidden" name="existing_resume_url" value={profile?.resume_url || ""} />
 
-                    <Field label="Name" name="name" defaultValue={profile?.name} required />
-                    <Field label="Role" name="role" defaultValue={profile?.role} required />
-                    <Field label="Tagline" name="tagline" defaultValue={profile?.tagline} textarea rows={2} />
-                    <Field label="Bio" name="bio" defaultValue={profile?.bio} textarea rows={4} />
-                    <Field label="Email" name="email" defaultValue={profile?.email} type="email" required />
-                    <Field label="Phone (optional)" name="phone" defaultValue={profile?.phone} />
-                    <Field label="Location (optional)" name="location" defaultValue={profile?.location} placeholder="Camarines Sur, PH · Remote" />
-                    <Field label="GitHub URL" name="github" defaultValue={profile?.github} />
-                    <Field label="LinkedIn URL" name="linkedin" defaultValue={profile?.linkedin} />
-                    <Field label="Facebook URL (optional)" name="facebook" defaultValue={profile?.facebook} />
-                    <Field label="Instagram URL (optional)" name="instagram" defaultValue={profile?.instagram} />
-                    <Field
-                        label="Open to (optional)"
-                        name="open_to"
-                        defaultValue={profile?.open_to}
-                        placeholder="Full-time · Contract"
-                    />
+                        <fieldset className="admin-fieldset">
+                            <legend className="admin-fieldset__legend">Intro</legend>
+                            <div className="admin-grid-2">
+                                <Field label="Name" name="name" defaultValue={profile?.name} autoComplete="name" required />
+                                <Field label="Role" name="role" defaultValue={profile?.role} placeholder="Full Stack Developer" required />
+                            </div>
+                            <Field label="Tagline" name="tagline" defaultValue={profile?.tagline} hint="One line under your name." optional />
+                            <Field label="Bio" name="bio" defaultValue={profile?.bio} textarea rows={4} optional />
+                        </fieldset>
 
-                    <div className="flex items-center gap-2">
-                        <input
-                            type="checkbox"
-                            id="available"
-                            name="available"
-                            defaultChecked={profile?.available ?? true}
-                            className="w-4 h-4 rounded-[var(--radius-sm)] border-[var(--color-border-strong)] accent-[var(--color-accent)]"
-                        />
-                        <label htmlFor="available" className="text-sm text-[var(--color-text)]">
-                            Show the status badge on the homepage
-                        </label>
-                    </div>
-                    <Field
-                        label="Status badge label"
-                        name="status_label"
-                        defaultValue={profile?.status_label || "OPEN TO WORK"}
-                    />
+                        <fieldset className="admin-fieldset">
+                            <legend className="admin-fieldset__legend">Availability and numbers</legend>
+                            <label className="admin-check">
+                                <input type="checkbox" name="available" defaultChecked={profile?.available ?? true} />
+                                Show the status badge next to your role
+                            </label>
+                            <Field label="Status badge" name="status_label" defaultValue={profile?.status_label || "Open to work"} />
+                            <p className="admin-fieldset__note">Headline numbers sit under your intro and count up on load. Leave a row empty to skip it.</p>
+                            <HeadlineNumbersFields profile={profile} />
+                        </fieldset>
 
-                    <HeadlineNumbersFields profile={profile} />
+                        <fieldset className="admin-fieldset">
+                            <legend className="admin-fieldset__legend">Contact and links</legend>
+                            <div className="admin-grid-2">
+                                <Field label="Email" name="email" defaultValue={profile?.email} type="email" autoComplete="email" required />
+                                <Field label="Location" name="location" defaultValue={profile?.location} placeholder="Camarines Sur, PH · Remote" optional />
+                                <Field label="GitHub URL" name="github" defaultValue={profile?.github} type="url" />
+                                <Field label="LinkedIn URL" name="linkedin" defaultValue={profile?.linkedin} type="url" />
+                                <Field label="Facebook URL" name="facebook" defaultValue={profile?.facebook} type="url" optional />
+                                <Field label="Instagram URL" name="instagram" defaultValue={profile?.instagram} type="url" optional />
+                            </div>
+                        </fieldset>
 
-                    <div>
-                        <label className={labelBase}>Photo</label>
-                        <div className="flex items-center gap-4">
-                            {profile?.photo_url && (
-                                <img
-                                    src={profile.photo_url}
-                                    alt="Current photo"
-                                    className="w-16 h-16 rounded-[var(--radius-md)] object-cover border border-[var(--color-border-strong)] shrink-0"
-                                />
-                            )}
-                            <input type="file" name="photo" accept="image/*" className="text-sm text-[var(--color-body)]" />
+                        <fieldset className="admin-fieldset">
+                            <legend className="admin-fieldset__legend">Photo and resume</legend>
+                            <div className="admin-field">
+                                <label className="admin-label" htmlFor="profile-photo">
+                                    Photo
+                                </label>
+                                <div className="admin-upload">
+                                    {profile?.photo_url && (
+                                        // eslint-disable-next-line @next/next/no-img-element -- a small admin preview of an uploaded file
+                                        <img src={profile.photo_url} alt="Current photo" className="admin-upload__preview" />
+                                    )}
+                                    <input id="profile-photo" type="file" name="photo" accept="image/*" className="admin-file" />
+                                </div>
+                                <p className="admin-hint">Shown in the hero. A new upload replaces the current photo.</p>
+                            </div>
+                            <div className="admin-field">
+                                <label className="admin-label" htmlFor="profile-resume">
+                                    Resume (PDF)
+                                </label>
+                                <input id="profile-resume" type="file" name="resume" accept="application/pdf" className="admin-file" />
+                                <p className="admin-hint">
+                                    {profile?.resume_url ? (
+                                        <>
+                                            A resume is uploaded.{" "}
+                                            <a href={profile.resume_url} target="_blank" rel="noopener noreferrer" className="link">
+                                                Open the current file
+                                            </a>
+                                            . A new upload replaces it.
+                                        </>
+                                    ) : (
+                                        "No resume yet. Upload one to show the Resume button in the navbar."
+                                    )}
+                                </p>
+                            </div>
+                        </fieldset>
+
+                        <div className="admin-form__actions">
+                            <button type="submit" className={buttonPrimary}>
+                                Save changes
+                            </button>
                         </div>
-                    </div>
-
-                    <div>
-                        <label className={labelBase}>
-                            Resume (PDF) {profile?.resume_url && <span className="text-[var(--color-accent)] font-normal normal-case">— currently set</span>}
-                        </label>
-                        <input type="file" name="resume" accept="application/pdf" className="text-sm text-[var(--color-body)]" />
-                    </div>
-
-                    <div className="pt-2">
-                        <button type="submit" className={buttonPrimary}>
-                            Save changes
-                        </button>
-                    </div>
-                </AdminActionForm>
-            </Card>
+                    </AdminActionForm>
+                </Card>
             )}
         </div>
     );

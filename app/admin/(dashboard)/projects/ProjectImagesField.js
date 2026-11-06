@@ -103,7 +103,7 @@ export default function ProjectImagesField({ imageUrls = [] }) {
 
     return (
         <div ref={fieldRef}>
-            <label className="field-label block mb-1.5">Showcase images</label>
+            <p className="admin-label">Showcase images</p>
             <div className="flex flex-wrap items-start gap-3" role="list" aria-label="Project showcase images">
                 {remainingImages.map((imageUrl, index) => (
                     <div
@@ -119,6 +119,7 @@ export default function ProjectImagesField({ imageUrls = [] }) {
                         }}
                         className="w-28 shrink-0"
                     >
+                        {/* eslint-disable-next-line @next/next/no-img-element -- a small draggable admin preview */}
                         <img
                             src={imageUrl}
                             alt=""
@@ -191,7 +192,7 @@ export default function ProjectImagesField({ imageUrls = [] }) {
                     multiple
                     onChange={addPickedFiles}
                     aria-label="Add showcase images"
-                    className="max-w-full text-sm text-[var(--color-body)]"
+                    className="admin-file"
                 />
             </div>
             {newImagesBytes > UPLOAD_WARNING_BYTES && (

@@ -12,15 +12,13 @@ import EmptyState from "../../ui/EmptyState";
 import ErrorState from "../../ui/ErrorState";
 import { ItemRow, AddNewRow } from "../../ui/CollapsibleRow";
 import { MonthField, CurrentCheckbox } from "../../ui/MonthYearFields";
-import { buttonPrimary, buttonIcon, linkDanger } from "../../ui/tokens";
-import { ArrowUpIcon, ArrowDownIcon, TrashIcon } from "../../ui/icons";
+import ReorderControls from "../../ui/ReorderControls";
+import DeleteAction from "../../ui/DeleteAction";
+import { buttonPrimary } from "../../ui/tokens";
 import AdminActionForm from "../../ui/AdminActionForm";
 
 export default async function ExperienceAdminPage() {
-    const { data: experience, error } = await supabaseAdmin
-        .from("experience")
-        .select("*")
-        .order("sort_order");
+    const { data: experience, error } = await supabaseAdmin.from("experience").select("*").order("sort_order");
 
     async function handleCreate(formData) {
         "use server";
@@ -29,49 +27,39 @@ export default async function ExperienceAdminPage() {
 
     return (
         <div>
-            <PageHeader
-                title="Experience"
-                description={
-                    <>
-                        Your work history. This section is hidden by default after setup — enable it from{" "}
-                        <a href="/admin/sections" className="text-[var(--color-accent)] hover:underline">Sections</a> once
-                        you&rsquo;ve added your roles.
-                    </>
-                }
-            />
+            <PageHeader title="Experience" description="Your work history, shown as a timeline under About, newest first in the order below." />
 
-            <div className="space-y-3 mb-6">
+            <div className="admin-stack">
                 <AddNewRow label="Add a role">
-                    <AdminActionForm action={handleCreate} className="mt-4 space-y-4 max-w-xl">
+                    <AdminActionForm action={handleCreate} className="admin-form" successMessage="Role added.">
                         <ExperienceFields />
-                        <button type="submit" className={buttonPrimary}>
-                            Add role
-                        </button>
+                        <div className="admin-form__actions">
+                            <button type="submit" className={buttonPrimary}>
+                                Add role
+                            </button>
+                        </div>
                     </AdminActionForm>
                 </AddNewRow>
+
+                {error && <ErrorState message={error.message} />}
+
+                {!error && (
+                    <div className="admin-list">
+                        {(experience || []).map((exp, index) => (
+                            <ExperienceRow
+                                key={exp.id}
+                                exp={exp}
+                                index={index}
+                                isFirst={index === 0}
+                                isLast={index === (experience?.length || 0) - 1}
+                            />
+                        ))}
+                        {(!experience || experience.length === 0) && (
+                            <EmptyState title="No roles yet" description="Add your first one above: company, role, dates and a few bullet points." />
+                        )}
+                    </div>
+                )}
             </div>
-
-            {error && <ErrorState message={error.message} />}
-
-            {!error && (
-                <div className="space-y-3">
-                    {(experience || []).map((exp, index) => (
-                        <ExperienceRow
-                            key={exp.id}
-                            exp={exp}
-                            index={index}
-                            isFirst={index === 0}
-                            isLast={index === (experience?.length || 0) - 1}
-                        />
-                    ))}
-                    {(!experience || experience.length === 0) && (
-                        <EmptyState
-                            title="No experience entries yet"
-                            description="Add your first role above — company, role, dates, and a few bullet points."
-                        />
-                    )}
-                </div>
-            )}
         </div>
     );
 }
@@ -94,39 +82,32 @@ function ExperienceRow({ exp, index, isFirst, isLast }) {
         await deleteExperienceAction(exp.id);
     }
 
+    const title = [exp.role, exp.company].filter(Boolean).join(" · ");
+
     return (
-        <ItemRow index={index} title={`${exp.role} · ${exp.company}`} meta={exp.period}>
-            <div className="mt-4 flex items-center gap-2">
-                <AdminActionForm action={handleMoveUp}>
-                    <button type="submit" disabled={isFirst} className={buttonIcon} title="Move up" aria-label="Move up">
-                        <ArrowUpIcon className="w-4 h-4" />
-                    </button>
-                </AdminActionForm>
-                <AdminActionForm action={handleMoveDown}>
-                    <button type="submit" disabled={isLast} className={buttonIcon} title="Move down" aria-label="Move down">
-                        <ArrowDownIcon className="w-4 h-4" />
-                    </button>
-                </AdminActionForm>
-            </div>
-
-            <AdminActionForm action={handleUpdate} className="mt-4 space-y-4 max-w-xl">
+        <ItemRow
+            index={index}
+            title={title}
+            meta={[exp.period, exp.location].filter(Boolean).join(" · ")}
+            actions={<ReorderControls label={title} isFirst={isFirst} isLast={isLast} onMoveUp={handleMoveUp} onMoveDown={handleMoveDown} />}
+        >
+            <AdminActionForm action={handleUpdate} className="admin-form">
                 <ExperienceFields exp={exp} />
-                <button type="submit" className={buttonPrimary}>
-                    Save changes
-                </button>
+                <div className="admin-form__actions">
+                    <button type="submit" className={buttonPrimary}>
+                        Save changes
+                    </button>
+                </div>
             </AdminActionForm>
 
-            <AdminActionForm
-                action={handleDelete}
-                className="mt-4"
-                confirmMessage="This experience entry will be permanently deleted."
-                successMessage="The experience entry was deleted."
-            >
-                <button type="submit" className={linkDanger}>
-                    <TrashIcon className="w-4 h-4" />
-                    Delete this role
-                </button>
-            </AdminActionForm>
+            <div className="admin-row__footer">
+                <DeleteAction
+                    action={handleDelete}
+                    label="Delete role"
+                    confirmMessage={`“${title}” will be removed from your timeline for good.`}
+                    successMessage="Role deleted."
+                />
+            </div>
         </ItemRow>
     );
 }
@@ -136,22 +117,23 @@ function ExperienceFields({ exp }) {
 
     return (
         <>
-            <Field label="Company" name="company" defaultValue={exp?.company} required />
-            <Field label="Role / Title" name="role" defaultValue={exp?.role} required />
-            <Field label="Location (optional)" name="location" defaultValue={exp?.location} placeholder="Manila, PH · Remote" />
-            <Field label="Company URL (optional)" name="company_url" defaultValue={exp?.company_url} />
-
-            <MonthField label="Start date" name="start" defaultValue={start} />
+            <div className="admin-grid-2">
+                <Field label="Role" name="role" defaultValue={exp?.role} placeholder="Full Stack Developer" required />
+                <Field label="Company" name="company" defaultValue={exp?.company} required />
+                <Field label="Location" name="location" defaultValue={exp?.location} placeholder="Manila, PH · Remote" optional />
+                <Field label="Company website" name="company_url" defaultValue={exp?.company_url} type="url" optional />
+                <MonthField label="Start" name="start" defaultValue={start} />
+                <MonthField label="End" name="end" defaultValue={end} hint="Ignored while you work here." />
+            </div>
             <CurrentCheckbox label="I currently work here" defaultChecked={isCurrent} />
-            <MonthField label="End date (ignored if currently working)" name="end" defaultValue={end} />
-
             <Field
-                label="Bullet points (one per line)"
+                label="Bullet points"
                 name="bullets"
                 textarea
                 rows={5}
                 defaultValue={(exp?.bullets || []).join("\n")}
-                placeholder={"Led a team of 4 engineers shipping the new checkout flow\nCut API response times by 40% by adding caching\nMentored 2 junior developers"}
+                placeholder={"Replaced spreadsheet billing with a Laravel system for 300+ accounts\nAutomated overdue reminders, raising collected income by 60%"}
+                hint="One per line. Lead with the result."
             />
         </>
     );

@@ -36,7 +36,6 @@ const baseFields = {
     title: "AWS SAA",
     issuer: "AWS",
     issued: "2025-03",
-    credential_id: "",
     description: "",
     url: "",
 };

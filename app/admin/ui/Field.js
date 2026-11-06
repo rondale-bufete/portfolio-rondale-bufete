@@ -1,5 +1,9 @@
-import { inputBase, labelBase } from "./tokens";
+"use client";
 
+import { useId } from "react";
+
+// A labelled input or textarea. Ids are generated because the same field
+// names repeat on one page (every project row has a "title").
 export default function Field({
     label,
     name,
@@ -9,35 +13,35 @@ export default function Field({
     textarea = false,
     rows = 3,
     required = false,
+    optional = false,
     hint,
+    autoComplete,
 }) {
+    const id = useId();
+    const hintId = hint ? `${id}-hint` : undefined;
+    const shared = {
+        id,
+        name,
+        defaultValue: defaultValue ?? undefined,
+        placeholder,
+        required,
+        autoComplete,
+        "aria-describedby": hintId,
+        className: "admin-input",
+    };
+
     return (
-        <div>
-            <label className={labelBase} htmlFor={name}>
+        <div className="admin-field">
+            <label className="admin-label" htmlFor={id}>
                 {label}
+                {optional && <span className="admin-label__optional">Optional</span>}
             </label>
-            {textarea ? (
-                <textarea
-                    id={name}
-                    name={name}
-                    defaultValue={defaultValue}
-                    placeholder={placeholder}
-                    rows={rows}
-                    required={required}
-                    className={`${inputBase} resize-none px-3`}
-                />
-            ) : (
-                <input
-                    id={name}
-                    name={name}
-                    type={type}
-                    defaultValue={defaultValue}
-                    placeholder={placeholder}
-                    required={required}
-                        className={`${inputBase} px-3`}
-                />
+            {textarea ? <textarea {...shared} rows={rows} /> : <input {...shared} type={type} />}
+            {hint && (
+                <p id={hintId} className="admin-hint">
+                    {hint}
+                </p>
             )}
-            {hint && <p className="mt-1.5 text-xs text-[var(--color-faint)]">{hint}</p>}
         </div>
     );
 }

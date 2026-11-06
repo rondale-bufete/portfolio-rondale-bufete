@@ -1,41 +1,36 @@
-import { ChevronIcon, PlusIcon } from "./icons";
-import { cardBase } from "./tokens";
+import { ChevronRightIcon, PlusIcon } from "@/components/icons";
 
-// Render an expandable item row for admin lists.
-export function ItemRow({ index, title, meta, badges, children, defaultOpen = false }) {
+// An expandable list item. `actions` (the reorder arrows) sit on the summary
+// line but outside the toggle, so an item can be moved without opening it.
+export function ItemRow({ index, title, meta, media, actions, children, defaultOpen = false }) {
     return (
-        <details className={`group ${cardBase} overflow-hidden`} open={defaultOpen || undefined}>
-            <summary className="list-none [&::-webkit-details-marker]:hidden cursor-pointer flex items-center justify-between gap-4 px-5 py-4 hover:bg-[var(--color-raised)] transition-colors">
-                <div className="flex items-center gap-3 min-w-0">
-                    {typeof index === "number" && (
-                        <span className="font-[family-name:var(--font-mono)] text-xs text-[var(--color-faint)] shrink-0">
-                            {String(index + 1).padStart(2, "0")}
-                        </span>
-                    )}
-                    <ChevronIcon className="w-4 h-4 text-[var(--color-faint)] shrink-0 transition-transform duration-200 group-open:rotate-90" />
-                    <span className="font-medium text-sm truncate">{title}</span>
-                    {badges}
-                </div>
-                {meta && (
-                    <span className="text-xs text-[var(--color-body)] font-[family-name:var(--font-mono)] shrink-0 max-w-[40%] truncate">
-                        {meta}
+        <div className="admin-row" style={actions ? { "--row-actions": "88px" } : undefined}>
+            <details open={defaultOpen || undefined}>
+                <summary className="admin-row__summary">
+                    <ChevronRightIcon size={16} className="admin-row__chevron" />
+                    {typeof index === "number" && <span className="admin-row__index">{String(index + 1).padStart(2, "0")}</span>}
+                    {media}
+                    <span className="admin-row__text">
+                        <span className="admin-row__title">{title}</span>
+                        {meta && <span className="admin-row__meta">{meta}</span>}
                     </span>
-                )}
-            </summary>
-            <div className="px-5 pb-6 pt-1 border-t border-[var(--color-border)]">{children}</div>
-        </details>
+                </summary>
+                <div className="admin-row__body">{children}</div>
+            </details>
+            {actions && <div className="admin-row__actions">{actions}</div>}
+        </div>
     );
 }
 
-// Keep the add-new action distinct and above the list.
+// The add-new form, kept distinct from and above the list.
 export function AddNewRow({ label, children }) {
     return (
-        <details className="group rounded-[var(--radius-lg)] border border-dashed border-[var(--color-border-strong)] bg-[var(--color-bg)] transition-colors open:border-[var(--color-accent)]/50">
-            <summary className="list-none [&::-webkit-details-marker]:hidden cursor-pointer flex items-center gap-2 px-5 py-4 text-sm font-medium text-[var(--color-accent)] hover:bg-[var(--color-accent)]/[0.04] transition-colors">
-                <PlusIcon className="w-4 h-4 shrink-0 transition-transform duration-200 group-open:rotate-45" />
+        <details className="admin-add">
+            <summary className="admin-add__summary">
+                <PlusIcon size={18} />
                 {label}
             </summary>
-            <div className="px-5 pb-6 pt-1 border-t border-[var(--color-border)]">{children}</div>
+            <div className="admin-add__body">{children}</div>
         </details>
     );
 }

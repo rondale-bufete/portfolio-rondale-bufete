@@ -36,7 +36,6 @@ export async function createCertificationAction(formData) {
         title: formData.get("title")?.toString() || "",
         issuer: formData.get("issuer")?.toString() || "",
         date: monthValueToDisplay(formData.get("issued")?.toString()),
-        credential_id: formData.get("credential_id")?.toString() || "",
         description: formData.get("description")?.toString() || "",
         url,
         image_url: imageUrl || "",
@@ -65,7 +64,6 @@ export async function updateCertificationAction(id, formData) {
         title: formData.get("title")?.toString() || "",
         issuer: formData.get("issuer")?.toString() || "",
         date: monthValueToDisplay(formData.get("issued")?.toString()),
-        credential_id: formData.get("credential_id")?.toString() || "",
         description: formData.get("description")?.toString() || "",
         url,
     };

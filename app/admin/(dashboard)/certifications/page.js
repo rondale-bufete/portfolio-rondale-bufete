@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { displayToMonthValue } from "@/lib/monthYear";
 import {
@@ -8,19 +9,18 @@ import {
 } from "../../actions/certifications";
 import PageHeader from "../../ui/PageHeader";
 import Field from "../../ui/Field";
+import Badge from "../../ui/Badge";
 import EmptyState from "../../ui/EmptyState";
 import ErrorState from "../../ui/ErrorState";
 import { ItemRow, AddNewRow } from "../../ui/CollapsibleRow";
 import { MonthField } from "../../ui/MonthYearFields";
-import { labelBase, buttonPrimary, buttonIcon, linkDanger } from "../../ui/tokens";
-import { ArrowUpIcon, ArrowDownIcon, TrashIcon } from "../../ui/icons";
+import ReorderControls from "../../ui/ReorderControls";
+import DeleteAction from "../../ui/DeleteAction";
+import { buttonPrimary } from "../../ui/tokens";
 import AdminActionForm from "../../ui/AdminActionForm";
 
 export default async function CertificationsAdminPage() {
-    const { data: certifications, error } = await supabaseAdmin
-        .from("certifications")
-        .select("*")
-        .order("sort_order");
+    const { data: certifications, error } = await supabaseAdmin.from("certifications").select("*").order("sort_order");
 
     async function handleCreate(formData) {
         "use server";
@@ -29,37 +29,39 @@ export default async function CertificationsAdminPage() {
 
     return (
         <div>
-            <PageHeader title="Certifications" description="Shown as a grid under the About section." />
+            <PageHeader title="Certifications" description="Shown as cards under About. A card links to the verification URL, or to the PDF when there's no URL." />
 
-            <div className="mb-6">
-                <AddNewRow label="Add a new certification">
-                    <AdminActionForm action={handleCreate} className="mt-4 space-y-4 max-w-xl">
+            <div className="admin-stack">
+                <AddNewRow label="Add a certification">
+                    <AdminActionForm action={handleCreate} className="admin-form" successMessage="Certification added.">
                         <CertFields />
-                        <button type="submit" className={buttonPrimary}>
-                            Add certification
-                        </button>
+                        <div className="admin-form__actions">
+                            <button type="submit" className={buttonPrimary}>
+                                Add certification
+                            </button>
+                        </div>
                     </AdminActionForm>
                 </AddNewRow>
+
+                {error && <ErrorState message={error.message} />}
+
+                {!error && (
+                    <div className="admin-list">
+                        {(certifications || []).map((cert, index) => (
+                            <CertRow
+                                key={cert.id}
+                                cert={cert}
+                                index={index}
+                                isFirst={index === 0}
+                                isLast={index === (certifications?.length || 0) - 1}
+                            />
+                        ))}
+                        {(!certifications || certifications.length === 0) && (
+                            <EmptyState title="No certifications yet" description="Add your first one above." />
+                        )}
+                    </div>
+                )}
             </div>
-
-            {error && <ErrorState message={error.message} />}
-
-            {!error && (
-                <div className="space-y-3">
-                    {(certifications || []).map((cert, index) => (
-                        <CertRow
-                            key={cert.id}
-                            cert={cert}
-                            index={index}
-                            isFirst={index === 0}
-                            isLast={index === (certifications?.length || 0) - 1}
-                        />
-                    ))}
-                    {(!certifications || certifications.length === 0) && (
-                        <EmptyState title="No certifications yet" description="Add your first one above." />
-                    )}
-                </div>
-            )}
         </div>
     );
 }
@@ -82,72 +84,98 @@ function CertRow({ cert, index, isFirst, isLast }) {
         await deleteCertificationAction(cert.id);
     }
 
+    const link = cert.url ? "Verify link" : cert.pdf_url ? "PDF" : null;
+
     return (
-        <ItemRow index={index} title={cert.title} meta={cert.issuer}>
-            <div className="mt-4 flex items-center gap-2">
-                <AdminActionForm action={handleMoveUp}>
-                    <button type="submit" disabled={isFirst} className={buttonIcon} title="Move up" aria-label="Move up">
-                        <ArrowUpIcon className="w-4 h-4" />
-                    </button>
-                </AdminActionForm>
-                <AdminActionForm action={handleMoveDown}>
-                    <button type="submit" disabled={isLast} className={buttonIcon} title="Move down" aria-label="Move down">
-                        <ArrowDownIcon className="w-4 h-4" />
-                    </button>
-                </AdminActionForm>
-            </div>
-
-            <AdminActionForm action={handleUpdate} className="mt-4 space-y-4 max-w-xl">
+        <ItemRow
+            index={index}
+            title={cert.title}
+            media={<span className="admin-row__media">{cert.image_url && <Image src={cert.image_url} alt="" fill sizes="64px" />}</span>}
+            meta={
+                <>
+                    <span>{[cert.issuer, cert.date].filter(Boolean).join(" · ")}</span>
+                    {link ? <Badge tone="accent">{link}</Badge> : <Badge>No link</Badge>}
+                </>
+            }
+            actions={<ReorderControls label={cert.title} isFirst={isFirst} isLast={isLast} onMoveUp={handleMoveUp} onMoveDown={handleMoveDown} />}
+        >
+            <AdminActionForm action={handleUpdate} className="admin-form">
                 <CertFields cert={cert} />
-                <button type="submit" className={buttonPrimary}>
-                    Save changes
-                </button>
+                <div className="admin-form__actions">
+                    <button type="submit" className={buttonPrimary}>
+                        Save changes
+                    </button>
+                </div>
             </AdminActionForm>
 
-            <AdminActionForm
-                action={handleDelete}
-                className="mt-4"
-                confirmMessage="This certification and its saved details will be permanently deleted."
-                successMessage="The certification was deleted."
-            >
-                <button type="submit" className={linkDanger}>
-                    <TrashIcon className="w-4 h-4" />
-                    Delete this certification
-                </button>
-            </AdminActionForm>
+            <div className="admin-row__footer">
+                <DeleteAction
+                    action={handleDelete}
+                    label="Delete certification"
+                    confirmMessage={`“${cert.title}” and its uploaded files will be removed for good.`}
+                    successMessage="Certification deleted."
+                />
+            </div>
         </ItemRow>
     );
 }
 
 function CertFields({ cert }) {
+    const key = cert?.id ?? "new";
+
     return (
         <>
             <Field label="Title" name="title" defaultValue={cert?.title} required />
-            <Field label="Issuer" name="issuer" defaultValue={cert?.issuer} />
-
-            <MonthField label="Issued" name="issued" defaultValue={displayToMonthValue(cert?.date)} />
-
-            <Field label="Credential ID (optional)" name="credential_id" defaultValue={cert?.credential_id} placeholder="UC-384c2ce8-fe37" />
-            <Field label="Description" name="description" defaultValue={cert?.description} textarea />
+            <div className="admin-grid-2">
+                <Field label="Issuer" name="issuer" defaultValue={cert?.issuer} placeholder="Coursera" />
+                <MonthField label="Issued" name="issued" defaultValue={displayToMonthValue(cert?.date)} />
+            </div>
             <Field
-                label="Verification URL (leave blank if you only have a PDF)"
+                label="Verification URL"
                 name="url"
                 defaultValue={cert?.url}
+                type="url"
+                hint="Leave empty if you only have a PDF."
+                optional
             />
-            <div>
-                <label className={labelBase}>Badge image</label>
-                <div className="flex items-center gap-4">
+            <Field
+                label="Description"
+                name="description"
+                defaultValue={cert?.description}
+                textarea
+                hint="Not shown on the card; the chat assistant uses it to answer questions about this certification."
+                optional
+            />
+            <div className="admin-field">
+                <label className="admin-label" htmlFor={`cert-image-${key}`}>
+                    Badge image
+                </label>
+                <div className="admin-upload">
                     {cert?.image_url && (
-                        <img src={cert.image_url} alt="" className="w-20 h-14 rounded-[var(--radius-md)] object-cover border border-[var(--color-border-strong)] shrink-0" />
+                        // eslint-disable-next-line @next/next/no-img-element -- a small admin preview of an uploaded file
+                        <img src={cert.image_url} alt="Current badge" className="admin-upload__preview admin-upload__preview--wide" />
                     )}
-                    <input type="file" name="image" accept="image/*" className="text-sm text-[var(--color-body)]" />
+                    <input id={`cert-image-${key}`} type="file" name="image" accept="image/*" className="admin-file" />
                 </div>
             </div>
-            <div>
-                <label className={labelBase}>
-                    Certificate PDF {cert?.pdf_url && <span className="text-[var(--color-accent)] font-normal normal-case">— currently set, used only if no URL is set</span>}
+            <div className="admin-field">
+                <label className="admin-label" htmlFor={`cert-pdf-${key}`}>
+                    Certificate PDF
                 </label>
-                <input type="file" name="pdf" accept="application/pdf" className="text-sm text-[var(--color-body)]" />
+                <input id={`cert-pdf-${key}`} type="file" name="pdf" accept="application/pdf" className="admin-file" />
+                <p className="admin-hint">
+                    {cert?.pdf_url ? (
+                        <>
+                            A PDF is uploaded.{" "}
+                            <a href={cert.pdf_url} target="_blank" rel="noopener noreferrer" className="link">
+                                Open it
+                            </a>
+                            . The card links to it only when there&rsquo;s no verification URL.
+                        </>
+                    ) : (
+                        "Optional. Used when there's no verification URL."
+                    )}
+                </p>
             </div>
         </>
     );

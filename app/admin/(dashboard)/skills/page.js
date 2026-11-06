@@ -8,9 +8,11 @@ import {
 import PageHeader from "../../ui/PageHeader";
 import EmptyState from "../../ui/EmptyState";
 import ErrorState from "../../ui/ErrorState";
-import { cardBase, inputBase, labelBase, buttonPrimary, buttonSecondary, linkDanger } from "../../ui/tokens";
-import { TrashIcon } from "../../ui/icons";
+import DeleteAction from "../../ui/DeleteAction";
 import AdminActionForm from "../../ui/AdminActionForm";
+import Field from "../../ui/Field";
+import { buttonPrimary, buttonSecondary } from "../../ui/tokens";
+import { CloseIcon, PlusIcon } from "@/components/icons";
 
 export default async function SkillsAdminPage() {
     const { data: categories, error } = await supabaseAdmin
@@ -25,42 +27,27 @@ export default async function SkillsAdminPage() {
 
     return (
         <div>
-            <PageHeader
-                title="Skills"
-                description="Organized into categories — each category is a column on the homepage."
-            />
+            <PageHeader title="Skills" description="Grouped into categories; each category is a row under About, and the first six skills also appear in the hero." />
 
-            {error && <ErrorState message={error.message} />}
+            <div className="admin-stack">
+                {error && <ErrorState message={error.message} />}
 
-            <div className="space-y-4 mb-6">
-                {(categories || []).map((cat) => (
-                    <CategoryCard key={cat.id} category={cat} />
+                {(categories || []).map((category) => (
+                    <CategoryCard key={category.id} category={category} />
                 ))}
                 {!error && (!categories || categories.length === 0) && (
                     <EmptyState title="No categories yet" description="Add one below to get started." />
                 )}
-            </div>
 
-            <AdminActionForm
-                action={handleCreateCategory}
-                className={`${cardBase} p-5 flex items-end gap-3 max-w-md`}
-            >
-                <div className="flex-1">
-                    <label className={labelBase} htmlFor="category">
-                        New category name
-                    </label>
-                    <input
-                        id="category"
-                        name="category"
-                        placeholder="Databases"
-                        required
-                        className={inputBase}
-                    />
+                <div className="admin-card admin-card--padded">
+                    <AdminActionForm action={handleCreateCategory} className="admin-form admin-form--inline" successMessage="Category added.">
+                        <Field label="New category" name="category" placeholder="Databases" required />
+                        <button type="submit" className={buttonPrimary}>
+                            Add category
+                        </button>
+                    </AdminActionForm>
                 </div>
-                <button type="submit" className={buttonPrimary}>
-                    Add
-                </button>
-            </AdminActionForm>
+            </div>
         </div>
     );
 }
@@ -78,66 +65,55 @@ function CategoryCard({ category }) {
     }
 
     return (
-        <div className={`${cardBase} p-5`}>
-            <div className="flex items-center justify-between mb-4">
-                <h3 className="font-[family-name:var(--font-display)] font-medium">{category.category}</h3>
-                <AdminActionForm
+        <section className="admin-card admin-card--padded" aria-labelledby={`skills-${category.id}`}>
+            <div className="admin-card__header">
+                <h2 id={`skills-${category.id}`} className="admin-card__title">
+                    {category.category}
+                </h2>
+                <DeleteAction
                     action={handleDeleteCategory}
-                    confirmMessage="This skill category and all of its skills will be permanently deleted."
-                    successMessage="The skill category was deleted."
-                >
-                    <button type="submit" className={linkDanger}>
-                        <TrashIcon className="w-4 h-4" />
-                        Delete category
-                    </button>
-                </AdminActionForm>
-            </div>
-
-            <div className="flex flex-wrap gap-2 mb-4">
-                {items.map((item) => (
-                    <SkillItemTag key={item.id} item={item} />
-                ))}
-                {items.length === 0 && (
-                    <p className="text-sm text-[var(--color-body)]">No skills in this category yet.</p>
-                )}
-            </div>
-
-            <AdminActionForm action={handleAddItem} className="flex items-center gap-2">
-                <input
-                    name="name"
-                    placeholder="e.g. Redis"
-                    required
-                    className={`${inputBase} flex-1 max-w-xs`}
+                    label="Delete category"
+                    confirmMessage={`“${category.category}” and its ${items.length} ${items.length === 1 ? "skill" : "skills"} will be removed for good.`}
+                    successMessage="Category deleted."
                 />
+            </div>
+
+            {items.length > 0 ? (
+                <ul className="admin-chips" aria-label={`${category.category} skills`}>
+                    {items.map((item) => (
+                        <SkillChip key={item.id} item={item} />
+                    ))}
+                </ul>
+            ) : (
+                <p className="admin-card__description">No skills in this category yet.</p>
+            )}
+
+            <AdminActionForm action={handleAddItem} className="admin-form admin-form--inline admin-chips__add" successMessage={null}>
+                <Field label={`Add to ${category.category}`} name="name" placeholder="e.g. Redis" required />
                 <button type="submit" className={buttonSecondary}>
-                    + Add skill
+                    <PlusIcon size={16} />
+                    Add skill
                 </button>
             </AdminActionForm>
-        </div>
+        </section>
     );
 }
 
-function SkillItemTag({ item }) {
+// Removing one tag is quick to undo (type it again), so it doesn't ask first.
+function SkillChip({ item }) {
     async function handleDelete() {
         "use server";
         await deleteSkillItemAction(item.id);
     }
 
     return (
-        <AdminActionForm
-            action={handleDelete}
-            confirmMessage="This skill will be permanently removed."
-            successMessage="The skill was removed."
-        >
-            <button
-                type="submit"
-                title="Remove this skill"
-                aria-label={`Remove ${item.name}`}
-                className="group tag tag-neutral gap-1.5 pl-2.5 pr-2 py-1.5 border border-transparent hover:border-[var(--color-danger)] hover:bg-[var(--color-danger-solid)]/5 transition-colors"
-            >
-                {item.name}
-                <TrashIcon className="w-3 h-3 text-[var(--color-faint)] group-hover:text-[var(--color-danger-text)] transition-colors" />
-            </button>
-        </AdminActionForm>
+        <li className="tech-tag admin-chip">
+            {item.name}
+            <AdminActionForm action={handleDelete} successMessage={`Removed ${item.name}.`} inlineErrors={false}>
+                <button type="submit" className="admin-chip__remove" aria-label={`Remove ${item.name}`} title="Remove">
+                    <CloseIcon size={14} />
+                </button>
+            </AdminActionForm>
+        </li>
     );
 }

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import {
     createProjectAction,
@@ -7,19 +8,24 @@ import {
 } from "../../actions/projects";
 import PageHeader from "../../ui/PageHeader";
 import Field from "../../ui/Field";
+import Badge from "../../ui/Badge";
 import EmptyState from "../../ui/EmptyState";
 import ErrorState from "../../ui/ErrorState";
 import { ItemRow, AddNewRow } from "../../ui/CollapsibleRow";
-import { labelBase, inputBase, buttonPrimary, buttonIcon, linkDanger } from "../../ui/tokens";
-import { ArrowUpIcon, ArrowDownIcon, TrashIcon } from "../../ui/icons";
+import ReorderControls from "../../ui/ReorderControls";
+import DeleteAction from "../../ui/DeleteAction";
+import { buttonPrimary } from "../../ui/tokens";
 import AdminActionForm from "../../ui/AdminActionForm";
 import ProjectImagesField from "./ProjectImagesField";
+import { provenanceLabel } from "@/lib/projectDetail";
+
+function savedImagesOf(project) {
+    if (project?.image_urls?.length) return project.image_urls;
+    return project?.image_url ? [project.image_url] : [];
+}
 
 export default async function ProjectsAdminPage() {
-    const { data: projects, error } = await supabaseAdmin
-        .from("projects")
-        .select("*")
-        .order("sort_order");
+    const { data: projects, error } = await supabaseAdmin.from("projects").select("*").order("sort_order");
 
     async function handleCreate(formData) {
         "use server";
@@ -28,37 +34,42 @@ export default async function ProjectsAdminPage() {
 
     return (
         <div>
-            <PageHeader title="Projects" description="Shown in order on the homepage project grid." />
+            <PageHeader
+                title="Projects"
+                description="In homepage order. The first two get the large case-study layout; every project has its own page."
+            />
 
-            <div className="mb-6">
-                <AddNewRow label="Add a new project">
-                    <AdminActionForm action={handleCreate} className="mt-4 space-y-4 max-w-xl">
+            <div className="admin-stack">
+                <AddNewRow label="Add a project">
+                    <AdminActionForm action={handleCreate} className="admin-form" successMessage="Project added.">
                         <ProjectFields />
-                        <button type="submit" className={buttonPrimary}>
-                            Add project
-                        </button>
+                        <div className="admin-form__actions">
+                            <button type="submit" className={buttonPrimary}>
+                                Add project
+                            </button>
+                        </div>
                     </AdminActionForm>
                 </AddNewRow>
+
+                {error && <ErrorState message={error.message} />}
+
+                {!error && (
+                    <div className="admin-list">
+                        {(projects || []).map((project, index) => (
+                            <ProjectRow
+                                key={project.id}
+                                project={project}
+                                index={index}
+                                isFirst={index === 0}
+                                isLast={index === (projects?.length || 0) - 1}
+                            />
+                        ))}
+                        {(!projects || projects.length === 0) && (
+                            <EmptyState title="No projects yet" description="Add your first one above." />
+                        )}
+                    </div>
+                )}
             </div>
-
-            {error && <ErrorState message={error.message} />}
-
-            {!error && (
-                <div className="space-y-3">
-                    {(projects || []).map((project, index) => (
-                        <ProjectRow
-                            key={project.id}
-                            project={project}
-                            index={index}
-                            isFirst={index === 0}
-                            isLast={index === (projects?.length || 0) - 1}
-                        />
-                    ))}
-                    {(!projects || projects.length === 0) && (
-                        <EmptyState title="No projects yet" description="Add your first one above." />
-                    )}
-                </div>
-            )}
         </div>
     );
 }
@@ -81,109 +92,110 @@ function ProjectRow({ project, index, isFirst, isLast }) {
         await deleteProjectAction(project.id);
     }
 
+    const images = savedImagesOf(project);
+    const cover = images[0];
+
     return (
-        <ItemRow index={index} title={project.title} meta={project.category || "General"}>
-            <div className="mt-4 flex items-center gap-2">
-                <AdminActionForm action={handleMoveUp}>
-                    <button type="submit" disabled={isFirst} className={buttonIcon} title="Move up" aria-label="Move up">
-                        <ArrowUpIcon className="w-4 h-4" />
-                    </button>
-                </AdminActionForm>
-                <AdminActionForm action={handleMoveDown}>
-                    <button type="submit" disabled={isLast} className={buttonIcon} title="Move down" aria-label="Move down">
-                        <ArrowDownIcon className="w-4 h-4" />
-                    </button>
-                </AdminActionForm>
-            </div>
-
-            <AdminActionForm action={handleUpdate} className="mt-4 space-y-4 max-w-xl">
+        <ItemRow
+            index={index}
+            title={project.title}
+            media={
+                <span className="admin-row__media">
+                    {cover && <Image src={cover} alt="" fill sizes="64px" />}
+                </span>
+            }
+            meta={
+                <>
+                    <Badge tone={project.provenance === "Client" ? "accent" : "neutral"}>{provenanceLabel(project.provenance)}</Badge>
+                    {project.year && <span>{project.year}</span>}
+                    <span>
+                        {images.length} {images.length === 1 ? "image" : "images"}
+                    </span>
+                    {index < 2 && <span>Featured</span>}
+                </>
+            }
+            actions={<ReorderControls label={project.title} isFirst={isFirst} isLast={isLast} onMoveUp={handleMoveUp} onMoveDown={handleMoveDown} />}
+        >
+            <AdminActionForm action={handleUpdate} className="admin-form">
                 <ProjectFields project={project} />
-                <button type="submit" className={buttonPrimary}>
-                    Save changes
-                </button>
+                <div className="admin-form__actions">
+                    <button type="submit" className={buttonPrimary}>
+                        Save changes
+                    </button>
+                </div>
             </AdminActionForm>
 
-            <AdminActionForm
-                action={handleDelete}
-                className="mt-4"
-                confirmMessage="This project and its saved details will be permanently deleted."
-                successMessage="The project was deleted."
-            >
-                <button type="submit" className={linkDanger}>
-                    <TrashIcon className="w-4 h-4" />
-                    Delete this project
-                </button>
-            </AdminActionForm>
+            <div className="admin-row__footer">
+                <DeleteAction
+                    action={handleDelete}
+                    label="Delete project"
+                    confirmMessage={`“${project.title}”, its page and its screenshots will be removed from your site for good.`}
+                    successMessage="Project deleted."
+                />
+            </div>
         </ItemRow>
     );
 }
 
 function ProjectFields({ project }) {
-    const savedImageUrls = project?.image_urls?.length
-        ? project.image_urls
-        : project?.image_url
-          ? [project.image_url]
-          : [];
-
     return (
         <>
             <Field label="Title" name="title" defaultValue={project?.title} required />
             <Field
-                label="Category"
-                name="category"
-                defaultValue={project?.category || "General"}
-                placeholder="Front-end, Back end, Fullstack"
+                label="Description"
+                name="description"
+                defaultValue={project?.description}
+                textarea
+                rows={6}
+                hint="The first paragraph is the card summary. Separate paragraphs with a blank line."
             />
-            <Field label="Description" name="description" defaultValue={project?.description} textarea />
             <Field
-                label="Tags (comma-separated)"
+                label="Tags"
                 name="tags"
                 defaultValue={(project?.tags || []).join(", ")}
-                placeholder="Next.js, Tailwind CSS, REST API"
+                placeholder="Next.js, Tailwind CSS, Supabase"
+                hint="Comma-separated. Cards show the first three or four; the project page shows all."
             />
-
-            <div>
-                <label className={labelBase}>Origin</label>
-                <select
-                    name="provenance"
-                    defaultValue={project?.provenance || "Personal"}
-                    className={`${inputBase} px-3`}
-                >
-                    <option value="Client">Client</option>
-                    <option value="Capstone">Capstone</option>
-                    <option value="Personal">Personal</option>
-                </select>
+            <div className="admin-grid-2">
+                <div className="admin-field">
+                    <label className="admin-label" htmlFor={`provenance-${project?.id ?? "new"}`}>
+                        Type
+                    </label>
+                    <select id={`provenance-${project?.id ?? "new"}`} name="provenance" defaultValue={project?.provenance || "Personal"} className="admin-input">
+                        <option value="Client">Client project</option>
+                        <option value="Capstone">Capstone project</option>
+                        <option value="Personal">Personal project</option>
+                    </select>
+                </div>
+                <Field label="Year" name="year" defaultValue={project?.year} placeholder="2026" optional />
             </div>
-            <Field label="Year (optional)" name="year" defaultValue={project?.year} placeholder="2026" />
             <Field
-                label="Outcome — shown in the project table (optional)"
+                label="Outcome"
                 name="outcome"
                 defaultValue={project?.outcome}
-                placeholder="300+ accounts · +60% collected"
+                placeholder="+60% income collected"
+                hint="The result, in a few words. Shown on featured cards and the project page."
+                optional
             />
+            <div className="admin-grid-2">
+                <Field label="Your role" name="role" defaultValue={project?.role} placeholder="Sole developer" optional />
+                <Field label="Timeline" name="timeline" defaultValue={project?.timeline} placeholder="6 weeks" optional />
+            </div>
             <Field
-                label="Your role — shown on the project's page (optional)"
-                name="role"
-                defaultValue={project?.role}
-                placeholder="Sole developer"
-            />
-            <Field
-                label="Timeline — shown on the project's page (optional)"
-                name="timeline"
-                defaultValue={project?.timeline}
-                placeholder="6 weeks"
-            />
-            <Field
-                label="Highlights — key things you did (one per line, optional)"
+                label="Highlights"
                 name="highlights"
                 textarea
                 rows={4}
                 defaultValue={(project?.highlights || []).join("\n")}
                 placeholder={"Cut initial load time by 60% with route-level code splitting\nAdded infinite scroll with cursor-based pagination"}
+                hint="One per line. Start a line with “Label:” to bold the label on the project page."
+                optional
             />
-            <Field label="Live demo URL" name="live_url" defaultValue={project?.live_url} />
-            <Field label="Repo URL" name="repo_url" defaultValue={project?.repo_url} />
-            <ProjectImagesField imageUrls={savedImageUrls} />
+            <div className="admin-grid-2">
+                <Field label="Live site URL" name="live_url" defaultValue={project?.live_url} type="url" optional />
+                <Field label="Source code URL" name="repo_url" defaultValue={project?.repo_url} type="url" optional />
+            </div>
+            <ProjectImagesField imageUrls={savedImagesOf(project)} />
         </>
     );
 }

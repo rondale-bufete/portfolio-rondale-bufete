@@ -1,75 +1,70 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import AdminActionForm from "./AdminActionForm";
+import { ToastProvider } from "./Toaster";
 
-beforeEach(() => {
-    // Stub reload because jsdom does not implement it.
-    Object.defineProperty(window, "location", {
-        value: { ...window.location, reload: vi.fn() },
-        writable: true,
-    });
-});
+function renderForm(props, button = "Save") {
+    return render(
+        <ToastProvider>
+            <AdminActionForm {...props}>
+                <button type="submit">{button}</button>
+            </AdminActionForm>
+        </ToastProvider>
+    );
+}
 
 describe("AdminActionForm", () => {
-    it("shows a success modal after the action resolves", async () => {
+    it("confirms a save with a toast instead of a pop-up to dismiss", async () => {
         const action = vi.fn().mockResolvedValue(undefined);
         const user = userEvent.setup();
-        render(
-            <AdminActionForm action={action} successMessage="Saved it.">
-                <button type="submit">Save</button>
-            </AdminActionForm>
-        );
+        renderForm({ action, successMessage: "Saved it." });
 
         await user.click(screen.getByRole("button", { name: "Save" }));
 
-        await screen.findByText("Saved it.");
-        expect(action).toHaveBeenCalled();
+        expect(await within(screen.getByRole("status")).findByText("Saved it.")).toBeInTheDocument();
+        expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+        expect(action).toHaveBeenCalledTimes(1);
     });
 
-    it("regression: clicking the success modal's Okay button does not re-submit the form", async () => {
-        // Keep the modal's Okay button from resubmitting the form after a save.
+    it("stays quiet when the change is visible anyway", async () => {
         const action = vi.fn().mockResolvedValue(undefined);
         const user = userEvent.setup();
-        render(
-            <AdminActionForm action={action} successMessage="Saved it.">
-                <button type="submit">Save</button>
-            </AdminActionForm>
-        );
+        renderForm({ action, successMessage: null }, "Move up");
 
-        await user.click(screen.getByRole("button", { name: "Save" }));
-        await screen.findByText("Saved it.");
-        expect(action).toHaveBeenCalledTimes(1);
+        await user.click(screen.getByRole("button", { name: "Move up" }));
 
-        await user.click(screen.getByRole("button", { name: "Okay" }));
-
-        expect(action).toHaveBeenCalledTimes(1);
+        await waitFor(() => expect(action).toHaveBeenCalled());
+        expect(screen.getByRole("status")).toBeEmptyDOMElement();
     });
 
-    it("shows the thrown error message instead of a success modal", async () => {
+    it("shows the thrown error next to the form", async () => {
         const action = vi.fn().mockRejectedValue(new Error("Unauthorized."));
         const user = userEvent.setup();
-        render(
-            <AdminActionForm action={action}>
-                <button type="submit">Save</button>
-            </AdminActionForm>
-        );
+        renderForm({ action });
 
         await user.click(screen.getByRole("button", { name: "Save" }));
 
-        await screen.findByText("Unauthorized.");
-        expect(screen.queryByText(/your changes were saved/i)).not.toBeInTheDocument();
+        expect(await screen.findByRole("alert")).toHaveTextContent("Unauthorized.");
+        expect(screen.getByRole("status")).toBeEmptyDOMElement();
+    });
+
+    it("reports errors as a toast when the form has no room for them", async () => {
+        const action = vi.fn().mockRejectedValue(new Error("Couldn't move it."));
+        const user = userEvent.setup();
+        renderForm({ action, inlineErrors: false }, "Move up");
+
+        await user.click(screen.getByRole("button", { name: "Move up" }));
+
+        expect(await within(screen.getByRole("status")).findByText("Couldn't move it.")).toBeInTheDocument();
+        expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     });
 
     it("disables buttons while the action is pending, and re-enables after it settles", async () => {
         let resolveAction;
         const action = vi.fn(() => new Promise((resolve) => (resolveAction = resolve)));
         const user = userEvent.setup();
-        render(
-            <AdminActionForm action={action}>
-                <button type="submit">Save</button>
-            </AdminActionForm>
-        );
+        renderForm({ action });
 
         const button = screen.getByRole("button", { name: "Save" });
         await user.click(button);
@@ -80,10 +75,9 @@ describe("AdminActionForm", () => {
         await waitFor(() => expect(button).not.toBeDisabled());
     });
 
-    it("preserves an already-disabled button's disabled state after pending clears", async () => {
-        const action = vi.fn().mockResolvedValue(undefined);
+    it("preserves an already-disabled button's disabled state", () => {
         render(
-            <AdminActionForm action={action}>
+            <AdminActionForm action={vi.fn()}>
                 <button type="submit" disabled>
                     Move up
                 </button>
@@ -93,50 +87,41 @@ describe("AdminActionForm", () => {
         expect(screen.getByRole("button", { name: "Move up" })).toBeDisabled();
     });
 
-    it("opens a confirm dialog instead of submitting immediately when confirmMessage is set", async () => {
+    it("asks before a destructive action instead of submitting", async () => {
         const action = vi.fn().mockResolvedValue(undefined);
         const user = userEvent.setup();
-        render(
-            <AdminActionForm action={action} confirmMessage="This will delete the thing.">
-                <button type="submit">Delete</button>
-            </AdminActionForm>
-        );
+        renderForm({ action, confirmMessage: "This will delete the thing." }, "Delete project");
 
-        await user.click(screen.getByRole("button", { name: "Delete" }));
+        await user.click(screen.getByRole("button", { name: "Delete project" }));
 
-        expect(screen.getByText("This will delete the thing.")).toBeInTheDocument();
+        const dialog = screen.getByRole("alertdialog");
+        expect(dialog).toHaveTextContent("This will delete the thing.");
+        expect(within(dialog).getByRole("button", { name: "Cancel" })).toHaveFocus();
         expect(action).not.toHaveBeenCalled();
     });
 
-    it("cancelling the confirm dialog does not call the action", async () => {
+    it("cancelling the confirmation does not call the action", async () => {
         const action = vi.fn().mockResolvedValue(undefined);
         const user = userEvent.setup();
-        render(
-            <AdminActionForm action={action} confirmMessage="This will delete the thing.">
-                <button type="submit">Delete</button>
-            </AdminActionForm>
-        );
+        renderForm({ action, confirmMessage: "This will delete the thing." }, "Delete project");
 
-        await user.click(screen.getByRole("button", { name: "Delete" }));
-        await user.click(screen.getByRole("button", { name: "keep" }));
+        await user.click(screen.getByRole("button", { name: "Delete project" }));
+        await user.click(within(screen.getByRole("alertdialog")).getByRole("button", { name: "Cancel" }));
 
         expect(action).not.toHaveBeenCalled();
-        expect(screen.queryByText("This will delete the thing.")).not.toBeInTheDocument();
+        expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
     });
 
-    it("confirming the dialog calls the action", async () => {
+    it("confirming calls the action and reports the result", async () => {
         const action = vi.fn().mockResolvedValue(undefined);
         const user = userEvent.setup();
-        render(
-            <AdminActionForm action={action} confirmMessage="This will delete the thing.">
-                <button type="submit">Delete</button>
-            </AdminActionForm>
-        );
+        renderForm({ action, confirmMessage: "This will delete the thing.", successMessage: "Project deleted." }, "Delete project");
 
-        await user.click(screen.getByRole("button", { name: "Delete" }));
-        // Click the confirmation dialog's delete button, not the form trigger.
-        await user.click(screen.getByRole("button", { name: "delete" }));
+        await user.click(screen.getByRole("button", { name: "Delete project" }));
+        await user.click(within(screen.getByRole("alertdialog")).getByRole("button", { name: "Delete" }));
 
-        await waitFor(() => expect(action).toHaveBeenCalled());
+        await waitFor(() => expect(action).toHaveBeenCalledTimes(1));
+        expect(await within(screen.getByRole("status")).findByText("Project deleted.")).toBeInTheDocument();
+        expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
     });
 });

@@ -8,29 +8,20 @@ import {
 } from "../../actions/sections";
 import { setChatWidgetVisibilityAction } from "../../actions/profile";
 import PageHeader from "../../ui/PageHeader";
-import Card from "../../ui/Card";
 import Field from "../../ui/Field";
 import Badge from "../../ui/Badge";
 import EmptyState from "../../ui/EmptyState";
 import ErrorState from "../../ui/ErrorState";
 import { ItemRow, AddNewRow } from "../../ui/CollapsibleRow";
-import { buttonPrimary, buttonSecondary, buttonIcon, linkDanger } from "../../ui/tokens";
-import { ArrowUpIcon, ArrowDownIcon, EyeIcon, EyeOffIcon, TrashIcon } from "../../ui/icons";
+import ReorderControls from "../../ui/ReorderControls";
+import DeleteAction from "../../ui/DeleteAction";
+import { buttonPrimary, buttonSecondary } from "../../ui/tokens";
 import AdminActionForm from "../../ui/AdminActionForm";
+import { EyeIcon, EyeOffIcon } from "@/components/icons";
 import { HOMEPAGE_SECTION_KINDS } from "@/lib/sectionKinds";
+import { stripOrdinal } from "@/lib/format";
 
-const KIND_LABELS = {
-    about: "About",
-    experience: "Experience",
-    skills: "Skills",
-    projects: "Projects",
-    contact: "Contact",
-    custom: "Custom",
-};
-
-// About, Projects, Contact and custom sections make up the homepage below the
-// hero, in this order. Experience and Skills are legacy rows that render inside
-// About, so they can't be moved or hidden on their own.
+const KIND_LABELS = { about: "About", projects: "Projects", contact: "Contact", custom: "Custom" };
 
 export default async function SectionsAdminPage() {
     const [{ data: sections, error }, { data: profile, error: profileError }] = await Promise.all([
@@ -39,69 +30,56 @@ export default async function SectionsAdminPage() {
         supabaseAdmin.from("profile").select("*").eq("id", 1).maybeSingle(),
     ]);
 
+    // Legacy Experience and Skills rows render inside About and have nothing to edit here.
+    const homepage = (sections || []).filter((section) => HOMEPAGE_SECTION_KINDS.has(section.kind));
+
     async function handleCreate(formData) {
         "use server";
         await createCustomSectionAction(formData);
     }
 
-    const homepageIds = (sections || []).filter((section) => HOMEPAGE_SECTION_KINDS.has(section.kind)).map((section) => section.id);
-
     return (
         <div>
             <PageHeader
                 title="Sections"
-                description={
-                    <>
-                        The homepage shows these sections below the hero, top to bottom in this order, and the
-                        navbar tabs follow the same order. Use the arrows to reorder About, Projects, Contact and
-                        custom sections, and hide any of them (hiding one also removes its navbar tab). Experience
-                        and Skills always render inside About when they have content.
-                    </>
-                }
+                description="Everything below the hero, top to bottom. The navbar tabs follow the same order and use each section's label."
             />
 
-            <ChatWidgetCard profile={profile} error={profileError} />
+            <div className="admin-stack">
+                <ChatWidgetCard profile={profile} error={profileError} />
 
-            <div className="mb-6">
                 <AddNewRow label="Add a custom section">
-                    <AdminActionForm action={handleCreate} className="mt-4 space-y-4 max-w-xl">
-                        <Field label="Label" name="label" placeholder="Testimonials" required />
-                        <Field label="Heading" name="heading" placeholder="What people say" required />
-                        <Field
-                            label="Body"
-                            name="body"
-                            textarea
-                            rows={5}
-                            placeholder="Write the section's content. Separate paragraphs with a blank line."
-                        />
-                        <button type="submit" className={buttonPrimary}>
-                            Add section
-                        </button>
+                    <AdminActionForm action={handleCreate} className="admin-form" successMessage="Section added.">
+                        <div className="admin-grid-2">
+                            <Field label="Navbar label" name="label" placeholder="Testimonials" required />
+                            <Field label="Heading" name="heading" placeholder="What people say" required />
+                        </div>
+                        <Field label="Body" name="body" textarea rows={5} hint="Separate paragraphs with a blank line." />
+                        <div className="admin-form__actions">
+                            <button type="submit" className={buttonPrimary}>
+                                Add section
+                            </button>
+                        </div>
                     </AdminActionForm>
                 </AddNewRow>
+
+                {error && <ErrorState message={error.message} />}
+
+                {!error && (
+                    <div className="admin-list">
+                        {homepage.map((section, index) => (
+                            <SectionRow
+                                key={section.id}
+                                section={section}
+                                index={index}
+                                isFirst={index === 0}
+                                isLast={index === homepage.length - 1}
+                            />
+                        ))}
+                        {homepage.length === 0 && <EmptyState title="No sections found" description="Run the sections migration SQL first." />}
+                    </div>
+                )}
             </div>
-
-            {error && <ErrorState message={error.message} />}
-
-            {!error && (
-                <div className="space-y-3">
-                    {(sections || []).map((section, i) => (
-                        <SectionRow
-                            key={section.id}
-                            section={section}
-                            index={i}
-                            isFirst={section.id === homepageIds[0]}
-                            isLast={section.id === homepageIds.at(-1)}
-                        />
-                    ))}
-                    {(!sections || sections.length === 0) && (
-                        <EmptyState
-                            title="No sections found"
-                            description="Run the sections migration SQL first."
-                        />
-                    )}
-                </div>
-            )}
         </div>
     );
 }
@@ -120,44 +98,33 @@ function ChatWidgetCard({ profile, error }) {
     }
 
     return (
-        <Card className="mb-6">
-            <div className="flex items-start justify-between gap-4">
+        <section className="admin-card admin-card--padded" aria-labelledby="chat-widget-title">
+            <div className="admin-card__header">
                 <div>
-                    <h2 className="font-medium text-[var(--color-text)] font-[family-name:var(--font-display)]">Chat widget</h2>
-                    <p className="mt-1 text-sm leading-relaxed text-[var(--color-body)]">
-                        The &ldquo;Ask me about my work&rdquo; assistant on every public page. Hiding it only removes it
-                        from the site; the assistant itself isn&apos;t changed.
+                    <h2 id="chat-widget-title" className="admin-card__title">
+                        Chat assistant
+                    </h2>
+                    <p className="admin-card__description">
+                        The &ldquo;Ask me about my work&rdquo; button on every public page. Hiding it removes the button only; the assistant itself is unchanged.
                     </p>
                 </div>
-                <Badge tone={isVisible ? "accent" : "neutral"}>{isVisible ? "Visible" : "Hidden"}</Badge>
+                <Badge tone={isVisible ? "success" : "neutral"}>{isVisible ? "On the site" : "Hidden"}</Badge>
             </div>
 
             {hasSetting ? (
                 <AdminActionForm
                     action={handleToggle}
-                    className="mt-4"
-                    successMessage={isVisible ? "The chat widget is now hidden from your site." : "The chat widget is back on your site."}
+                    successMessage={isVisible ? "Chat assistant hidden from the site." : "Chat assistant is back on the site."}
                 >
                     <button type="submit" className={buttonSecondary}>
-                        {isVisible ? (
-                            <>
-                                <EyeOffIcon className="w-4 h-4" />
-                                Hide from site
-                            </>
-                        ) : (
-                            <>
-                                <EyeIcon className="w-4 h-4" />
-                                Show on site
-                            </>
-                        )}
+                        {isVisible ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
+                        {isVisible ? "Hide from site" : "Show on site"}
                     </button>
                 </AdminActionForm>
             ) : (
-                <p className="mt-4 field-label">
-                    Run supabase/chat_widget_toggle_migration.sql in the Supabase SQL Editor to turn on this toggle.
-                </p>
+                <p className="admin-note">Run supabase/chat_widget_toggle_migration.sql in the Supabase SQL Editor to turn on this toggle.</p>
             )}
-        </Card>
+        </section>
     );
 }
 
@@ -183,77 +150,58 @@ function SectionRow({ section, index, isFirst, isLast }) {
         await deleteSectionAction(section.id);
     }
 
-    const canReorder = HOMEPAGE_SECTION_KINDS.has(section.kind);
-    const canToggle = canReorder;
-
-    const badges = (
-        <div className="flex items-center gap-1.5 shrink-0">
-            <Badge tone="accent">{KIND_LABELS[section.kind]}</Badge>
-            {!section.visible && <Badge tone="neutral">Hidden</Badge>}
-        </div>
-    );
+    const kindLabel = KIND_LABELS[section.kind];
+    const name = section.kind === "custom" ? section.heading || "Untitled section" : kindLabel;
+    // About renders its own sub-headings, so only its navbar label is used.
+    const usesHeading = section.kind !== "about";
 
     return (
-        <ItemRow index={index} title={section.heading || "(untitled)"} badges={badges}>
-            {(canReorder || canToggle) && (
-                <div className="mt-4 flex items-center gap-2 flex-wrap">
-                    {canReorder && (
-                        <>
-                            <AdminActionForm action={handleMoveUp}>
-                                <button type="submit" disabled={isFirst} className={buttonIcon} title="Move up" aria-label="Move up">
-                                    <ArrowUpIcon className="w-4 h-4" />
-                                </button>
-                            </AdminActionForm>
-                            <AdminActionForm action={handleMoveDown}>
-                                <button type="submit" disabled={isLast} className={buttonIcon} title="Move down" aria-label="Move down">
-                                    <ArrowDownIcon className="w-4 h-4" />
-                                </button>
-                            </AdminActionForm>
-                        </>
-                    )}
-                    {canToggle && (
-                        <AdminActionForm action={handleToggle}>
-                            <button type="submit" className={buttonSecondary}>
-                                {section.visible ? (
-                                    <>
-                                        <EyeOffIcon className="w-4 h-4" />
-                                        Hide from site
-                                    </>
-                                ) : (
-                                    <>
-                                        <EyeIcon className="w-4 h-4" />
-                                        Show on site
-                                    </>
-                                )}
-                            </button>
-                        </AdminActionForm>
-                    )}
-                </div>
-            )}
-
-            <AdminActionForm action={handleUpdate} className="mt-5 space-y-4 max-w-xl">
-                <Field label="Label" name="label" defaultValue={section.label} required />
-                <Field label="Heading" name="heading" defaultValue={section.heading} required />
-                {section.kind === "custom" && (
-                    <Field label="Body" name="body" defaultValue={section.body} textarea rows={5} />
-                )}
-                <button type="submit" className={buttonPrimary}>
-                    Save changes
-                </button>
-            </AdminActionForm>
-
-            {section.kind === "custom" && (
-                <AdminActionForm
-                    action={handleDelete}
-                    className="mt-4"
-                    confirmMessage="This custom section will be permanently deleted."
-                    successMessage="The custom section was deleted."
-                >
-                    <button type="submit" className={linkDanger}>
-                        <TrashIcon className="w-4 h-4" />
-                        Delete this section
+        <ItemRow
+            index={index}
+            title={name}
+            meta={
+                <>
+                    {section.kind === "custom" && <Badge tone="accent">Custom</Badge>}
+                    {!section.visible && <Badge>Hidden</Badge>}
+                    <span>Navbar: {stripOrdinal(section.label) || kindLabel}</span>
+                </>
+            }
+            actions={<ReorderControls label={name} isFirst={isFirst} isLast={isLast} onMoveUp={handleMoveUp} onMoveDown={handleMoveDown} />}
+        >
+            <div className="admin-stack">
+                <AdminActionForm action={handleToggle} successMessage={section.visible ? `${name} hidden from the site.` : `${name} is back on the site.`}>
+                    <button type="submit" className={buttonSecondary}>
+                        {section.visible ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
+                        {section.visible ? "Hide from site" : "Show on site"}
                     </button>
                 </AdminActionForm>
+
+                <AdminActionForm action={handleUpdate} className="admin-form">
+                    <div className="admin-grid-2">
+                        <Field label="Navbar label" name="label" defaultValue={stripOrdinal(section.label)} required />
+                        {usesHeading && <Field label="Heading" name="heading" defaultValue={section.heading} required />}
+                    </div>
+                    {!usesHeading && <input type="hidden" name="heading" value={section.heading || ""} />}
+                    {section.kind === "custom" && (
+                        <Field label="Body" name="body" defaultValue={section.body} textarea rows={5} hint="Separate paragraphs with a blank line." />
+                    )}
+                    <div className="admin-form__actions">
+                        <button type="submit" className={buttonPrimary}>
+                            Save changes
+                        </button>
+                    </div>
+                </AdminActionForm>
+            </div>
+
+            {section.kind === "custom" && (
+                <div className="admin-row__footer">
+                    <DeleteAction
+                        action={handleDelete}
+                        label="Delete section"
+                        confirmMessage={`“${name}” will be removed from your homepage for good.`}
+                        successMessage="Section deleted."
+                    />
+                </div>
             )}
         </ItemRow>
     );

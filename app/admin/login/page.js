@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { loginAction } from "../auth-actions";
-import { inputBase, labelBase, buttonPrimary } from "../ui/tokens";
+import { AlertIcon } from "@/components/icons";
 
 const initialState = { error: null };
 
@@ -17,50 +17,55 @@ export default function LoginPage() {
     );
 
     return (
-        <div className="min-h-screen bg-[var(--color-bg)] flex items-center justify-center px-6">
-            <form
-                action={formAction}
-                className="w-full max-w-sm rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] overflow-hidden"
-            >
-                <div className="flex items-center justify-between px-[18px] py-3 border-b border-[var(--color-border)] font-[family-name:var(--font-mono)] text-xs text-[var(--color-faint)]">
-                    <span><span className="text-[var(--color-accent)]">~/</span>admin/login</span>
-                    <span>🔒</span>
+        <main className="admin-login">
+            <form action={formAction} className="admin-login__card">
+                <div className="admin-login__brand">
+                    <span className="admin-monogram" aria-hidden="true">
+                        RB
+                    </span>
+                    <span className="admin-sidebar__name">
+                        <strong>Portfolio admin</strong>
+                        <span>Rondale Rae Bufete</span>
+                    </span>
                 </div>
 
-                <div className="p-6 flex flex-col gap-[18px]">
-                    <h1 className="font-[family-name:var(--font-display)] text-2xl font-medium text-[var(--color-text)]">
-                        Sign in
-                    </h1>
-
+                <div className="admin-login__body">
                     <div>
-                        <label className={labelBase} htmlFor="password">
-                            password
+                        <h1 className="admin-login__title">Sign in</h1>
+                        <p className="admin-login__lead">Edit what appears on your portfolio.</p>
+                    </div>
+
+                    <div className="admin-field">
+                        <label className="admin-label" htmlFor="password">
+                            Password
                         </label>
                         <input
                             id="password"
                             name="password"
                             type="password"
+                            autoComplete="current-password"
                             required
                             autoFocus
-                            className={inputBase}
+                            aria-invalid={state?.error ? true : undefined}
+                            aria-describedby={state?.error ? "login-error" : undefined}
+                            className="admin-input"
                         />
                     </div>
 
                     {state?.error && (
-                        <p className="font-[family-name:var(--font-mono)] text-xs text-[var(--color-danger-text)]">
-                            error: {state.error}
+                        <p id="login-error" role="alert" className="admin-form__error">
+                            <AlertIcon size={16} />
+                            {state.error}
                         </p>
                     )}
 
-                    <button type="submit" disabled={isPending} className={`${buttonPrimary} w-full mt-2`}>
-                        {isPending ? "checking…" : "$ sign in ↵"}
+                    <button type="submit" disabled={isPending} className="button button--primary button--compact button--block">
+                        {isPending ? "Signing in…" : "Sign in"}
                     </button>
                 </div>
 
-                <div className="px-[18px] py-3 border-t border-[var(--color-border)] font-[family-name:var(--font-mono)] text-[11px] text-[var(--color-faint)]">
-                    changes publish to the public site in ~1 min
-                </div>
+                <p className="admin-login__footer">Changes appear on the public site within about a minute.</p>
             </form>
-        </div>
+        </main>
     );
 }

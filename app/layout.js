@@ -1,13 +1,7 @@
-import { Geist, Geist_Mono, Space_Grotesk, DM_Sans } from "next/font/google";
+import { Geist_Mono, Space_Grotesk, DM_Sans } from "next/font/google";
 import PublicAnalytics from "@/components/PublicAnalytics";
 import { getSiteUrl } from "@/lib/site";
 import "./globals.css";
-
-const geist = Geist({
-  subsets: ["latin"],
-  weight: "variable",
-  variable: "--font-display",
-});
 
 const geistMono = Geist_Mono({
   subsets: ["latin"],
@@ -18,7 +12,7 @@ const geistMono = Geist_Mono({
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   weight: "variable",
-  variable: "--font-space",
+  variable: "--font-display",
 });
 
 const dmSans = DM_Sans({
@@ -37,13 +31,13 @@ export const metadata = {
 export const viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#f1f4ef",
+  themeColor: "#f4f6f8",
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${geist.variable} ${geistMono.variable} ${spaceGrotesk.variable} ${dmSans.variable}`}>
-      <body className="bg-[var(--color-bg)] text-[var(--color-text)] font-[family-name:var(--font-display)] antialiased">
+    <html lang="en" className={`${geistMono.variable} ${spaceGrotesk.variable} ${dmSans.variable}`}>
+      <body className="bg-[var(--color-bg)] text-[var(--color-text)] font-[family-name:var(--font-body)] antialiased">
         {children}
         <PublicAnalytics />
       </body>

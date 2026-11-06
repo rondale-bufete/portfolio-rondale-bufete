@@ -12,15 +12,13 @@ import EmptyState from "../../ui/EmptyState";
 import ErrorState from "../../ui/ErrorState";
 import { ItemRow, AddNewRow } from "../../ui/CollapsibleRow";
 import { MonthField, CurrentCheckbox } from "../../ui/MonthYearFields";
-import { buttonPrimary, buttonIcon, linkDanger } from "../../ui/tokens";
-import { ArrowUpIcon, ArrowDownIcon, TrashIcon } from "../../ui/icons";
+import ReorderControls from "../../ui/ReorderControls";
+import DeleteAction from "../../ui/DeleteAction";
+import { buttonPrimary } from "../../ui/tokens";
 import AdminActionForm from "../../ui/AdminActionForm";
 
 export default async function EducationAdminPage() {
-    const { data: education, error } = await supabaseAdmin
-        .from("education")
-        .select("*")
-        .order("sort_order");
+    const { data: education, error } = await supabaseAdmin.from("education").select("*").order("sort_order");
 
     async function handleCreate(formData) {
         "use server";
@@ -29,37 +27,39 @@ export default async function EducationAdminPage() {
 
     return (
         <div>
-            <PageHeader title="Education" description="Shown as a timeline under About." />
+            <PageHeader title="Education" description="Listed under About. The description and bullet points aren't shown there; the chat assistant uses them to answer questions." />
 
-            <div className="mb-6">
-                <AddNewRow label="Add an entry">
-                    <AdminActionForm action={handleCreate} className="mt-4 space-y-4 max-w-xl">
+            <div className="admin-stack">
+                <AddNewRow label="Add a school">
+                    <AdminActionForm action={handleCreate} className="admin-form" successMessage="School added.">
                         <EduFields />
-                        <button type="submit" className={buttonPrimary}>
-                            Add entry
-                        </button>
+                        <div className="admin-form__actions">
+                            <button type="submit" className={buttonPrimary}>
+                                Add school
+                            </button>
+                        </div>
                     </AdminActionForm>
                 </AddNewRow>
+
+                {error && <ErrorState message={error.message} />}
+
+                {!error && (
+                    <div className="admin-list">
+                        {(education || []).map((edu, index) => (
+                            <EduRow
+                                key={edu.id}
+                                edu={edu}
+                                index={index}
+                                isFirst={index === 0}
+                                isLast={index === (education?.length || 0) - 1}
+                            />
+                        ))}
+                        {(!education || education.length === 0) && (
+                            <EmptyState title="No education yet" description="Add your degree or program above." />
+                        )}
+                    </div>
+                )}
             </div>
-
-            {error && <ErrorState message={error.message} />}
-
-            {!error && (
-                <div className="space-y-3">
-                    {(education || []).map((edu, index) => (
-                        <EduRow
-                            key={edu.id}
-                            edu={edu}
-                            index={index}
-                            isFirst={index === 0}
-                            isLast={index === (education?.length || 0) - 1}
-                        />
-                    ))}
-                    {(!education || education.length === 0) && (
-                        <EmptyState title="Nothing yet" description="Add your first entry above." />
-                    )}
-                </div>
-            )}
         </div>
     );
 }
@@ -83,38 +83,29 @@ function EduRow({ edu, index, isFirst, isLast }) {
     }
 
     return (
-        <ItemRow index={index} title={edu.degree} meta={edu.period}>
-            <div className="mt-4 flex items-center gap-2">
-                <AdminActionForm action={handleMoveUp}>
-                    <button type="submit" disabled={isFirst} className={buttonIcon} title="Move up" aria-label="Move up">
-                        <ArrowUpIcon className="w-4 h-4" />
-                    </button>
-                </AdminActionForm>
-                <AdminActionForm action={handleMoveDown}>
-                    <button type="submit" disabled={isLast} className={buttonIcon} title="Move down" aria-label="Move down">
-                        <ArrowDownIcon className="w-4 h-4" />
-                    </button>
-                </AdminActionForm>
-            </div>
-
-            <AdminActionForm action={handleUpdate} className="mt-4 space-y-4 max-w-xl">
+        <ItemRow
+            index={index}
+            title={edu.degree}
+            meta={[edu.school, edu.period].filter(Boolean).join(" · ")}
+            actions={<ReorderControls label={edu.degree} isFirst={isFirst} isLast={isLast} onMoveUp={handleMoveUp} onMoveDown={handleMoveDown} />}
+        >
+            <AdminActionForm action={handleUpdate} className="admin-form">
                 <EduFields edu={edu} />
-                <button type="submit" className={buttonPrimary}>
-                    Save changes
-                </button>
+                <div className="admin-form__actions">
+                    <button type="submit" className={buttonPrimary}>
+                        Save changes
+                    </button>
+                </div>
             </AdminActionForm>
 
-            <AdminActionForm
-                action={handleDelete}
-                className="mt-4"
-                confirmMessage="This education entry will be permanently deleted."
-                successMessage="The education entry was deleted."
-            >
-                <button type="submit" className={linkDanger}>
-                    <TrashIcon className="w-4 h-4" />
-                    Delete this entry
-                </button>
-            </AdminActionForm>
+            <div className="admin-row__footer">
+                <DeleteAction
+                    action={handleDelete}
+                    label="Delete entry"
+                    confirmMessage={`“${edu.degree}” will be removed from your site for good.`}
+                    successMessage="Entry deleted."
+                />
+            </div>
         </ItemRow>
     );
 }
@@ -124,22 +115,23 @@ function EduFields({ edu }) {
 
     return (
         <>
-            <Field label="Degree / Program" name="degree" defaultValue={edu?.degree} required />
+            <Field label="Degree or program" name="degree" defaultValue={edu?.degree} required />
             <Field label="School" name="school" defaultValue={edu?.school} required />
-
-            <MonthField label="Start date" name="start" defaultValue={start} />
-            <CurrentCheckbox label="Currently studying here" defaultChecked={isCurrent} />
-            <MonthField label="End date (ignored if currently studying)" name="end" defaultValue={end} />
-
-            <Field label="Description (optional)" name="description" defaultValue={edu?.description} textarea />
-
+            <div className="admin-grid-2">
+                <MonthField label="Start" name="start" defaultValue={start} />
+                <MonthField label="End" name="end" defaultValue={end} hint="Ignored while you study here." />
+            </div>
+            <CurrentCheckbox label="I currently study here" defaultChecked={isCurrent} />
+            <Field label="Description" name="description" defaultValue={edu?.description} textarea optional />
             <Field
-                label="Bullet points — coursework, honors, thesis (one per line, optional)"
+                label="Bullet points"
                 name="bullets"
                 textarea
                 rows={4}
                 defaultValue={(edu?.bullets || []).join("\n")}
                 placeholder={"Dean's Lister, 2023–2025\nThesis: Real-time anomaly detection for IoT sensor networks"}
+                hint="Coursework, honors or thesis, one per line."
+                optional
             />
         </>
     );

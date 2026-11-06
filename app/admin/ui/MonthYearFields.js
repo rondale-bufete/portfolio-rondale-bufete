@@ -1,29 +1,25 @@
-import { inputBase, labelBase } from "./tokens";
+"use client";
 
-// Use one native month picker to avoid incomplete month/year values.
-export function MonthField({ label, name, defaultValue }) {
+import { useId } from "react";
+
+// One native month picker, so a date is never half filled in.
+export function MonthField({ label, name, defaultValue, hint }) {
+    const id = useId();
     return (
-        <div>
-            <label className={labelBase}>{label}</label>
-            <input
-                type="month"
-                name={name}
-                defaultValue={defaultValue || ""}
-                className={inputBase}
-            />
+        <div className="admin-field">
+            <label className="admin-label" htmlFor={id}>
+                {label}
+            </label>
+            <input id={id} type="month" name={name} defaultValue={defaultValue || ""} className="admin-input" />
+            {hint && <p className="admin-hint">{hint}</p>}
         </div>
     );
 }
 
 export function CurrentCheckbox({ label, defaultChecked }) {
     return (
-        <label className="flex items-center gap-2 text-sm text-[var(--color-body)]">
-            <input
-                type="checkbox"
-                name="is_current"
-                defaultChecked={defaultChecked}
-                className="w-4 h-4 rounded-[var(--radius-sm)] border-[var(--color-border-strong)] accent-[var(--color-accent)]"
-            />
+        <label className="admin-check">
+            <input type="checkbox" name="is_current" defaultChecked={defaultChecked} />
             {label}
         </label>
     );

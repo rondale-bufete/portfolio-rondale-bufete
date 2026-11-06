@@ -37,9 +37,7 @@ const baseFields = {
     github: "https://github.com/example",
     linkedin: "https://linkedin.com/in/example",
     location: "",
-    phone: "",
-    open_to: "",
-    status_label: "OPEN TO WORK",
+    status_label: "Open to work",
     existing_photo_url: "",
     existing_resume_url: "",
 };

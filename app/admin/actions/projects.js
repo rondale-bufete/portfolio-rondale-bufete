@@ -20,10 +20,6 @@ function parseTags(raw) {
         .filter(Boolean);
 }
 
-function parseProjectCategory(raw) {
-    return (raw || "").toString().trim() || "General";
-}
-
 function projectMetaPatch(formData) {
     return {
         provenance: formData.get("provenance")?.toString() || "Personal",
@@ -58,7 +54,6 @@ export async function createProjectAction(formData) {
     const { error } = await supabaseAdmin.from("projects").insert({
         title: formData.get("title")?.toString() || "",
         description: formData.get("description")?.toString() || "",
-        category: parseProjectCategory(formData.get("category")),
         tags: parseTags(formData.get("tags")?.toString()),
         highlights: parseBullets(formData.get("highlights")?.toString()),
         live_url: liveUrl,
@@ -107,7 +102,6 @@ export async function updateProjectAction(id, formData) {
     const patch = {
         title: formData.get("title")?.toString() || "",
         description: formData.get("description")?.toString() || "",
-        category: parseProjectCategory(formData.get("category")),
         tags: parseTags(formData.get("tags")?.toString()),
         highlights: parseBullets(formData.get("highlights")?.toString()),
         live_url: liveUrl,

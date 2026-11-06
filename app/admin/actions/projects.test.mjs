@@ -32,7 +32,6 @@ function formDataOf(fields) {
 const baseFields = {
     title: "My Project",
     description: "Does things",
-    category: "Front-end",
     tags: "Next.js, Tailwind",
     provenance: "Personal",
     year: "2026",
