@@ -13,6 +13,7 @@ import AdminActionForm from "../../ui/AdminActionForm";
 import Field from "../../ui/Field";
 import { buttonPrimary, buttonSecondary } from "../../ui/tokens";
 import { CloseIcon, PlusIcon } from "@/components/icons";
+import TechIcon from "@/components/TechIcon";
 
 export default async function SkillsAdminPage() {
     const { data: categories, error } = await supabaseAdmin
@@ -27,7 +28,7 @@ export default async function SkillsAdminPage() {
 
     return (
         <div>
-            <PageHeader title="Skills" description="Grouped into categories; each category is a row under About, and the first six skills also appear in the hero." />
+            <PageHeader title="Skills" description="Grouped into categories, each a card under About; the first six skills also appear in the hero. Icons come from Simple Icons and are matched by name, so write the usual spelling (Next.js, Tailwind CSS). Skills without one show their initials." />
 
             <div className="admin-stack">
                 {error && <ErrorState message={error.message} />}
@@ -108,6 +109,7 @@ function SkillChip({ item }) {
 
     return (
         <li className="tech-tag admin-chip">
+            <TechIcon name={item.name} bare />
             {item.name}
             <AdminActionForm action={handleDelete} successMessage={`Removed ${item.name}.`} inlineErrors={false}>
                 <button type="submit" className="admin-chip__remove" aria-label={`Remove ${item.name}`} title="Remove">

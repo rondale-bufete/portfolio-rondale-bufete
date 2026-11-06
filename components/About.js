@@ -1,4 +1,5 @@
 import Image from "next/image";
+import TechIcon from "./TechIcon";
 import { ExternalLinkIcon } from "./icons";
 
 // The intro (tagline and bio) lives in the hero, so About starts at Experience.
@@ -119,20 +120,24 @@ export default function About({ profile, experience = [], skills = [], education
 
                     {skills.length > 0 && (
                         <Subsection id="about-skills" title="Skills">
-                            <dl className="skills" data-reveal>
-                                {skills.map((group) => (
-                                    <div key={group.category} className="skills__row">
-                                        <dt>{group.category}</dt>
-                                        <dd>
-                                            <ul className="skills__tags">
-                                                {group.items.map((item) => (
-                                                    <li key={item} className="tech-tag">{item}</li>
-                                                ))}
-                                            </ul>
-                                        </dd>
-                                    </div>
+                            <div className="skills" data-reveal>
+                                {skills.map((group, groupIndex) => (
+                                    <section key={group.category} className="skill-group" style={{ "--i": groupIndex }} aria-label={group.category}>
+                                        <header className="skill-group__header">
+                                            <h3 className="skill-group__title">{group.category}</h3>
+                                            <span className="skill-group__count">{group.items.length}</span>
+                                        </header>
+                                        <ul className="skill-group__list">
+                                            {group.items.map((item) => (
+                                                <li key={item} className="tech-chip">
+                                                    <TechIcon name={item} />
+                                                    {item}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </section>
                                 ))}
-                            </dl>
+                            </div>
                         </Subsection>
                     )}
 

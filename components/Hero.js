@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import Image from "next/image";
 import PointerSpotlight from "./motion/PointerSpotlight";
+import TechIcon from "./TechIcon";
 import { ArrowDownIcon } from "./icons";
 import { initials } from "@/lib/format";
 
@@ -90,6 +91,7 @@ export default function Hero({ profile, projects = [], skills = [] }) {
                         <ul className="hero__stack" aria-label="Core technologies">
                             {coreStack.map((item, index) => (
                                 <li key={item} className="tech-tag" style={{ "--i": index }}>
+                                    <TechIcon name={item} bare />
                                     {item}
                                 </li>
                             ))}

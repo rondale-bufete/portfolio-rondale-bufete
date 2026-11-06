@@ -32,3 +32,14 @@ describe("About intro", () => {
         expect(screen.getByRole("link", { name: /experience/i })).toHaveAttribute("href", "#about-experience");
     });
 });
+
+describe("About skills", () => {
+    it("lists each category with its skills, an icon where one exists and initials otherwise", () => {
+        const { container } = render(<About skills={[{ category: "Languages", items: ["TypeScript", "Java"] }]} />);
+        const group = screen.getByRole("region", { name: "Languages" });
+        expect(group).toHaveTextContent("TypeScript");
+        expect(group).toHaveTextContent("Java");
+        expect(container.querySelectorAll(".tech-icon svg")).toHaveLength(1);
+        expect(container.querySelector(".tech-icon--initials")).toHaveTextContent("Ja");
+    });
+});

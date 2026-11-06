@@ -133,8 +133,7 @@ body[data-modal-open] .chat-widget { display: none; }
 :is(.portfolio-site, .admin-shell) .tech-tag { display: inline-flex; align-items: center; min-height: 28px; padding: 4px 10px; border: 1px solid var(--color-border); background: var(--color-surface); color: var(--color-body); font-family: var(--font-mono), monospace; font-size: 12px; line-height: 1.2; white-space: nowrap; transition: border-color 200ms ease, color 200ms ease, transform 260ms var(--ease-out); }
 :is(.portfolio-site, .admin-shell) .tech-tag--more { border-style: dashed; background: transparent; color: var(--color-muted); }
 .hero__stack,
-.project-tags,
-.skills__tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.project-tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
 
 /* navigation */
 .site-nav { position: sticky; top: 0; z-index: 40; border-bottom: 1px solid rgb(24 34 47 / 10%); background: rgb(244 246 248 / 84%); backdrop-filter: saturate(140%) blur(16px); }
@@ -318,11 +317,23 @@ body[data-modal-open] .chat-widget { display: none; }
 .timeline__bullets li { position: relative; padding-left: 20px; color: var(--color-body); font-size: 15px; line-height: 1.7; }
 .timeline__bullets li::before { position: absolute; top: 0.85em; left: 0; width: 8px; height: 1px; content: ""; background: var(--color-faint); }
 
-.skills { margin: 0; border-top: 1px solid var(--color-border); }
-.skills__row { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 12px 32px; padding: 20px 0; border-bottom: 1px solid var(--color-border); }
-.skills dt { color: var(--color-text); font-size: 15px; font-weight: 600; }
-.skills dd { margin: 0; }
-.skills__tags .tech-tag:hover { border-color: var(--color-accent); color: var(--color-accent); transform: translateY(-2px); }
+/* skills: one card per category, each skill with its brand icon (components/TechIcon.js) */
+.skills { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 16px; }
+.skill-group { display: flex; min-width: 0; flex-direction: column; gap: 16px; padding: 20px; border: 1px solid var(--color-border); background: var(--color-surface); }
+.skill-group__header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--color-border); }
+.skill-group__title { margin: 0; color: var(--color-text); font-family: var(--font-display), sans-serif; font-size: 17px; font-weight: 600; }
+.skill-group__count { color: var(--color-muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+.skill-group__list { display: grid; grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; }
+.tech-chip { display: flex; min-width: 0; align-items: center; gap: 10px; min-height: 44px; padding: 5px 10px 5px 5px; border: 1px solid var(--color-border); background: var(--color-bg); color: var(--color-text); font-size: 14px; font-weight: 500; line-height: 1.25; transition: border-color 220ms ease, box-shadow 260ms var(--ease-out), transform 260ms var(--ease-out); }
+.tech-chip:hover { border-color: var(--color-text); box-shadow: 4px 4px 0 var(--color-accent-border); transform: translate(-2px, -2px); }
+.tech-icon { display: grid; flex: none; place-items: center; width: 32px; height: 32px; border: 1px solid var(--color-border); background: var(--color-surface); color: var(--color-text); transition: background-color 220ms ease, border-color 220ms ease, color 220ms ease; }
+.tech-icon svg { width: 18px; height: 18px; fill: currentColor; }
+.tech-icon--initials { font-family: var(--font-display), sans-serif; font-size: 12px; font-weight: 700; letter-spacing: -0.02em; }
+.tech-chip:hover .tech-icon { border-color: var(--brand, var(--color-text)); background: var(--brand, var(--color-text)); color: var(--brand-ink, #fff); }
+/* inside a tag: just the glyph, in the tag's own color */
+.tech-icon--bare { width: auto; height: auto; border: 0; background: none; color: inherit; }
+.tech-icon--bare svg { width: 14px; height: 14px; }
+:is(.portfolio-site, .admin-shell) .tech-tag:has(.tech-icon) { gap: 6px; }
 
 .education { margin: 0; padding: 0; border-top: 1px solid var(--color-border); list-style: none; }
 .education__item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 24px; padding: 20px 0; border-bottom: 1px solid var(--color-border); }
@@ -414,7 +425,9 @@ a.cert-card:hover .cert-card__image { transform: scale(1.08); }
    each element's own transition. */
 .motion-ready [data-reveal] { transition: opacity 800ms var(--ease-out), transform 900ms var(--ease-out); }
 .motion-ready [data-reveal]:not([data-revealed]) { opacity: 0; transform: translateY(32px); transition: none; }
-.motion-ready :is(.section-header, .about__heading, .featured-project, .project-grid, .certs, .contact__methods)[data-reveal]:not([data-revealed]) { opacity: 1; transform: none; }
+.motion-ready :is(.section-header, .about__heading, .featured-project, .project-grid, .certs, .contact__methods, .skills)[data-reveal]:not([data-revealed]) { opacity: 1; transform: none; }
+.motion-ready .skills[data-reveal] > .skill-group { transition: opacity 700ms var(--ease-out) calc(var(--i, 0) * 110ms), transform 800ms var(--ease-out) calc(var(--i, 0) * 110ms); }
+.motion-ready .skills[data-reveal]:not([data-revealed]) > .skill-group { opacity: 0; transform: translateY(28px); transition: none; }
 .motion-ready :is(.section-header, .about__heading):not([data-revealed])::before,
 .motion-ready :is(.section-header, .about__heading):not([data-revealed])::after { transform: scaleX(0); transition: none; }
 .motion-ready :is(.section-header, .about__heading):not([data-revealed]) > span,
@@ -581,7 +594,6 @@ a.cert-card:hover .cert-card__image { transform: scale(1.08); }
   .featured-project--flip { grid-template-columns: 1fr; gap: 28px; }
   .featured-project--flip .featured-project__media { order: 0; }
   .about__layout { grid-template-columns: 200px minmax(0, 1fr); gap: 40px; }
-  .skills__row { grid-template-columns: 1fr; gap: 12px; }
   .contact__layout { grid-template-columns: 1fr; gap: 56px; }
   .contact__intro { position: static; }
   .contact-form { margin-right: 16px; }
