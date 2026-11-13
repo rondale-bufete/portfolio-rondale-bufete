@@ -99,11 +99,11 @@ export default function Contact({ profile, label = "Contact", heading = "Let’s
                     <div className="contact-form__fields">
                         <label className="field">
                             <span className="field__label">Name</span>
-                            <input name="name" type="text" autoComplete="name" required value={form.name} onChange={handleChange} disabled={isSending} className="field__input" />
+                            <input name="name" type="text" placeholder="Your Name" autoComplete="name" required value={form.name} onChange={handleChange} disabled={isSending} className="field__input" />
                         </label>
                         <label className="field">
                             <span className="field__label">Email</span>
-                            <input name="email" type="email" autoComplete="email" required value={form.email} onChange={handleChange} disabled={isSending} className="field__input" />
+                            <input name="email" type="email" placeholder="your.email@example.com" autoComplete="email" required value={form.email} onChange={handleChange} disabled={isSending} className="field__input" />
                         </label>
                         <label className="field">
                             <span className="field__label">Message</span>
