@@ -22,12 +22,15 @@ function mainNav() {
 describe("buildTabs", () => {
     it("follows the admin order, drops numbering and skips legacy rows", () => {
         const tabs = buildTabs([
-            ...sections,
+            sections[0],
+            { id: 6, kind: "github", label: "04 — GitHub" },
+            ...sections.slice(1),
             { id: 4, kind: "experience", label: "Experience" },
             { id: 5, kind: "custom", label: "" },
         ]);
         expect(tabs).toEqual([
             { anchor: "projects", label: "Projects" },
+            { anchor: "github", label: "GitHub" },
             { anchor: "about", label: "About" },
             { anchor: "contact", label: "Contact" },
             { anchor: "section-5", label: "More" },

@@ -227,6 +227,10 @@ body[data-modal-open] .chat-widget { display: none; }
 .project-filter__count { min-width: 1.5em; font-size: 12px; font-variant-numeric: tabular-nums; opacity: 0.72; }
 .projects__empty { margin: 0; padding: 56px 24px; border: 1px dashed var(--color-border-strong); color: var(--color-muted); font-size: 15px; text-align: center; }
 
+.github-activity__card { padding: clamp(20px, 4vw, 36px); border: 1px solid var(--color-border); background: var(--color-surface); }
+.github-activity__unavailable { margin: 0; color: var(--color-muted); font-size: 14px; line-height: 1.6; }
+.github-activity__unavailable a { color: var(--color-accent); text-decoration: underline; text-underline-offset: 3px; }
+
 .featured-projects { display: flex; flex-direction: column; gap: clamp(64px, 8vw, 112px); margin-bottom: clamp(72px, 9vw, 128px); }
 .portfolio-site .featured-project { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); align-items: center; gap: clamp(32px, 5vw, 80px); color: inherit; }
 .featured-project--flip { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); }

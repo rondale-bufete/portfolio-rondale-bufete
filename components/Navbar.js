@@ -9,7 +9,7 @@ import Logo from "./Logo";
 import { stripOrdinal } from "@/lib/format";
 import { prefersReducedMotion } from "@/lib/motion";
 
-const FALLBACK_LABELS = { about: "About", projects: "Projects", contact: "Contact", custom: "More" };
+const FALLBACK_LABELS = { about: "About", projects: "Projects", github: "GitHub", contact: "Contact", custom: "More" };
 
 // Tabs follow the section order set in the admin, so reordering sections
 // there reorders the nav too. The intro has no tab: the name goes home.

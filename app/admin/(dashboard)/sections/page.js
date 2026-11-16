@@ -21,7 +21,7 @@ import { EyeIcon, EyeOffIcon } from "@/components/icons";
 import { HOMEPAGE_SECTION_KINDS } from "@/lib/sectionKinds";
 import { stripOrdinal } from "@/lib/format";
 
-const KIND_LABELS = { about: "About", projects: "Projects", contact: "Contact", custom: "Custom" };
+const KIND_LABELS = { about: "About", projects: "Projects", github: "GitHub activity", contact: "Contact", custom: "Custom" };
 
 export default async function SectionsAdminPage() {
     const [{ data: sections, error }, { data: profile, error: profileError }] = await Promise.all([

@@ -30,6 +30,7 @@ A full-stack developer portfolio built with **Next.js** and **Supabase** — not
 ### Public site
 - Responsive homepage with an animated flip-card hero
 - Modular sections — About, Experience, Skills, Projects, Certifications, Contact — each reorderable, hideable, and retitlable from the admin panel, plus support for fully custom sections
+- Optional GitHub contribution graph, reorderable with the other homepage sections
 - Contact form via EmailJS
 - Floating AI chat widget grounded in live portfolio content, rate-limited per visitor
 - Vercel Speed Insights
@@ -101,6 +102,7 @@ supabase/
 ├── sections_migration.sql      # Adds the sections table (order/visibility/titles)
 ├── project_images_migration.sql # Adds the multi-image gallery column to projects
 ├── experience_migration.sql    # Adds Experience + bullets/highlights/credential fields
+├── github_section_migration.sql # Adds the optional public contribution graph section
 ├── chat_migration.sql          # Adds the chat rate-limit table
 ├── migration_modernist_v2.sql  # Adds project origin/year/role/timeline/outcome + profile status fields
 ├── social_links_migration.sql  # Adds Facebook and Instagram links to the profile
@@ -120,7 +122,7 @@ npm install
 
 1. Create a [Supabase](https://supabase.com) project.
 2. In the Supabase SQL Editor, run the migrations **in order**:
-   `schema.sql` → `sections_migration.sql` → `project_images_migration.sql` → `experience_migration.sql` → `chat_migration.sql` → `migration_modernist_v2.sql` → `social_links_migration.sql` → `chat_widget_toggle_migration.sql` → `profile_stats_migration.sql`.
+   `schema.sql` → `sections_migration.sql` → `project_images_migration.sql` → `experience_migration.sql` → `github_section_migration.sql` → `chat_migration.sql` → `migration_modernist_v2.sql` → `social_links_migration.sql` → `chat_widget_toggle_migration.sql` → `profile_stats_migration.sql`.
 3. Copy `.env.local.example` to `.env.local` and fill in the values (see below).
 4. Get a [Gemini API key](https://aistudio.google.com/app/apikey) if you want the chat assistant enabled.
 5. Run the dev server:
@@ -129,10 +131,12 @@ npm install
 npm run dev
 ```
 
-To show the contribution graph on the admin Overview, set `GITHUB_TOKEN` in
-`.env.local` to a GitHub personal access token with `read:user` access. Use a
-token for the account in your Profile's GitHub URL to include its private
-contributions. Keep the token server-only; never use a `NEXT_PUBLIC_` prefix.
+To show the contribution graph on the admin Overview and public site, set
+`GITHUB_TOKEN` in `.env.local` to a GitHub personal access token with
+`read:user` access. The public graph is cached for an hour. Apply
+`github_section_migration.sql` to add its visible homepage section, then
+reorder or hide it from **Admin → Sections**. Keep the token server-only;
+never use a `NEXT_PUBLIC_` prefix.
 
 ## Admin panel
 

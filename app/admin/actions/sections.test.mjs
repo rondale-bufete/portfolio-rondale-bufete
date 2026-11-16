@@ -181,4 +181,37 @@ describe("moveSectionAction", () => {
         );
         expect(updates).toHaveLength(2);
     });
+
+    it("allows moving the GitHub activity section with other homepage sections", async () => {
+        const updates = [];
+        supabaseFrom = vi.fn(() => {
+            const builder = createQueryBuilder({
+                data: [
+                    { id: "projects", kind: "projects", sort_order: 2 },
+                    { id: "github", kind: "github", sort_order: 3 },
+                    { id: "contact", kind: "contact", sort_order: 4 },
+                ],
+                error: null,
+            });
+            builder.update = vi.fn((values) => {
+                const update = createQueryBuilder();
+                update.eq = vi.fn((column, id) => {
+                    updates.push({ id, ...values });
+                    return update;
+                });
+                return update;
+            });
+            return builder;
+        });
+
+        await moveSectionAction("github", "up");
+
+        expect(updates).toEqual(
+            expect.arrayContaining([
+                { id: "github", sort_order: 2 },
+                { id: "projects", sort_order: 3 },
+            ])
+        );
+        expect(updates).toHaveLength(2);
+    });
 });

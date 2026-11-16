@@ -1,8 +1,10 @@
+import { Suspense } from "react";
 import Hero from "@/components/Hero";
 import CustomSection from "@/components/CustomSection";
 import About from "@/components/About";
 import Projects from "@/components/Projects";
 import Contact from "@/components/Contact";
+import GitHubActivity, { GitHubActivityFallback } from "@/components/GitHubActivity";
 import PublicSite from "@/components/PublicSite";
 import { getPortfolioData } from "@/lib/data";
 import { buildPersonJsonLd, pageMetadata, serializeJsonLd } from "@/lib/seo";
@@ -27,14 +29,15 @@ export default async function Home() {
     const data = await getPortfolioData();
     const { profile, sections, projects, education, skills, experience, certifications } = data;
     const personJsonLd = buildPersonJsonLd(data, getSiteUrl());
+    const publicSections = sections.filter((section) => section.kind !== "github" || profile?.github);
 
     return (
-        <PublicSite profile={profile} sections={sections}>
+        <PublicSite profile={profile} sections={publicSections}>
             {personJsonLd && (
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(personJsonLd) }} />
             )}
             <Hero profile={profile} projects={projects} skills={skills} />
-            {sections.map((section) => {
+            {publicSections.map((section) => {
                 if (section.kind === "about") {
                     return (
                         <About
@@ -62,6 +65,14 @@ export default async function Home() {
 
                 if (section.kind === "contact") {
                     return <Contact key={section.id} profile={profile} label={section.label} heading={section.heading} />;
+                }
+
+                if (section.kind === "github") {
+                    return (
+                        <Suspense key={section.id} fallback={<GitHubActivityFallback label={section.label} heading={section.heading} />}>
+                            <GitHubActivity profile={profile} label={section.label} heading={section.heading} />
+                        </Suspense>
+                    );
                 }
 
                 if (section.kind === "custom") {
