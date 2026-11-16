@@ -40,7 +40,7 @@ A full-stack developer portfolio built with **Next.js** and **Supabase** — not
 - Structured inputs where it matters — Month/Year date pickers, bullet-point fields — instead of freeform text
 - Section management: reorder with one click, show/hide, rename labels and headings, add custom text sections
 - Image and PDF uploads straight to Supabase Storage
-- Overview dashboard with traffic, chat activity, and a GitHub contribution graph
+- Overview dashboard with traffic, chat activity, and a year-selectable GitHub contribution graph
 - A shared internal design system (buttons, fields, cards, icons) so every admin page looks and behaves consistently
 
 ### AI assistant

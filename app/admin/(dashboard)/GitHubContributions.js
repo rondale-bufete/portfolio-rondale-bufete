@@ -1,4 +1,5 @@
 import { getContributionMonthLabels, getGitHubContributions } from "@/lib/githubContributions";
+import ContributionYearFilter from "./ContributionYearFilter";
 
 const WEEKDAY_LABELS = ["", "Mon", "", "Wed", "", "Fri", ""];
 const CONTRIBUTION_COUNT = new Intl.NumberFormat("en");
@@ -21,9 +22,9 @@ function GitHubCalendar({ data }) {
     return (
         <>
             <p className="github-calendar__summary">
-                <strong>{CONTRIBUTION_COUNT.format(data.totalContributions)}</strong> contributions in the last year
+                <strong>{CONTRIBUTION_COUNT.format(data.totalContributions)}</strong> contributions in {data.year}
             </p>
-            <div className="github-calendar" role="group" aria-label={`${data.totalContributions} GitHub contributions in the last year`}>
+            <div className="github-calendar" role="group" aria-label={`${data.totalContributions} GitHub contributions in ${data.year}`}>
                 <div className="github-calendar__weekday-labels" aria-hidden="true">
                     {WEEKDAY_LABELS.map((label, index) => (
                         <span key={index}>{label}</span>
@@ -91,16 +92,17 @@ export function GitHubContributionsFallback() {
     );
 }
 
-export default async function GitHubContributions({ githubUrl }) {
-    const data = await getGitHubContributions(githubUrl);
+export default async function GitHubContributions({ githubUrl, selectedYear, range }) {
+    const data = await getGitHubContributions(githubUrl, { year: selectedYear });
 
     return (
         <section className="chart-card github-contributions">
             <header className="chart-card__header">
                 <div>
                     <h2 className="chart-card__title">GitHub contributions</h2>
-                    {data.username && <p className="chart-card__subtitle">Activity over the last year</p>}
+                    {data.username && <p className="chart-card__subtitle">Activity in {data.year}</p>}
                 </div>
+                {data.available && <ContributionYearFilter years={data.availableYears} selectedYear={data.year} range={range} />}
             </header>
             {data.available ? (
                 <GitHubCalendar data={data} />

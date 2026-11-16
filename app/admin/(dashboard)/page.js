@@ -68,7 +68,7 @@ function ChartCard({ title, subtitle, className = "", children, empty }) {
 }
 
 export default async function AdminOverview({ searchParams }) {
-    const { range } = await searchParams;
+    const { range, githubYear } = await searchParams;
     const days = parseRange(range);
     const now = new Date();
     const windows = rangeWindows(days, now);
@@ -284,7 +284,7 @@ export default async function AdminOverview({ searchParams }) {
                 </ChartCard>
 
                 <Suspense fallback={<GitHubContributionsFallback />}>
-                    <GitHubContributions githubUrl={content.profile?.github} />
+                    <GitHubContributions githubUrl={content.profile?.github} selectedYear={githubYear} range={days} />
                 </Suspense>
 
                 <ChartCard
