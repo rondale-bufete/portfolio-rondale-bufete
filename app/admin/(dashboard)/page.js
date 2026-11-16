@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { getWebAnalytics } from "@/lib/vercel-analytics";
@@ -14,6 +15,7 @@ import BarList from "../ui/charts/BarList";
 import SegmentedBar from "../ui/charts/SegmentedBar";
 import TableView from "../ui/charts/TableView";
 import { CheckIcon } from "@/components/icons";
+import GitHubContributions, { GitHubContributionsFallback } from "./GitHubContributions";
 
 const PROJECT_PATH = /^\/projects\/([^/?#]+)\/?$/;
 const DEVICE_LABELS = { desktop: "Desktop", mobile: "Mobile", tablet: "Tablet" };
@@ -280,6 +282,10 @@ export default async function AdminOverview({ searchParams }) {
                         </>
                     )}
                 </ChartCard>
+
+                <Suspense fallback={<GitHubContributionsFallback />}>
+                    <GitHubContributions githubUrl={content.profile?.github} />
+                </Suspense>
 
                 <ChartCard
                     title="Site checklist"
