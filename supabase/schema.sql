@@ -12,6 +12,11 @@ create table if not exists profile (
   linkedin text not null default '',
   resume_url text not null default '',
   photo_url text not null default '',
+  chat_job_availability text not null default 'Open to work',
+  chat_preferred_roles text not null default 'Front-end, backend, or full-stack developer',
+  chat_work_arrangements text not null default 'Onsite, hybrid, and work-from-home',
+  chat_start_availability text not null default '1 week after notification',
+  chat_relocation text not null default 'Metro Manila (including Makati City, Quezon City, Taguig, Pasay, and other Metro Manila cities) and anywhere in the Bicol Region',
   updated_at timestamptz not null default now(),
   constraint profile_singleton check (id = 1)
 );

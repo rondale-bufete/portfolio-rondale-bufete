@@ -54,6 +54,14 @@ export async function updateProfileAction(formData) {
         updated_at: new Date().toISOString(),
     };
 
+    if (formData.has("chat_preferred_roles")) {
+        patch.chat_job_availability = formData.get("chat_job_availability")?.toString().trim() || "";
+        patch.chat_preferred_roles = formData.get("chat_preferred_roles")?.toString().trim() || "";
+        patch.chat_work_arrangements = formData.get("chat_work_arrangements")?.toString().trim() || "";
+        patch.chat_start_availability = formData.get("chat_start_availability")?.toString().trim() || "";
+        patch.chat_relocation = formData.get("chat_relocation")?.toString().trim() || "";
+    }
+
     const { error } = await supabaseAdmin.from("profile").upsert(patch);
     if (error) throw new Error(error.message);
 

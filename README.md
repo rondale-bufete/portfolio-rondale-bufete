@@ -47,6 +47,8 @@ A full-stack developer portfolio built with **Next.js** and **Supabase** — not
 ### AI assistant
 - Backed by Google Gemini, called only from the server — the API key never reaches the browser
 - Grounded in the same live Supabase data the homepage renders, so an admin edit is reflected in the assistant's answers immediately
+- Recommends relevant projects and explains role fit using portfolio evidence, with links restricted to destinations present in portfolio data
+- Uses editable job availability, role preferences, work arrangements, start timing, and relocation facts from the Profile admin page
 - Scoped system prompt: stays on portfolio-related topics and declines requests to act as a general-purpose assistant
 - Per-visitor daily message limit to keep API usage bounded
 
@@ -107,7 +109,8 @@ supabase/
 ├── migration_modernist_v2.sql  # Adds project origin/year/role/timeline/outcome + profile status fields
 ├── social_links_migration.sql  # Adds Facebook and Instagram links to the profile
 ├── chat_widget_toggle_migration.sql # Adds the admin show/hide switch for the chat widget
-└── profile_stats_migration.sql # Adds the editable headline numbers under the homepage intro
+├── profile_stats_migration.sql # Adds the editable headline numbers under the homepage intro
+└── chat_assistant_profile_migration.sql # Adds editable hiring facts for assistant answers
 ```
 
 ---
@@ -122,7 +125,7 @@ npm install
 
 1. Create a [Supabase](https://supabase.com) project.
 2. In the Supabase SQL Editor, run the migrations **in order**:
-   `schema.sql` → `sections_migration.sql` → `project_images_migration.sql` → `experience_migration.sql` → `github_section_migration.sql` → `chat_migration.sql` → `migration_modernist_v2.sql` → `social_links_migration.sql` → `chat_widget_toggle_migration.sql` → `profile_stats_migration.sql`.
+   `schema.sql` → `sections_migration.sql` → `project_images_migration.sql` → `experience_migration.sql` → `github_section_migration.sql` → `chat_migration.sql` → `migration_modernist_v2.sql` → `social_links_migration.sql` → `chat_widget_toggle_migration.sql` → `profile_stats_migration.sql` → `chat_assistant_profile_migration.sql`.
 3. Copy `.env.local.example` to `.env.local` and fill in the values (see below).
 4. Get a [Gemini API key](https://aistudio.google.com/app/apikey) if you want the chat assistant enabled.
 5. Run the dev server:
@@ -141,7 +144,7 @@ never use a `NEXT_PUBLIC_` prefix.
 ## Admin panel
 
 - **Sections** — reorder, show/hide, and retitle every section; add custom text sections; show or hide the chat widget
-- **Profile** — name, bio, tagline, links, photo, resume
+- **Profile** — name, bio, tagline, links, photo, resume, and assistant hiring facts
 - **Experience / Education** — structured Month/Year dates, bullet points for achievements/coursework
 - **Projects** — title, description, tags, optional highlight bullets, screenshot
 - **Certifications** — issuer, issued date, credential ID, badge image, verification link/PDF
@@ -159,6 +162,8 @@ The chat widget (bottom-right on the public site) sends conversation history to 
 2. Fetches the same portfolio data the homepage renders, via `getPortfolioData()`
 3. Formats it into a compact context block and sends it to Gemini with a scoped system prompt
 4. Returns the reply to the widget
+
+For hiring questions, the assistant uses facts maintained under **Admin → Profile**. For role-fit and project recommendations, it cites relevant portfolio evidence and links to project details or contact options when available. It avoids guessing missing facts or inventing links.
 
 No conversation history is persisted server-side — it resets on page refresh by design.
 

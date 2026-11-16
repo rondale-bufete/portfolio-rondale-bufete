@@ -203,3 +203,47 @@ describe("updateProfileAction headline numbers", () => {
         expect(upsert).not.toHaveBeenCalled();
     });
 });
+
+describe("updateProfileAction assistant hiring facts", () => {
+    let upsert;
+
+    beforeEach(() => {
+        mockIsAuthed.mockResolvedValue(true);
+        mockUploadAsset.mockReset();
+        mockUploadAsset.mockResolvedValue(null);
+        upsert = vi.fn(() => Promise.resolve({ data: null, error: null }));
+        supabaseFrom = vi.fn(() => {
+            const builder = createQueryBuilder({ data: null, error: null });
+            builder.upsert = upsert;
+            return builder;
+        });
+    });
+
+    it("saves editable hiring facts when the migration-backed fields are present", async () => {
+        await updateProfileAction(
+            formDataOf({
+                ...baseFields,
+                chat_job_availability: "Open to work ",
+                chat_preferred_roles: "Full-stack developer ",
+                chat_work_arrangements: "Remote ",
+                chat_start_availability: "One week ",
+                chat_relocation: "Metro Manila ",
+            })
+        );
+
+        expect(upsert.mock.calls[0][0]).toMatchObject({
+            chat_job_availability: "Open to work",
+            chat_preferred_roles: "Full-stack developer",
+            chat_work_arrangements: "Remote",
+            chat_start_availability: "One week",
+            chat_relocation: "Metro Manila",
+        });
+    });
+
+    it("does not write assistant facts for databases without the migration-backed form fields", async () => {
+        await updateProfileAction(formDataOf(baseFields));
+
+        expect(upsert.mock.calls[0][0]).not.toHaveProperty("chat_preferred_roles");
+        expect(upsert.mock.calls[0][0]).not.toHaveProperty("chat_relocation");
+    });
+});

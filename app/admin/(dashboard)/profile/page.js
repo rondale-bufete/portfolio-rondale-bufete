@@ -29,6 +29,34 @@ function HeadlineNumbersFields({ profile }) {
     ));
 }
 
+function AssistantHiringFactsFields({ profile }) {
+    const fields = [
+        "chat_job_availability",
+        "chat_preferred_roles",
+        "chat_work_arrangements",
+        "chat_start_availability",
+        "chat_relocation",
+    ];
+
+    if (!profile || !fields.every((field) => field in profile)) {
+        return (
+            <p className="admin-note">
+                Run supabase/chat_assistant_profile_migration.sql to add editable hiring facts for the portfolio assistant.
+            </p>
+        );
+    }
+
+    return (
+        <div className="admin-grid-2">
+            <Field label="Job availability (assistant)" name="chat_job_availability" defaultValue={profile.chat_job_availability} textarea rows={2} optional hint="For example, open to work or not currently seeking a role." />
+            <Field label="Preferred roles (assistant)" name="chat_preferred_roles" defaultValue={profile.chat_preferred_roles} textarea rows={2} optional hint="Leave blank if you do not want the assistant to answer this." />
+            <Field label="Work arrangements (assistant)" name="chat_work_arrangements" defaultValue={profile.chat_work_arrangements} textarea rows={2} optional hint="For example, onsite, hybrid, or remote." />
+            <Field label="Start availability (assistant)" name="chat_start_availability" defaultValue={profile.chat_start_availability} textarea rows={2} optional hint="Only include a timeframe you are comfortable sharing." />
+            <Field label="Relocation (assistant)" name="chat_relocation" defaultValue={profile.chat_relocation} textarea rows={2} optional hint="List locations or regions you are open to." />
+        </div>
+    );
+}
+
 export default async function ProfileAdminPage() {
     const { data: profile, error } = await supabaseAdmin.from("profile").select("*").eq("id", 1).maybeSingle();
 
@@ -66,6 +94,7 @@ export default async function ProfileAdminPage() {
                                 Show the status badge next to your role
                             </label>
                             <Field label="Status badge" name="status_label" defaultValue={profile?.status_label || "Open to work"} />
+                            <AssistantHiringFactsFields profile={profile} />
                             <p className="admin-fieldset__note">Headline numbers sit under your intro and count up on load. Leave a row empty to skip it.</p>
                             <HeadlineNumbersFields profile={profile} />
                         </fieldset>
