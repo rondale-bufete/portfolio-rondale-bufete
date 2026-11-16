@@ -18,7 +18,11 @@ const WELCOME_MESSAGES = [
     "Hey! I'm Rondale's assistant here — ask about his projects, skills, or how to connect with him directly.",
 ];
 
-const SUGGESTED_QUESTIONS = ["What is your strongest stack?", "Are you open to remote work?", "Show me client projects"];
+const SUGGESTED_QUESTIONS = [
+    "Which projects best show your frontend skills?",
+    "What experience fits a full-stack role?",
+    "How can I contact you about an opportunity?",
+];
 
 function SendIcon({ className }) {
     return (
@@ -39,10 +43,33 @@ function TypingDots() {
     );
 }
 
-function renderInlineMarkdown(text) {
-    const tokens = text.split(/(\*\*.*?\*\*|\*.*?\*)/g).filter(Boolean);
+function renderInlineMarkdown(text, allowedLinks = []) {
+    const tokens = text.split(/(\[[^\]]+\]\([^)]+\)|\*\*.*?\*\*|\*.*?\*)/g).filter(Boolean);
 
     return tokens.map((token, index) => {
+        const linkMatch = token.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+        if (linkMatch) {
+            const href = linkMatch[2].trim();
+            const isLocalPath = href.startsWith("/") && !href.startsWith("//") && !href.includes("\\");
+            const isSafeAbsoluteUrl = /^(https?:\/\/|mailto:)\S+$/i.test(href);
+            if ((!isLocalPath && !isSafeAbsoluteUrl) || !allowedLinks.includes(href)) {
+                return <span key={index}>{linkMatch[1]}</span>;
+            }
+
+            const isExternal = /^https?:\/\//i.test(href);
+            return (
+                <a
+                    key={index}
+                    href={href}
+                    target={isExternal ? "_blank" : undefined}
+                    rel={isExternal ? "noopener noreferrer" : undefined}
+                    className="text-[var(--color-accent)] underline underline-offset-2"
+                >
+                    {linkMatch[1]}
+                </a>
+            );
+        }
+
         if (token.startsWith("**") && token.endsWith("**")) {
             return <strong key={index}>{token.slice(2, -2)}</strong>;
         }
@@ -55,7 +82,7 @@ function renderInlineMarkdown(text) {
     });
 }
 
-function renderMarkdownContent(content) {
+function renderMarkdownContent(content, allowedLinks = []) {
     const blocks = content
         .split(/\n{2,}/)
         .map((block) => block.trim())
@@ -76,7 +103,7 @@ function renderMarkdownContent(content) {
                             <tr>
                                 {header.map((cell, cellIndex) => (
                                     <th key={`${blockIndex}-head-${cellIndex}`} className="border border-[var(--color-border)] bg-[var(--color-raised)] px-2 py-1.5 font-medium text-[var(--color-muted)]">
-                                        {renderInlineMarkdown(cell)}
+                                        {renderInlineMarkdown(cell, allowedLinks)}
                                     </th>
                                 ))}
                             </tr>
@@ -86,7 +113,7 @@ function renderMarkdownContent(content) {
                                 <tr key={`${blockIndex}-row-${rowIndex}`}>
                                     {row.map((cell, cellIndex) => (
                                         <td key={`${blockIndex}-cell-${rowIndex}-${cellIndex}`} className="border border-[var(--color-border)] px-2 py-1.5 align-top text-[var(--color-body)]">
-                                            {renderInlineMarkdown(cell)}
+                                            {renderInlineMarkdown(cell, allowedLinks)}
                                         </td>
                                     ))}
                                 </tr>
@@ -113,13 +140,13 @@ function renderMarkdownContent(content) {
                             if (labelMatch) {
                                 return (
                                     <li key={`${blockIndex}-${lineIndex}`}>
-                                        <span className="font-semibold text-[var(--color-text)]">{labelMatch[1]}:</span> {renderInlineMarkdown(labelMatch[2].trim())}
+                                        <span className="font-semibold text-[var(--color-text)]">{labelMatch[1]}:</span> {renderInlineMarkdown(labelMatch[2].trim(), allowedLinks)}
                                     </li>
                                 );
                             }
                         }
 
-                        return <li key={`${blockIndex}-${lineIndex}`}>{renderInlineMarkdown(cleanLine)}</li>;
+                        return <li key={`${blockIndex}-${lineIndex}`}>{renderInlineMarkdown(cleanLine, allowedLinks)}</li>;
                     })}
                 </ListTag>
             );
@@ -129,14 +156,14 @@ function renderMarkdownContent(content) {
             const level = Math.min(3, block.match(/^#+/)?.[0].length || 1);
             const headingText = block.replace(/^#{1,3}\s+/, "");
             const Tag = `h${level}`;
-            return <Tag key={blockIndex} className="font-semibold text-[var(--color-text)] mt-1 mb-1">{renderInlineMarkdown(headingText)}</Tag>;
+            return <Tag key={blockIndex} className="font-semibold text-[var(--color-text)] mt-1 mb-1">{renderInlineMarkdown(headingText, allowedLinks)}</Tag>;
         }
 
         if (/^(Quick answer|Short answer|Brief answer|Summary):\s*/i.test(block)) {
             const cleaned = block.replace(/^(Quick answer|Short answer|Brief answer|Summary):\s*/i, "");
             return (
                 <p key={blockIndex} className="leading-relaxed">
-                    <span className="font-semibold text-[var(--color-text)]">Quick answer:</span> {renderInlineMarkdown(cleaned)}
+                    <span className="font-semibold text-[var(--color-text)]">Quick answer:</span> {renderInlineMarkdown(cleaned, allowedLinks)}
                 </p>
             );
         }
@@ -146,14 +173,14 @@ function renderMarkdownContent(content) {
             return (
                 <div key={blockIndex} className="pt-1">
                     <p className="font-semibold text-[var(--color-text)]">Details</p>
-                    <p className="leading-relaxed">{renderInlineMarkdown(cleaned)}</p>
+                    <p className="leading-relaxed">{renderInlineMarkdown(cleaned, allowedLinks)}</p>
                 </div>
             );
         }
 
         return (
             <p key={blockIndex} className="leading-relaxed">
-                {renderInlineMarkdown(block)}
+                {renderInlineMarkdown(block, allowedLinks)}
             </p>
         );
     });
@@ -226,7 +253,14 @@ export default function ChatWidget() {
             if (!res.ok) {
                 setMessages((prev) => [...prev, { role: "error", content: data.error || "Something went wrong." }]);
             } else {
-                setMessages((prev) => [...prev, { role: "assistant", content: data.reply }]);
+                setMessages((prev) => [
+                    ...prev,
+                    {
+                        role: "assistant",
+                        content: data.reply,
+                        allowedLinks: Array.isArray(data.allowedLinks) ? data.allowedLinks : [],
+                    },
+                ]);
             }
         } catch {
             setMessages((prev) => [...prev, { role: "error", content: "Network error — please try again." }]);
@@ -306,7 +340,7 @@ export default function ChatWidget() {
                         </div>
                     ) : (
                         <div key={i} className="chat-message chat-message--assistant">
-                            <div className="space-y-2">{renderMarkdownContent(m.content)}</div>
+                            <div className="space-y-2">{renderMarkdownContent(m.content, m.allowedLinks)}</div>
                         </div>
                     )
                 )}
