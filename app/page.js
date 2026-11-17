@@ -10,7 +10,7 @@ import { getPortfolioData } from "@/lib/data";
 import { buildPersonJsonLd, pageMetadata, serializeJsonLd } from "@/lib/seo";
 import { getSiteUrl } from "@/lib/site";
 
-// Revalidate every minute so admin edits appear without a redeploy.
+// Revalidate every minute so admin edits appear without a redeploy
 export const revalidate = 60;
 
 export async function generateMetadata() {
