@@ -50,9 +50,9 @@ describe("Projects", () => {
         expect(screen.getByRole("button", { name: /personal 0/i })).toBeDisabled();
     });
 
-    it("does not render the GitHub callout when the profile has no github url", () => {
+    it("does not render the GitHub contribution card when the profile has no github url", () => {
         render(<Projects projects={projects} profile={{}} />);
-        expect(screen.queryByText(/more on github/i)).not.toBeInTheDocument();
+        expect(screen.queryByText(/contribution/i)).not.toBeInTheDocument();
     });
 
     it("gives the first two projects the large case-study layout, with the outcome", () => {
@@ -74,12 +74,44 @@ describe("Projects", () => {
         expect(within(card).queryByText("D")).not.toBeInTheDocument();
     });
 
-    it("renders the GitHub callout when the profile has a github url", () => {
-        render(<Projects projects={projects} profile={{ github: "https://github.com/example" }} />);
-        expect(screen.getByText(/more on github/i)).toBeInTheDocument();
-        expect(screen.getByRole("link", { name: /github.com\/example/i })).toHaveAttribute(
+    it("renders the GitHub contribution card when profile and contribution data are available", () => {
+        const githubContributions = {
+            available: true,
+            username: "example",
+            year: 2026,
+            totalContributions: 42,
+            weeks: [],
+        };
+        render(
+            <Projects
+                projects={projects}
+                profile={{ github: "https://github.com/example" }}
+                githubContributions={githubContributions}
+            />
+        );
+        expect(screen.getByText("42")).toBeInTheDocument();
+        expect(screen.getByRole("group", { name: /42 github contributions/i }).closest("li")).toHaveClass("project-grid__item--github");
+        expect(screen.getByRole("link", { name: /@example on github/i })).toHaveAttribute(
             "href",
             "https://github.com/example"
         );
+    });
+
+    it("shows the More on GitHub card when the GitHub section is hidden", () => {
+        render(
+            <Projects
+                projects={projects}
+                profile={{ github: "https://github.com/example" }}
+                githubContributions={{ available: true, username: "example", year: 2026, totalContributions: 42, weeks: [] }}
+                githubVisible={false}
+            />
+        );
+
+        const moreOnGithub = screen.getByRole("heading", { name: /more on github/i });
+        expect(moreOnGithub).toBeInTheDocument();
+        expect(moreOnGithub.closest("li")).not.toHaveClass("project-grid__item--github");
+        expect(screen.getByText(/explore more projects, source code, and experiments/i)).toBeInTheDocument();
+        expect(screen.queryByText("contributions in 2026")).not.toBeInTheDocument();
+        expect(screen.getByRole("link", { name: /github.com\/example/i })).toHaveAttribute("href", "https://github.com/example");
     });
 });

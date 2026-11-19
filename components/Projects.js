@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import SectionHeader from "./SectionHeader";
+import GitHubCalendar from "./GitHubCalendar";
 import Morph from "./motion/Morph";
 import { ArrowRightIcon, GitHubIcon } from "./icons";
 import { splitParagraphs, stripProtocol, truncate } from "@/lib/format";
@@ -160,7 +161,14 @@ function ProjectFilter({ options, counts, value, onChange }) {
     );
 }
 
-export default function Projects({ projects = [], profile, label = "Projects", heading = "Things I’ve built" }) {
+export default function Projects({
+    projects = [],
+    profile,
+    githubContributions,
+    githubVisible = true,
+    label = "Projects",
+    heading = "Things I’ve built",
+}) {
     const [filter, setFilter] = useState("All");
 
     const counts = useMemo(() => {
@@ -199,12 +207,37 @@ export default function Projects({ projects = [], profile, label = "Projects", h
                             <ProjectCard key={project.id} project={project} index={index} />
                         ))}
                         {profile?.github && (
-                            <li className="project-grid__item" style={{ "--i": rest.length }}>
-                                <a href={profile.github} target="_blank" rel="noopener noreferrer" className="project-card project-card--github">
-                                    <GitHubIcon size={28} />
-                                    <span className="project-card--github__title">More on GitHub</span>
-                                    <span className="project-card--github__handle">{stripProtocol(profile.github)}</span>
-                                </a>
+                            <li
+                                className={`project-grid__item ${githubVisible && githubContributions?.available ? "project-grid__item--github" : ""}`}
+                                style={{ "--i": rest.length }}
+                            >
+                                {githubVisible && githubContributions?.available ? (
+                                    <div className="project-card project-card--github">
+                                        <GitHubCalendar data={githubContributions} />
+                                    </div>
+                                ) : (
+                                    <a
+                                        href={profile.github}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="project-card project-card--github-link"
+                                    >
+                                        <div className="project-card__media project-card--github-link__media" aria-hidden="true">
+                                            <span className="project-card--github-link__eyebrow">GITHUB / OPEN SOURCE</span>
+                                            <GitHubIcon size={52} className="project-card--github-link__mark" />
+                                            <ArrowRightIcon size={20} className="project-card--github-link__arrow" />
+                                        </div>
+                                        <div className="project-card__body">
+                                            <p className="project-meta">{stripProtocol(profile.github)}</p>
+                                            <h3 className="project-card__title">More on GitHub</h3>
+                                            <p className="project-card__summary">Explore more projects, source code, and experiments.</p>
+                                            <span className="project-card--github-link__cta">
+                                                Browse profile
+                                                <ArrowRightIcon size={16} />
+                                            </span>
+                                        </div>
+                                    </a>
+                                )}
                             </li>
                         )}
                     </ul>
