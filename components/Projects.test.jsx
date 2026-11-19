@@ -87,8 +87,10 @@ describe("Projects", () => {
                 projects={projects}
                 profile={{ github: "https://github.com/example" }}
                 githubContributions={githubContributions}
+                githubTitle="Contribution activity"
             />
         );
+        expect(screen.getByRole("heading", { name: "Contribution activity" })).toHaveClass("project-card__title");
         expect(screen.getByText("42")).toBeInTheDocument();
         expect(screen.getByRole("group", { name: /42 github contributions/i }).closest("li")).toHaveClass("project-grid__item--github");
         expect(screen.getByRole("link", { name: /@example on github/i })).toHaveAttribute(

@@ -26,7 +26,7 @@ export async function generateMetadata() {
 
 export default async function Home() {
     const data = await getPortfolioData();
-    const { profile, sections, projects, education, skills, experience, certifications, githubVisible } = data;
+    const { profile, sections, projects, education, skills, experience, certifications, githubVisible, githubTitle } = data;
     const personJsonLd = buildPersonJsonLd(data, getSiteUrl());
     const githubContributions = profile?.github ? await getPublicGitHubContributions(profile.github) : null;
     const publicSections = sections.filter((section) => section.kind !== "github");
@@ -59,6 +59,7 @@ export default async function Home() {
                             profile={profile}
                             githubContributions={githubContributions}
                             githubVisible={githubVisible}
+                            githubTitle={githubTitle}
                             label={section.label}
                             heading={section.heading}
                         />

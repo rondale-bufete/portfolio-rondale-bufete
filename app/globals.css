@@ -296,6 +296,7 @@ body[data-modal-open] .chat-widget { display: none; }
 .project-card--github-link__cta { display: inline-flex; align-items: center; gap: 8px; margin-top: 2px; color: var(--color-accent); font-size: 14px; font-weight: 600; }
 .project-card--github-link__cta svg { transition: transform 320ms var(--ease-out); }
 .project-card--github-link:hover .project-card--github-link__cta svg { transform: translateX(4px); }
+.project-card--github__title { margin-bottom: 16px; }
 .project-card--github .github-calendar__summary { margin-bottom: 10px; }
 .project-card--github .github-calendar__body { width: 100%; }
 .project-card--github .github-calendar__months,

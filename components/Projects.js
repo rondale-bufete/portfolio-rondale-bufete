@@ -166,6 +166,7 @@ export default function Projects({
     profile,
     githubContributions,
     githubVisible = true,
+    githubTitle = "Open-source activity",
     label = "Projects",
     heading = "Things I’ve built",
 }) {
@@ -213,6 +214,7 @@ export default function Projects({
                             >
                                 {githubVisible && githubContributions?.available ? (
                                     <div className="project-card project-card--github">
+                                        <h3 className="project-card__title project-card--github__title">{githubTitle}</h3>
                                         <GitHubCalendar data={githubContributions} />
                                     </div>
                                 ) : (
