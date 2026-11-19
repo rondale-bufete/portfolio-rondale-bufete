@@ -296,7 +296,14 @@ body[data-modal-open] .chat-widget { display: none; }
 .project-card--github-link__cta { display: inline-flex; align-items: center; gap: 8px; margin-top: 2px; color: var(--color-accent); font-size: 14px; font-weight: 600; }
 .project-card--github-link__cta svg { transition: transform 320ms var(--ease-out); }
 .project-card--github-link:hover .project-card--github-link__cta svg { transform: translateX(4px); }
-.project-card--github__title { margin-bottom: 16px; }
+.project-card--github__content { min-width: 0; }
+.project-card--github__header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; margin-bottom: 16px; }
+.project-card--github__title { margin: 0; }
+.project-card--github__year { display: inline-flex; align-items: center; gap: 8px; color: var(--color-muted); font-size: 13px; }
+.project-card--github__year-select { min-height: 36px; padding: 4px 30px 4px 10px; border: 1px solid var(--color-border-strong); border-radius: 0; background: var(--color-bg); color: var(--color-text); font: inherit; font-variant-numeric: tabular-nums; cursor: pointer; }
+.project-card--github__year-select:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.project-card--github__year-select:disabled { cursor: progress; opacity: 0.65; }
+.project-card--github__error { margin: 0 0 12px; color: var(--color-danger-text); font-size: 13px; }
 .project-card--github .github-calendar__summary { margin-bottom: 10px; }
 .project-card--github .github-calendar__body { width: 100%; }
 .project-card--github .github-calendar__months,

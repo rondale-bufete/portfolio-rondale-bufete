@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import SectionHeader from "./SectionHeader";
-import GitHubCalendar from "./GitHubCalendar";
+import PublicGitHubContributions from "./PublicGitHubContributions";
 import Morph from "./motion/Morph";
 import { ArrowRightIcon, GitHubIcon } from "./icons";
 import { splitParagraphs, stripProtocol, truncate } from "@/lib/format";
@@ -214,8 +214,7 @@ export default function Projects({
                             >
                                 {githubVisible && githubContributions?.available ? (
                                     <div className="project-card project-card--github">
-                                        <h3 className="project-card__title project-card--github__title">{githubTitle}</h3>
-                                        <GitHubCalendar data={githubContributions} />
+                                        <PublicGitHubContributions initialData={githubContributions} title={githubTitle} />
                                     </div>
                                 ) : (
                                     <a
