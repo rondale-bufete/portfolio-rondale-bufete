@@ -65,6 +65,7 @@ describe("Contact", () => {
 
         await user.type(screen.getByLabelText("Name"), "Jane Doe");
         await user.type(screen.getByLabelText("Email"), "jane@example.com");
+        await user.selectOptions(screen.getByLabelText("Opportunity type"), "Full-stack development");
         await user.type(screen.getByLabelText("Message"), "Hello there");
         await user.click(screen.getByRole("button", { name: /send/i }));
 
@@ -72,6 +73,7 @@ describe("Contact", () => {
         expect(mockSend.mock.calls[0][2]).toEqual({
             name: "Jane Doe",
             email: "jane@example.com",
+            projectType: "Full-stack development",
             message: "Hello there",
         });
 
@@ -85,6 +87,7 @@ describe("Contact", () => {
 
         await user.type(screen.getByLabelText("Name"), "Jane Doe");
         await user.type(screen.getByLabelText("Email"), "jane@example.com");
+        await user.selectOptions(screen.getByLabelText("Opportunity type"), "Employment opportunity");
         await user.type(screen.getByLabelText("Message"), "Hello there");
         await user.click(screen.getByRole("button", { name: /send/i }));
 
@@ -99,6 +102,7 @@ describe("Contact", () => {
 
         await user.type(screen.getByLabelText("Name"), "Jane Doe");
         await user.type(screen.getByLabelText("Email"), "jane@example.com");
+        await user.selectOptions(screen.getByLabelText("Opportunity type"), "Collaboration");
         await user.type(screen.getByLabelText("Message"), "Hello there");
         await user.click(screen.getByRole("button", { name: /send/i }));
 

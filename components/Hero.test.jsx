@@ -9,6 +9,25 @@ describe("Hero", () => {
         render(<Hero profile={profile} />);
         expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Rondale Rae Bufete");
     });
+
+    it("shows a hiring CTA and project secondary action when available", () => {
+        render(<Hero profile={profile} />);
+        expect(screen.getByRole("link", { name: /let’s work together/i })).toHaveAttribute("href", "#contact");
+        expect(screen.getByRole("link", { name: /view my projects/i })).toHaveAttribute("href", "#projects");
+    });
+
+    it("replaces the hiring CTA when unavailable", () => {
+        render(<Hero profile={{ ...profile, available: false }} />);
+        expect(screen.queryByRole("link", { name: /let’s work together/i })).not.toBeInTheDocument();
+        expect(screen.getByRole("link", { name: /view my projects/i })).toHaveAttribute("href", "#projects");
+        expect(screen.getByRole("link", { name: /about me/i })).toHaveAttribute("href", "#about");
+        expect(screen.queryByText("Open to work")).not.toBeInTheDocument();
+    });
+
+    it("shows a resume modal action when a resume is available", async () => {
+        render(<Hero profile={{ ...profile, resumeUrl: "/resume.pdf" }} />);
+        expect(screen.getByRole("button", { name: /view resume/i })).toBeInTheDocument();
+    });
 });
 
 describe("Hero headline numbers", () => {

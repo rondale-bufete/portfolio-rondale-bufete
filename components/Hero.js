@@ -1,9 +1,13 @@
-import { Fragment } from "react";
+"use client";
+
+import { Fragment, useState } from "react";
 import Image from "next/image";
 import PointerSpotlight from "./motion/PointerSpotlight";
 import TechIcon from "./TechIcon";
 import { ArrowDownIcon } from "./icons";
 import { initials } from "@/lib/format";
+import ResumeModal from "./ResumeModal";
+import { track } from "@vercel/analytics/react";
 
 // Numbers like "300+", "+60%" or "200+" count up on load; anything else
 // (a comma, a decimal, plain text) is shown as written.
@@ -50,13 +54,16 @@ function StatValue({ value, index }) {
 }
 
 export default function Hero({ profile, projects = [], skills = [] }) {
+    const [showResume, setShowResume] = useState(false);
     if (!profile) return null;
 
     const coreStack = skills.flatMap((group) => group.items).slice(0, 6);
     const stats = profile.stats ?? [];
     const heroImage = profile.photo || projects[0]?.imageUrl;
+    const available = profile.available !== false;
 
     return (
+        <>
         <section id="work" className="hero" aria-labelledby="hero-title">
             <PointerSpotlight />
             <div className="container hero__inner">
@@ -78,13 +85,38 @@ export default function Hero({ profile, projects = [], skills = [] }) {
                     {profile.bio && <p className="hero__bio">{profile.bio}</p>}
 
                     <div className="hero__actions">
-                        <a href="#projects" className="button button--primary">
-                            View my projects
-                            <ArrowDownIcon size={16} />
-                        </a>
-                        <a href="#about" className="button button--ghost">
-                            About me
-                        </a>
+                        {available ? (
+                            <a href="#contact" className="button button--primary">
+                                Let’s work together
+                                <ArrowDownIcon size={16} />
+                            </a>
+                        ) : (
+                            <a href="#projects" className="button button--primary">
+                                View my projects
+                                <ArrowDownIcon size={16} />
+                            </a>
+                        )}
+                        {available ? (
+                            <a href="#projects" className="button button--ghost">
+                                View my projects
+                            </a>
+                        ) : (
+                            <a href="#about" className="button button--ghost">
+                                About me
+                            </a>
+                        )}
+                        {profile.resumeUrl && (
+                            <button type="button" onClick={() => {
+                                try {
+                                    track("Resume preview opened", { location: "hero" });
+                                } catch {
+                                    // Analytics must never block resume access.
+                                }
+                                setShowResume(true);
+                            }} className="button button--outline">
+                                View resume
+                            </button>
+                        )}
                     </div>
 
                     {coreStack.length > 0 && (
@@ -136,5 +168,7 @@ export default function Hero({ profile, projects = [], skills = [] }) {
                 </div>
             )}
         </section>
+        {showResume && <ResumeModal profile={profile} onClose={() => setShowResume(false)} />}
+        </>
     );
 }

@@ -388,6 +388,7 @@ a.cert-card:hover .cert-card__image { transform: scale(1.08); }
 .contact__intro { position: sticky; top: calc(var(--nav-height) + 32px); }
 .contact__intro .section-header { margin-bottom: 20px; }
 .contact__lead { max-width: 40ch; margin: 0 0 32px; color: var(--color-body); font-size: 17px; line-height: 1.65; }
+.contact__availability { max-width: 48ch; margin: -18px 0 32px; padding-left: 12px; border-left: 2px solid var(--color-accent); color: var(--color-muted); font-size: 13px; line-height: 1.6; }
 .contact__methods { margin: 0; padding: 0; border-top: 1px solid var(--color-border); list-style: none; }
 .portfolio-site .contact-method { position: relative; display: flex; align-items: center; gap: 16px; min-height: 76px; padding: 14px 4px 14px 0; border-bottom: 1px solid var(--color-border); color: var(--color-text); }
 .contact-method::after { position: absolute; right: 0; bottom: -1px; left: 0; height: 1px; content: ""; background: var(--color-accent); transform: scaleX(0); transform-origin: left; transition: transform 520ms var(--ease-out); }

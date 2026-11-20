@@ -6,6 +6,7 @@ import FormStatusModal from "./FormStatusModal";
 import SectionHeader from "./SectionHeader";
 import { ArrowRightIcon, ExternalLinkIcon, FacebookIcon, InstagramIcon, LinkedInIcon, MailIcon } from "./icons";
 import { stripProtocol } from "@/lib/format";
+import { track } from "@vercel/analytics/react";
 
 function contactMethodsFor(profile) {
     return [
@@ -47,7 +48,7 @@ function ContactMethod({ label, value, href, Icon, index }) {
 }
 
 export default function Contact({ profile, label = "Contact", heading = "Let’s talk" }) {
-    const [form, setForm] = useState({ name: "", email: "", message: "" });
+    const [form, setForm] = useState({ name: "", email: "", projectType: "", message: "" });
     const [status, setStatus] = useState("idle"); // idle | sending | success | error
 
     function handleChange(event) {
@@ -62,11 +63,16 @@ export default function Contact({ profile, label = "Contact", heading = "Let’s
             await emailjs.send(
                 process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID,
                 process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID,
-                { name: form.name, email: form.email, message: form.message },
+                { name: form.name, email: form.email, projectType: form.projectType, message: form.message },
                 process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY
             );
+            try {
+                track("Contact form submitted", { projectType: form.projectType });
+            } catch {
+                // Analytics must never turn a successful submission into a form error.
+            }
             setStatus("success");
-            setForm({ name: "", email: "", message: "" });
+            setForm({ name: "", email: "", projectType: "", message: "" });
         } catch {
             setStatus("error");
         }
@@ -74,13 +80,21 @@ export default function Contact({ profile, label = "Contact", heading = "Let’s
 
     const methods = contactMethodsFor(profile);
     const isSending = status === "sending";
+    const availabilityDetails = [
+        profile?.chatWorkArrangements,
+        profile?.chatStartAvailability,
+        profile?.chatRelocation,
+    ].filter(Boolean);
 
     return (
         <section id="contact" className="section contact">
             <div className="container contact__layout">
                 <div className="contact__intro">
                     <SectionHeader label={label} heading={heading} />
-                    <p className="contact__lead">Send a message here, or reach me directly.</p>
+                    <p className="contact__lead">Discuss an opportunity, project, or collaboration here, or reach me directly.</p>
+                    {availabilityDetails.length > 0 && (
+                        <p className="contact__availability">{availabilityDetails.join(" · ")}</p>
+                    )}
                     {methods.length > 0 && (
                         <ul className="contact__methods" data-reveal>
                             {methods.map((method, index) => (
@@ -104,6 +118,26 @@ export default function Contact({ profile, label = "Contact", heading = "Let’s
                         <label className="field">
                             <span className="field__label">Email</span>
                             <input name="email" type="email" placeholder="your.email@example.com" autoComplete="email" required value={form.email} onChange={handleChange} disabled={isSending} className="field__input" />
+                        </label>
+                        <label className="field">
+                            <span className="field__label">Opportunity type</span>
+                            <select
+                                name="projectType"
+                                required
+                                value={form.projectType}
+                                onChange={handleChange}
+                                disabled={isSending}
+                                className="field__input"
+                            >
+                                <option value="">Select a type</option>
+                                <option value="Frontend development">Frontend development</option>
+                                <option value="Backend development">Backend development</option>
+                                <option value="Full-stack development">Full-stack development</option>
+                                <option value="Employment opportunity">Employment opportunity</option>
+                                <option value="Freelance project">Freelance project</option>
+                                <option value="Collaboration">Collaboration</option>
+                                <option value="Other">Other</option>
+                            </select>
                         </label>
                         <label className="field">
                             <span className="field__label">Message</span>
